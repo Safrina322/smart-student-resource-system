@@ -1,0 +1,8 @@
+{
+  "dependencies": {
+    "cors": "^2.8.5",
+    "dotenv": "^17.2.3",
+    "mysql2": "^3.16.0",
+    "react-router-dom": "^7.11.0"
+  }
+}

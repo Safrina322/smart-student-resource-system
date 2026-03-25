@@ -1,0 +1,66 @@
+.why-choose {
+  min-height: 100vh;
+  background: black;
+  color: white;
+  display: grid;
+  grid-template-columns: 1fr 2fr;
+  gap: 0px;
+  padding: 60px;
+}
+
+/* LEFT */
+.why-left h1 {
+  font-size: 3rem;
+  margin-bottom: 20px;
+}
+
+.why-left p {
+  font-size: 1.2rem;
+  line-height: 1.6;
+  color: #ccc;
+  margin-bottom: 30px;
+}
+
+.contact-btn {
+  background: transparent;
+  color: #2d7cff;
+  border: 1px solid #2d7cff;
+  padding: 10px 20px;
+  cursor: pointer;
+  border-radius: 6px;
+  font-size: 1rem;
+}
+
+.contact-btn:hover {
+  background: #2d7cff;
+  color: white;
+}
+
+/* RIGHT */
+.why-right {
+  display: inline-grid;
+  gap: 25px;
+}
+
+.feature-card {
+  background: #111;
+  padding: 25px;
+  border-radius: 15px;
+  box-shadow: 0 0 15px rgba(255,255,255,0.05);
+  transition: transform 0.3s;
+}
+
+.feature-card:hover {
+  transform: translateY(-5px);
+}
+
+.feature-card h3 {
+  font-size: 1.8rem;
+  margin-bottom: 10px;
+}
+
+.feature-card p {
+  font-size: 1.4rem;
+  color: #ccc;
+  line-height: 1.5;
+}

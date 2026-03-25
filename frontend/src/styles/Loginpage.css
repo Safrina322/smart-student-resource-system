@@ -1,0 +1,100 @@
+/* Page background */
+.login-page {
+  min-height: 10vh;
+  display: flex;
+  
+  justify-content: center;
+  background: linear-gradient(135deg, #000000, #121212);
+}
+
+/* Form card */
+.login-form {
+  background-color: #111;
+  padding: 40px;
+  width: 100%;
+  max-width: 420px;
+  border-radius: 12px;
+  box-shadow: 0 0 25px rgba(255, 255, 255, 0.1);
+  color: white;
+}
+
+/* Title */
+.login-form h2 {
+  text-align: center;
+  margin-bottom: 30px;
+  font-size: 1.8rem;
+}
+
+/* Labels */
+.login-form .form-label {
+  color: #ccc;
+  margin-bottom: 5px;
+}
+
+/* Inputs */
+.login-form .form-control {
+  background-color: #1c1c1c;
+  border: 1px solid #333;
+  color: white;
+  padding: 10px;
+  border-radius: 6px;
+}
+
+.login-form .form-control:focus {
+  background-color: #1c1c1c;
+  border-color: #4f9cff;
+  box-shadow: none;
+  color: white;
+}
+
+/* Checkbox */
+.login-form .form-check-label {
+  color: #bbb;
+}
+
+/* Error message */
+.password-error {
+  color: #ff4d4d;
+  margin-top: 10px;
+  font-size: 0.9rem;
+}
+
+/* Button */
+.login-form .btn {
+  width: 100%;
+  margin-top: 20px;
+  padding: 10px;
+  font-size: 1rem;
+  border-radius: 6px;
+  background: linear-gradient(135deg, #4f9cff, #2b6cb0);
+  border: none;
+}
+
+.login-form .btn:hover {
+  background: linear-gradient(135deg, #2b6cb0, #4f9cff);
+}
+/* Slightly increase spacing between fields */
+.login-form .mb-3 {
+  margin-bottom: 18px;
+  background-color: #1c1c1c;
+  border: 1px solid #333;
+  color: white;
+  padding:10px;
+}
+
+.switch-auth {
+  text-align: center;
+  margin-top: 20px;
+  font-size: 0.95rem;
+  color: #ccc;
+}
+
+.switch-auth a {
+  color: #4f9cff;
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.switch-auth a:hover {
+  text-decoration: underline;
+}
