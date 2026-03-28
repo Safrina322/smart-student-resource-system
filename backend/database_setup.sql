@@ -168,9 +168,17 @@ CREATE TABLE resource_requests (
   id INT AUTO_INCREMENT PRIMARY KEY,
   user_id INT,
   title VARCHAR(255) NOT NULL,
+  description TEXT,
   subject VARCHAR(100),
   semester INT,
   type ENUM('Notes', 'Video', 'PDF', 'Book', 'Link') DEFAULT 'Notes',
+  level VARCHAR(50) DEFAULT 'Beginner',
+  duration VARCHAR(50),
+  image VARCHAR(255),
+  lesson_title VARCHAR(255),
+  lesson_description TEXT,
+  resource_url VARCHAR(500),
+  lesson_order INT DEFAULT 1,
   message TEXT,
   status ENUM('pending', 'approved', 'rejected') DEFAULT 'pending',
   course_id INT,
@@ -211,6 +219,25 @@ FROM (SELECT 1) AS dummy
 WHERE NOT EXISTS (SELECT 1 FROM resource_requests WHERE title = 'React Tutorial Videos');
 
 SELECT 'Resource Requests table created' as status, COUNT(*) as total_requests FROM resource_requests;
+
+-- ============================================
+-- STEP 6B: CREATE COURSE LESSONS TABLE
+-- ============================================
+CREATE TABLE course_lessons (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  course_id INT NOT NULL,
+  lesson_title VARCHAR(255) NOT NULL,
+  lesson_description TEXT,
+  resource_type ENUM('PDF', 'Video', 'Link') DEFAULT 'PDF',
+  resource_url VARCHAR(500) NOT NULL,
+  lesson_order INT DEFAULT 1,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY (course_id) REFERENCES courses(id) ON DELETE CASCADE,
+  INDEX idx_course_lessons_course_id (course_id),
+  INDEX idx_course_lessons_order (lesson_order)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+SELECT 'Course Lessons table created' as status, COUNT(*) as total_lessons FROM course_lessons;
 
 -- ============================================
 -- STEP 7: CREATE AUDIT TABLE FOR TRIGGERS

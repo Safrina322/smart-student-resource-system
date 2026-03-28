@@ -1,13 +1,21 @@
 import { useState } from "react";
-import { apiCall, getApiUrl } from "../utils/api.js";
+import { apiCall, getAuthHeader } from "../utils/api.js";
 import "../styles/UploadResource.css";
 
 function RequestResource() {
+  const [imageFile, setImageFile] = useState(null);
   const [formData, setFormData] = useState({
     title: "",
+    description: "",
     subject: "",
     semester: "",
+    level: "Beginner",
+    duration: "",
     type: "PDF",
+    lesson_title: "",
+    lesson_description: "",
+    resource_url: "",
+    lesson_order: 1,
     message: "",
   });
 
@@ -31,9 +39,18 @@ function RequestResource() {
     setStatus("");
 
     try {
+      const payload = new FormData();
+      Object.entries(formData).forEach(([key, value]) => {
+        payload.append(key, value);
+      });
+      if (imageFile) {
+        payload.append("image", imageFile);
+      }
+
       const data = await apiCall("/api/requests", {
         method: "POST",
-        body: JSON.stringify(formData),
+        headers: getAuthHeader("token"),
+        body: payload,
       });
 
       setStatus("✅ Request sent to admin successfully!");
@@ -41,11 +58,19 @@ function RequestResource() {
       // 🔄 clear form after success
       setFormData({
         title: "",
+        description: "",
         subject: "",
         semester: "",
+        level: "Beginner",
+        duration: "",
         type: "PDF",
+        lesson_title: "",
+        lesson_description: "",
+        resource_url: "",
+        lesson_order: 1,
         message: "",
       });
+      setImageFile(null);
     } catch (err) {
       setStatus(`❌ ${err.message || "Failed to send request"}`);
     }
@@ -81,11 +106,70 @@ function RequestResource() {
             required
           />
 
+          <label>Course Description</label>
+          <input
+            name="description"
+            value={formData.description}
+            onChange={handleChange}
+            placeholder="Short overview of this course"
+            required
+          />
+
           <label>Semester</label>
           <input
+            type="number"
+            min="1"
+            max="12"
             name="semester"
             value={formData.semester}
             onChange={handleChange}
+            placeholder="Eg: 2"
+            required
+          />
+
+          <label>Level</label>
+          <select
+            name="level"
+            value={formData.level}
+            onChange={handleChange}
+          >
+            <option>Beginner</option>
+            <option>Intermediate</option>
+            <option>Advanced</option>
+          </select>
+
+          <label>Duration</label>
+          <input
+            name="duration"
+            value={formData.duration}
+            onChange={handleChange}
+            placeholder="Eg: 6 weeks"
+            required
+          />
+
+          <label>Course Image</label>
+          <input
+            type="file"
+            accept="image/*"
+            onChange={(e) => setImageFile(e.target.files?.[0] || null)}
+            required
+          />
+
+          <label>Lesson Title</label>
+          <input
+            name="lesson_title"
+            value={formData.lesson_title}
+            onChange={handleChange}
+            placeholder="Eg: Introduction and Setup"
+            required
+          />
+
+          <label>Lesson Description</label>
+          <input
+            name="lesson_description"
+            value={formData.lesson_description}
+            onChange={handleChange}
+            placeholder="What learner will complete in this lesson"
             required
           />
 
@@ -99,6 +183,25 @@ function RequestResource() {
             <option>Video</option>
             <option>Link</option>
           </select>
+
+          <label>Resource URL (PDF / Video / Link)</label>
+          <input
+            name="resource_url"
+            value={formData.resource_url}
+            placeholder="https://..."
+            onChange={handleChange}
+            required
+          />
+
+          <label>Lesson Order</label>
+          <input
+            type="number"
+            min="1"
+            name="lesson_order"
+            value={formData.lesson_order}
+            onChange={handleChange}
+            required
+          />
 
           <label>Message to Admin</label>
           <input

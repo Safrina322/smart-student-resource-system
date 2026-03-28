@@ -71,9 +71,17 @@ function AdminRequests() {
           requests.map(req => (
             <div key={req.id} className="request-box">
               <p><b>Title:</b> {req.title}</p>
+              <p><b>Description:</b> {req.description}</p>
               <p><b>Subject:</b> {req.subject}</p>
               <p><b>Semester:</b> {req.semester}</p>
+              <p><b>Level:</b> {req.level}</p>
+              <p><b>Duration:</b> {req.duration}</p>
               <p><b>Type:</b> {req.type}</p>
+              <p><b>Lesson Title:</b> {req.lesson_title}</p>
+              <p><b>Lesson Description:</b> {req.lesson_description}</p>
+              <p><b>Lesson Order:</b> {req.lesson_order}</p>
+              <p><b>Image:</b> {req.image}</p>
+              <p><b>Resource URL:</b> <a href={req.resource_url} target="_blank" rel="noreferrer">Open resource</a></p>
               <p><b>Message:</b> {req.message}</p>
 
               <button onClick={() => handleApprove(req.id)}>✅ Approve</button>

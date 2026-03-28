@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { getApiUrl } from "../utils/api";
 import "../styles/UploadResource.css";
 
 function AdminAddCourse() {
@@ -6,11 +7,17 @@ function AdminAddCourse() {
     title: "",
     description: "",
     subject: "",
-    level: "",
+    level: "Beginner",
     duration: "",
+    lesson_title: "",
+    lesson_description: "",
+    resource_type: "PDF",
+    resource_url: "",
+    lesson_order: 1,
   });
 
   const [image, setImage] = useState(null);
+  const [resourceFile, setResourceFile] = useState(null);
   const [message, setMessage] = useState("");
 
   const token = localStorage.getItem("adminToken");
@@ -31,10 +38,13 @@ function AdminAddCourse() {
       data.append(key, formData[key])
     );
     data.append("image", image);
+    if (resourceFile) {
+      data.append("resource_file", resourceFile);
+    }
 
     try {
       const res = await fetch(
-        "http://localhost:5000/api/admin/courses/add",
+        `${getApiUrl()}/api/admin/courses/add`,
         {
           method: "POST",
           headers: {
@@ -58,10 +68,16 @@ function AdminAddCourse() {
         title: "",
         description: "",
         subject: "",
-        level: "",
+        level: "Beginner",
         duration: "",
+        lesson_title: "",
+        lesson_description: "",
+        resource_type: "PDF",
+        resource_url: "",
+        lesson_order: 1,
       });
       setImage(null);
+      setResourceFile(null);
     } catch (err) {
       console.error(err);
       setMessage("❌ Server error");
@@ -104,13 +120,15 @@ function AdminAddCourse() {
           />
 
           <label>Level</label>
-          <input
+          <select
             name="level"
             value={formData.level}
             onChange={handleChange}
-            placeholder="Beginner / Intermediate / Advanced"
-            required
-          />
+          >
+            <option value="Beginner">Beginner</option>
+            <option value="Intermediate">Intermediate</option>
+            <option value="Advanced">Advanced</option>
+          </select>
 
           <label>Duration</label>
           <input
@@ -126,6 +144,62 @@ function AdminAddCourse() {
             type="file"
             accept="image/*"
             onChange={(e) => setImage(e.target.files[0])}
+            required
+          />
+
+          <h3 style={{ marginTop: "22px", marginBottom: "8px" }}>First Lesson Resource</h3>
+
+          <label>Lesson Title</label>
+          <input
+            name="lesson_title"
+            value={formData.lesson_title}
+            onChange={handleChange}
+            placeholder="Eg: Introduction"
+            required
+          />
+
+          <label>Lesson Description</label>
+          <input
+            name="lesson_description"
+            value={formData.lesson_description}
+            onChange={handleChange}
+            placeholder="What students learn in this lesson"
+            required
+          />
+
+          <label>Resource Type</label>
+          <select
+            name="resource_type"
+            value={formData.resource_type}
+            onChange={handleChange}
+          >
+            <option value="PDF">PDF</option>
+            <option value="Video">Video</option>
+            <option value="Link">Link</option>
+          </select>
+
+          <label>Resource URL (Optional if file chosen)</label>
+          <input
+            name="resource_url"
+            value={formData.resource_url}
+            onChange={handleChange}
+            placeholder="https://..."
+          />
+
+          <label>Or Upload Resource File</label>
+          <input
+            type="file"
+            accept=".pdf,.mp4,.mov,.avi,.mkv,.doc,.docx,.ppt,.pptx,.txt"
+            onChange={(e) => setResourceFile(e.target.files?.[0] || null)}
+          />
+
+          <label>Lesson Order</label>
+          <input
+            type="number"
+            min="1"
+            name="lesson_order"
+            value={formData.lesson_order}
+            onChange={handleChange}
             required
           />
 

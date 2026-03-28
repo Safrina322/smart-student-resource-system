@@ -8,6 +8,20 @@ function AdminLogin() {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
+  const buildAdminDisplayName = (name, emailValue) => {
+    const cleanedName = (name || "").trim();
+    if (cleanedName && cleanedName.toLowerCase() !== "admin user") {
+      return cleanedName;
+    }
+
+    const mail = (emailValue || "").trim().toLowerCase();
+    if (mail.includes("@")) {
+      return mail.split("@")[0];
+    }
+
+    return cleanedName || "Admin";
+  };
+
   const handleLogin = async (e) => {
     e.preventDefault();
     setError("");
@@ -32,7 +46,11 @@ function AdminLogin() {
 
       // ✅ Save admin token and info
       localStorage.setItem("adminToken", data.token);
-      localStorage.setItem("adminName", data.admin?.name || "Admin");
+      localStorage.setItem("adminEmail", data.admin?.email || email);
+      localStorage.setItem(
+        "adminName",
+        buildAdminDisplayName(data.admin?.name, data.admin?.email || email)
+      );
 
       // ✅ Refresh page to ensure navbar updates
       setTimeout(() => {

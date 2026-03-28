@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
-import { apiCall } from "../utils/api.js";
+import { Link } from "react-router-dom";
+import { apiCall, getApiUrl } from "../utils/api.js";
 import "../styles/Resources.css";
 
 function ResourceListPage() {
@@ -27,6 +28,14 @@ function ResourceListPage() {
     e.target.src = "https://via.placeholder.com/300x200?text=No+Image";
   };
 
+  const resolveImageUrl = (image) => {
+    if (!image) return "https://via.placeholder.com/300x200?text=No+Image";
+    if (image.startsWith("http://") || image.startsWith("https://")) {
+      return image;
+    }
+    return `${getApiUrl()}/images/${image}`;
+  };
+
   return (
     <div className="resources-page">
       <h1>Available Courses</h1>
@@ -40,9 +49,14 @@ function ResourceListPage() {
       ) : (
         <div className="course-grid">
           {courses.map((course) => (
-            <div className="course-card" key={course.id}>
+            <Link
+              className="course-card"
+              key={course.id}
+              to={`/resources/${course.id}`}
+              aria-label={`Open ${course.title} learning page`}
+            >
               <img
-                src={`${apiCall.baseURL || "http://localhost:5000"}/images/${course.image}`}
+                src={resolveImageUrl(course.image)}
                 alt={course.title}
                 onError={handleImageError}
               />
@@ -57,7 +71,7 @@ function ResourceListPage() {
                   {course.subject} • {course.duration}
                 </p>
               </div>
-            </div>
+            </Link>
           ))}
         </div>
       )}

@@ -1,4 +1,5 @@
 import "../styles/AboutPage.css";
+import { Link } from "react-router-dom";
 import aboutImage from "../assets/abouting.jpg"; // You'll need to add this image
 
 function AboutPage() {
@@ -129,8 +130,15 @@ function AboutPage() {
           <h2>Join Our Learning Community</h2>
           <p>Become part of the revolution in digital education</p>
           <div className="cta-buttons">
-            <button className="cta-btn primary">Get Started Now</button>
-            <button className="cta-btn secondary">Contact Our Team</button>
+            <Link className="cta-btn primary" to="/register">
+              Get Started Now
+            </Link>
+            <a
+              className="cta-btn secondary"
+              href="mailto:support@smartstudent.com?subject=SmartStudent%20Support"
+            >
+              Contact Our Team
+            </a>
           </div>
         </div>
       </section>

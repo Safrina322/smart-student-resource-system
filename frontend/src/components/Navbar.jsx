@@ -11,6 +11,20 @@ function Navbar() {
   const [userName, setUserName] = useState("");
   const [adminName, setAdminName] = useState("");
 
+  const buildAdminDisplayName = (name, email) => {
+    const cleanedName = (name || "").trim();
+    if (cleanedName && cleanedName.toLowerCase() !== "admin user") {
+      return cleanedName;
+    }
+
+    const mail = (email || "").trim().toLowerCase();
+    if (mail.includes("@")) {
+      return mail.split("@")[0];
+    }
+
+    return cleanedName || "Admin";
+  };
+
   useEffect(() => {
     const token = localStorage.getItem("token");
     const adminToken = localStorage.getItem("adminToken");
@@ -18,7 +32,9 @@ function Navbar() {
     if (adminToken) {
       setIsAdmin(true);
       setIsLoggedIn(true);
-      setAdminName(localStorage.getItem("adminName") || "Admin");
+      const storedAdminName = localStorage.getItem("adminName") || "";
+      const storedAdminEmail = localStorage.getItem("adminEmail") || "";
+      setAdminName(buildAdminDisplayName(storedAdminName, storedAdminEmail));
     } else if (token) {
       setIsLoggedIn(true);
       setIsAdmin(false);
@@ -40,6 +56,7 @@ function Navbar() {
   const handleAdminLogout = () => {
     localStorage.removeItem("adminToken");
     localStorage.removeItem("adminName");
+    localStorage.removeItem("adminEmail");
     setProfileDropdown(false);
     window.location.href = "/";
   };
@@ -121,6 +138,9 @@ function Navbar() {
               </Link>
               <Link to="/admin/add-course" className="nav-link admin" onClick={closeMobileMenu}>
                 Add Course
+              </Link>
+              <Link to="/admin/lessons" className="nav-link admin" onClick={closeMobileMenu}>
+                Manage Lessons
               </Link>
 
               {/* Admin Profile Dropdown */}
