@@ -54,13 +54,27 @@ function CourseLearningPage() {
         setCourse(courseData);
         setLessons(Array.isArray(lessonData) ? lessonData : []);
 
-        // Track course access for continue learning
+        // Track course access for continue learning + popularity
         const token = localStorage.getItem("token");
         if (token) {
+          // Track in user learning progress
           apiCall("/api/user/track-access", {
             method: "POST",
             headers: getAuthHeader("token"),
             body: JSON.stringify({ courseId: Number(id) }),
+          }).catch(() => {
+            // Silently ignore tracking errors
+          });
+
+          // Track as analytics event for popularity ranking
+          apiCall("/api/analytics/events", {
+            method: "POST",
+            headers: getAuthHeader("token"),
+            body: JSON.stringify({
+              eventType: "course_access",
+              courseId: Number(id),
+              metadata: { courseTitle: courseData?.title },
+            }),
           }).catch(() => {
             // Silently ignore tracking errors
           });

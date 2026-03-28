@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { apiCall, getAuthHeader, getApiUrl } from "../utils/api.js";
 import "../styles/Dashboard.css";
 import { Link, useNavigate } from "react-router-dom";
+import PopularResources from "../components/PopularResources.jsx";
 
 function Dashboard() {
   const [courses, setCourses] = useState([]);
@@ -108,6 +109,9 @@ function Dashboard() {
             <p className="card-number">{Math.max(1, Math.floor(courses.length / 2))}</p>
           </div>
         </div>
+
+        {/* Popular Resources Section */}
+        <PopularResources />
 
         {/* Continue Learning Section */}
         {continueLearning && (

@@ -12,6 +12,7 @@ import adminRequestRoutes from "./routes/adminRequestRoutes.js";
 import analyticsRoutes from "./routes/analyticsRoutes.js";
 import adminAnalyticsRoutes from "./routes/adminAnalyticsRoutes.js";
 import userLearningRoutes from "./routes/userLearningRoutes.js";
+import popularResourcesRoutes from "./routes/popularResourcesRoutes.js";
 dotenv.config();
 
 const app = express();
@@ -127,6 +128,7 @@ app.use("/api/admin/requests", adminRequestRoutes);
 app.use("/api/analytics", analyticsRoutes);
 app.use("/api/admin/analytics", adminAnalyticsRoutes);
 app.use("/api/user", userLearningRoutes);
+app.use("/api/popular", popularResourcesRoutes);
 
 // 🔓 expose images folder
 app.use("/api/admin/courses", adminCourseRoutes);
