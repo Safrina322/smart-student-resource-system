@@ -11,6 +11,7 @@ import requestRoutes from "./routes/requestRoutes.js";
 import adminRequestRoutes from "./routes/adminRequestRoutes.js";
 import analyticsRoutes from "./routes/analyticsRoutes.js";
 import adminAnalyticsRoutes from "./routes/adminAnalyticsRoutes.js";
+import userLearningRoutes from "./routes/userLearningRoutes.js";
 dotenv.config();
 
 const app = express();
@@ -88,6 +89,27 @@ const ensureExtendedLearningSchema = () => {
       }
     }
   );
+
+  db.query(
+    `CREATE TABLE IF NOT EXISTS user_learning_progress (
+      id INT AUTO_INCREMENT PRIMARY KEY,
+      user_id INT NOT NULL,
+      course_id INT NOT NULL,
+      lesson_id INT NULL,
+      last_accessed_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+      FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+      FOREIGN KEY (course_id) REFERENCES courses(id) ON DELETE CASCADE,
+      UNIQUE KEY user_course (user_id, course_id),
+      INDEX idx_user_course_accessed (user_id, last_accessed_at),
+      INDEX idx_course_accessed (course_id, last_accessed_at)
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4`,
+    (tableErr) => {
+      if (tableErr) {
+        console.error("⚠️ Schema migration warning:", tableErr.message);
+      }
+    }
+  );
 };
 
 ensureExtendedLearningSchema();
@@ -104,6 +126,7 @@ app.use("/api/requests", requestRoutes);
 app.use("/api/admin/requests", adminRequestRoutes);
 app.use("/api/analytics", analyticsRoutes);
 app.use("/api/admin/analytics", adminAnalyticsRoutes);
+app.use("/api/user", userLearningRoutes);
 
 // 🔓 expose images folder
 app.use("/api/admin/courses", adminCourseRoutes);

@@ -53,6 +53,18 @@ function CourseLearningPage() {
         ]);
         setCourse(courseData);
         setLessons(Array.isArray(lessonData) ? lessonData : []);
+
+        // Track course access for continue learning
+        const token = localStorage.getItem("token");
+        if (token) {
+          apiCall("/api/user/track-access", {
+            method: "POST",
+            headers: getAuthHeader("token"),
+            body: JSON.stringify({ courseId: Number(id) }),
+          }).catch(() => {
+            // Silently ignore tracking errors
+          });
+        }
       } catch (err) {
         setError(err.message || "Failed to load course");
       } finally {

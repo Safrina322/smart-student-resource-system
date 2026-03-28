@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { apiCall, getAuthHeader } from "../utils/api.js";
+import { apiCall, getAuthHeader, getApiUrl } from "../utils/api.js";
 import "../styles/Dashboard.css";
 import { Link, useNavigate } from "react-router-dom";
 
@@ -7,6 +7,8 @@ function Dashboard() {
   const [courses, setCourses] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [continueLearning, setContinueLearning] = useState(null);
+  const [recentActivity, setRecentActivity] = useState([]);
   const token = localStorage.getItem("token");
   const navigate = useNavigate();
 
@@ -16,6 +18,7 @@ function Dashboard() {
       return;
     }
     fetchCourses();
+    fetchLearningProgress();
   }, [token, navigate]);
 
   const fetchCourses = async () => {
@@ -29,6 +32,47 @@ function Dashboard() {
       setCourses([]);
     }
     setLoading(false);
+  };
+
+  const fetchLearningProgress = async () => {
+    try {
+      const data = await apiCall("/api/user/continue-learning", {
+        method: "GET",
+        headers: getAuthHeader("token"),
+      });
+      if (data.continueLearning) {
+        setContinueLearning(data.continueLearning);
+      }
+      if (data.recentActivity) {
+        setRecentActivity(data.recentActivity);
+      }
+    } catch (err) {
+      // Silently ignore errors for optional feature
+      console.log("Could not load learning progress");
+    }
+  };
+
+  const resolveImageUrl = (image) => {
+    if (!image) return "https://via.placeholder.com/300x200?text=Course";
+    if (image.startsWith("http://") || image.startsWith("https://")) {
+      return image;
+    }
+    return `${getApiUrl()}/images/${image}`;
+  };
+
+  const formatDate = (dateString) => {
+    const date = new Date(dateString);
+    const today = new Date();
+    const yesterday = new Date(today);
+    yesterday.setDate(yesterday.getDate() - 1);
+
+    if (date.toDateString() === today.toDateString()) {
+      return date.toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit" });
+    } else if (date.toDateString() === yesterday.toDateString()) {
+      return "Yesterday";
+    } else {
+      return date.toLocaleDateString("en-US", { month: "short", day: "numeric" });
+    }
   };
 
   return (
@@ -65,6 +109,58 @@ function Dashboard() {
           </div>
         </div>
 
+        {/* Continue Learning Section */}
+        {continueLearning && (
+          <section className="continue-learning-section">
+            <h2>📚 Continue Learning</h2>
+            <div className="continue-learning-card">
+              <img 
+                src={resolveImageUrl(continueLearning.image)} 
+                alt={continueLearning.course_title}
+                className="continue-learning-image"
+              />
+              <div className="continue-learning-content">
+                <h3>{continueLearning.course_title}</h3>
+                <p className="continue-subject">{continueLearning.subject}</p>
+                {continueLearning.lesson_title && (
+                  <p className="continue-lesson">Last lesson: {continueLearning.lesson_title}</p>
+                )}
+                <p className="continue-time">
+                  Last accessed: {formatDate(continueLearning.last_accessed_at)}
+                </p>
+                <Link 
+                  to={`/course/${continueLearning.course_id}`}
+                  className="continue-btn"
+                >
+                  Continue Course →
+                </Link>
+              </div>
+            </div>
+          </section>
+        )}
+
+        {/* Recent Activity Section */}
+        {recentActivity.length > 0 && (
+          <section className="recent-activity-section">
+            <h2>⚡ Recent Activity</h2>
+            <div className="activity-list">
+              {recentActivity.map((activity) => (
+                <div key={activity.id} className="activity-item">
+                  <div className="activity-icon">📖</div>
+                  <div className="activity-content">
+                    <h4>{activity.course_title}</h4>
+                    {activity.lesson_title && (
+                      <p className="activity-lesson">{activity.lesson_title}</p>
+                    )}
+                    <span className="activity-type">{activity.resource_type}</span>
+                    <span className="activity-time">{formatDate(activity.created_at)}</span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </section>
+        )}
+
         {/* Recent Courses */}
         <section className="recent-section">
           <h2>Recent Courses</h2>
@@ -81,6 +177,7 @@ function Dashboard() {
                   <th>Subject</th>
                   <th>Level</th>
                   <th>Duration</th>
+                  <th>Action</th>
                 </tr>
               </thead>
 
@@ -91,6 +188,14 @@ function Dashboard() {
                     <td>{course.subject}</td>
                     <td>{course.level}</td>
                     <td>{course.duration}</td>
+                    <td>
+                      <Link 
+                        to={`/course/${course.id}`}
+                        className="view-course-link"
+                      >
+                        View
+                      </Link>
+                    </td>
                   </tr>
                 ))}
               </tbody>
