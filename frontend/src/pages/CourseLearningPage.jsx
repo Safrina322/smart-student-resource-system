@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link, useParams } from "react-router-dom";
-import { apiCall, getApiUrl } from "../utils/api";
+import { apiCall, getApiUrl, getAuthHeader } from "../utils/api";
 import "../styles/Resources.css";
 
 function buildLearningPlan(course) {
@@ -82,6 +82,27 @@ function CourseLearningPage() {
       return url;
     }
     return `${getApiUrl()}${url.startsWith("/") ? "" : "/"}${url}`;
+  };
+
+  const trackResourceOpen = (lesson) => {
+    const token = localStorage.getItem("token");
+    if (!token) return;
+
+    apiCall("/api/analytics/events", {
+      method: "POST",
+      headers: getAuthHeader("token"),
+      body: JSON.stringify({
+        eventType: "resource_open",
+        courseId: Number(id),
+        lessonId: lesson.id,
+        resourceType: lesson.resource_type,
+        metadata: {
+          lessonTitle: lesson.lesson_title,
+        },
+      }),
+    }).catch(() => {
+      // Do not block resource opening if analytics fails.
+    });
   };
 
   if (loading) {
@@ -171,6 +192,7 @@ function CourseLearningPage() {
                   target="_blank"
                   rel="noreferrer"
                   className="resource-open-btn"
+                  onClick={() => trackResourceOpen(lesson)}
                 >
                   Open {lesson.resource_type}
                 </a>

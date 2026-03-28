@@ -42,13 +42,26 @@
 
 import { useEffect, useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
-import { getApiUrl } from "../utils/api";
+import { apiCall, getApiUrl, getAuthHeader } from "../utils/api";
 import "../styles/AdminDashboard.css";
 
 function AdminDashboard() {
   const navigate = useNavigate();
   const [adminName, setAdminName] = useState("");
   const [heroImageError, setHeroImageError] = useState(false);
+  const [summary, setSummary] = useState({
+    pendingRequests: 0,
+    approvals7d: 0,
+    resourceOpens7d: 0,
+    topSubject: "N/A",
+    topResourceType: "N/A",
+  });
+  const [trends, setTrends] = useState({
+    labels: [],
+    approvalsByDay: [],
+    resourceOpensByDay: [],
+    topSubjects: [],
+  });
 
   const buildAdminDisplayName = (name, email) => {
     const cleanedName = (name || "").trim();
@@ -73,8 +86,39 @@ function AdminDashboard() {
       navigate("/admin/login");
     } else {
       setAdminName(buildAdminDisplayName(name, adminEmail));
+
+      apiCall("/api/admin/analytics/summary", {
+        headers: getAuthHeader("adminToken"),
+      })
+        .then((data) => {
+          setSummary(data || {});
+        })
+        .catch(() => {
+          // Keep fallback stats if summary fails.
+        });
+
+      apiCall("/api/admin/analytics/trends", {
+        headers: getAuthHeader("adminToken"),
+      })
+        .then((data) => {
+          setTrends(data || {});
+        })
+        .catch(() => {
+          // Keep fallback chart state if trend call fails.
+        });
     }
   }, []);
+
+  const maxActivity = Math.max(
+    1,
+    ...(trends.approvalsByDay || []),
+    ...(trends.resourceOpensByDay || [])
+  );
+
+  const maxSubjectCount = Math.max(
+    1,
+    ...((trends.topSubjects || []).map((item) => item.count || 0))
+  );
 
   const handleLogout = () => {
     localStorage.removeItem("adminToken");
@@ -105,19 +149,90 @@ function AdminDashboard() {
 
           <div className="admin-stats">
             <div className="admin-stat-card">
-              <span>Role</span>
-              <strong>Administrator</strong>
+              <span>Pending Requests</span>
+              <strong>{summary.pendingRequests ?? 0}</strong>
             </div>
             <div className="admin-stat-card">
-              <span>Access</span>
-              <strong>Full Control</strong>
+              <span>Approvals (7d)</span>
+              <strong>{summary.approvals7d ?? 0}</strong>
             </div>
             <div className="admin-stat-card">
-              <span>Status</span>
-              <strong>Online</strong>
+              <span>Resource Opens (7d)</span>
+              <strong>{summary.resourceOpens7d ?? 0}</strong>
+            </div>
+            <div className="admin-stat-card">
+              <span>Top Subject</span>
+              <strong>{summary.topSubject || "N/A"}</strong>
+            </div>
+            <div className="admin-stat-card">
+              <span>Top Resource Type</span>
+              <strong>{summary.topResourceType || "N/A"}</strong>
             </div>
           </div>
         </div>
+      </section>
+
+      <section className="admin-charts-grid">
+        <article className="admin-chart-card">
+          <h3>7-Day Activity</h3>
+          <p>Approvals and resource opens over the last week.</p>
+
+          <div className="activity-chart">
+            {(trends.labels || []).map((label, idx) => {
+              const approvals = trends.approvalsByDay?.[idx] || 0;
+              const opens = trends.resourceOpensByDay?.[idx] || 0;
+
+              return (
+                <div className="activity-col" key={`${label}-${idx}`}>
+                  <div className="activity-bars">
+                    <span
+                      className="bar approvals"
+                      style={{ height: `${Math.max(6, (approvals / maxActivity) * 100)}%` }}
+                      title={`Approvals: ${approvals}`}
+                    />
+                    <span
+                      className="bar opens"
+                      style={{ height: `${Math.max(6, (opens / maxActivity) * 100)}%` }}
+                      title={`Opens: ${opens}`}
+                    />
+                  </div>
+                  <small>{label}</small>
+                </div>
+              );
+            })}
+          </div>
+
+          <div className="chart-legend">
+            <span><i className="dot approvals"></i>Approvals</span>
+            <span><i className="dot opens"></i>Resource Opens</span>
+          </div>
+        </article>
+
+        <article className="admin-chart-card">
+          <h3>Top Subjects</h3>
+          <p>Current distribution across published courses.</p>
+
+          <div className="subject-bars">
+            {(trends.topSubjects || []).length === 0 ? (
+              <p className="chart-empty">No subject data yet.</p>
+            ) : (
+              (trends.topSubjects || []).map((item) => (
+                <div className="subject-row" key={item.subject}>
+                  <div className="subject-labels">
+                    <span>{item.subject}</span>
+                    <span>{item.count}</span>
+                  </div>
+                  <div className="subject-track">
+                    <span
+                      className="subject-fill"
+                      style={{ width: `${(item.count / maxSubjectCount) * 100}%` }}
+                    />
+                  </div>
+                </div>
+              ))
+            )}
+          </div>
+        </article>
       </section>
 
       <section className="admin-actions-grid">
