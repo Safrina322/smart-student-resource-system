@@ -5,6 +5,7 @@ import path from "path";
 import { fileURLToPath } from "url";
 import db from "../db.js";
 import adminAuth from "../middleware/adminAuth.js";
+import { logAdminAction } from "../utils/auditLogger.js";
 
 const router = express.Router();
 
@@ -109,6 +110,14 @@ router.post(
             return res.status(500).json({ message: "Course created, but lesson save failed" });
           }
 
+          logAdminAction({
+            adminId: req.admin?.adminId || null,
+            actionType: "course_created",
+            targetType: "course",
+            targetId: newCourseId,
+            details: `Created course \"${title}\" with first lesson \"${lesson_title}\"`,
+          });
+
           res.json({ message: "Course and lesson added successfully", courseId: newCourseId });
         }
       );
@@ -153,6 +162,15 @@ router.post(
         if (err) {
           return res.status(500).json({ message: "DB Error" });
         }
+
+        logAdminAction({
+          adminId: req.admin?.adminId || null,
+          actionType: "lesson_created",
+          targetType: "course_lesson",
+          targetId: result.insertId,
+          details: `Added lesson \"${lesson_title}\" to course ${courseId}`,
+        });
+
         res.json({ message: "Lesson added", lessonId: result.insertId });
       }
     );
@@ -200,6 +218,15 @@ router.put("/lessons/:lessonId", adminAuth, (req, res) => {
       if (err) {
         return res.status(500).json({ message: "DB Error" });
       }
+
+      logAdminAction({
+        adminId: req.admin?.adminId || null,
+        actionType: "lesson_updated",
+        targetType: "course_lesson",
+        targetId: Number(lessonId),
+        details: `Updated lesson ${lessonId} to \"${lesson_title}\"`,
+      });
+
       res.json({ message: "Lesson updated" });
     }
   );
@@ -212,6 +239,15 @@ router.delete("/lessons/:lessonId", adminAuth, (req, res) => {
     if (err) {
       return res.status(500).json({ message: "DB Error" });
     }
+
+    logAdminAction({
+      adminId: req.admin?.adminId || null,
+      actionType: "lesson_deleted",
+      targetType: "course_lesson",
+      targetId: Number(lessonId),
+      details: `Deleted lesson ${lessonId}`,
+    });
+
     res.json({ message: "Lesson deleted" });
   });
 });

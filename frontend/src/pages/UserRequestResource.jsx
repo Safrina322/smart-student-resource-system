@@ -1,8 +1,10 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { apiCall, getAuthHeader } from "../utils/api.js";
+import { useNavigate } from "react-router-dom";
 import "../styles/UploadResource.css";
 
 function RequestResource() {
+  const navigate = useNavigate();
   const [imageFile, setImageFile] = useState(null);
   const [formData, setFormData] = useState({
     title: "",
@@ -21,6 +23,67 @@ function RequestResource() {
 
   const [status, setStatus] = useState("");
   const [loading, setLoading] = useState(false);
+  const [timelineLoading, setTimelineLoading] = useState(true);
+  const [myRequests, setMyRequests] = useState([]);
+
+  useEffect(() => {
+    fetchMyRequests();
+  }, []);
+
+  const handleAuthFailure = (message) => {
+    if (!message) return false;
+    const normalizedMessage = message.toLowerCase();
+    const isAuthError =
+      normalizedMessage.includes("invalid token") ||
+      normalizedMessage.includes("token expired") ||
+      normalizedMessage.includes("no token provided") ||
+      normalizedMessage.includes("malformed token");
+
+    if (isAuthError) {
+      localStorage.removeItem("token");
+      localStorage.removeItem("userName");
+      setStatus("❌ Session expired. Please login again.");
+      setTimeout(() => navigate("/user/login"), 700);
+      return true;
+    }
+
+    return false;
+  };
+
+  const fetchMyRequests = async () => {
+    setTimelineLoading(true);
+    try {
+      const data = await apiCall("/api/requests/mine", {
+        headers: getAuthHeader("token"),
+      });
+      setMyRequests(Array.isArray(data.requests) ? data.requests : []);
+    } catch (err) {
+      if (handleAuthFailure(err.message)) {
+        setTimelineLoading(false);
+        return;
+      }
+      console.error("Failed to load request timeline", err.message);
+    } finally {
+      setTimelineLoading(false);
+    }
+  };
+
+  const formatDateTime = (value) => {
+    if (!value) return "-";
+    const date = new Date(value);
+    return date.toLocaleString();
+  };
+
+  const prettyStatus = (value) => {
+    if (!value) return "Unknown";
+    const map = {
+      submitted: "Submitted",
+      pending: "Under Review",
+      approved: "Approved",
+      rejected: "Rejected",
+    };
+    return map[value.toLowerCase()] || value;
+  };
 
   const handleChange = (e) => {
     setFormData({
@@ -71,7 +134,12 @@ function RequestResource() {
         message: "",
       });
       setImageFile(null);
+      fetchMyRequests();
     } catch (err) {
+      if (handleAuthFailure(err.message)) {
+        setLoading(false);
+        return;
+      }
       setStatus(`❌ ${err.message || "Failed to send request"}`);
     }
 
@@ -215,6 +283,44 @@ function RequestResource() {
             {loading ? "Sending..." : "Send Request"}
           </button>
         </form>
+
+        <section className="request-timeline-section">
+          <h3>Your Request Timeline</h3>
+          {timelineLoading ? (
+            <p className="timeline-empty">Loading your requests...</p>
+          ) : myRequests.length === 0 ? (
+            <p className="timeline-empty">No requests yet. Submit one above to start tracking.</p>
+          ) : (
+            <div className="timeline-request-list">
+              {myRequests.map((requestItem) => (
+                <article key={requestItem.id} className="timeline-request-card">
+                  <div className="timeline-request-header">
+                    <h4>{requestItem.title}</h4>
+                    <span className={`timeline-status status-${(requestItem.status || "").toLowerCase()}`}>
+                      {prettyStatus(requestItem.status)}
+                    </span>
+                  </div>
+                  <p className="timeline-request-meta">
+                    {requestItem.subject} • Semester {requestItem.semester} • {requestItem.type}
+                  </p>
+
+                  <div className="timeline-steps">
+                    {(requestItem.timeline || []).map((step) => (
+                      <div key={step.id} className="timeline-step">
+                        <span className={`timeline-dot dot-${(step.status || "").toLowerCase()}`} />
+                        <div className="timeline-step-content">
+                          <strong>{prettyStatus(step.status)}</strong>
+                          {step.note ? <p>{step.note}</p> : null}
+                          <small>{formatDateTime(step.changed_at)}</small>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </article>
+              ))}
+            </div>
+          )}
+        </section>
       </div>
     </div>
   );

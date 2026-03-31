@@ -9,6 +9,26 @@
   margin-bottom: 30px;
 }
 
+.resources-controls {
+  display: grid;
+  grid-template-columns: 2fr 1fr 1fr;
+  gap: 12px;
+  margin-bottom: 22px;
+}
+
+.resources-search-input,
+.resources-filter-select {
+  width: 100%;
+  border: 1px solid #1f2937;
+  border-radius: 10px;
+  background: #111827;
+  color: #fff;
+}
+
+.resources-search-input::placeholder {
+  color: #9ca3af;
+}
+
 .course-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
@@ -164,6 +184,10 @@
 @media (max-width: 900px) {
   .resources-page {
     padding: 20px;
+  }
+
+  .resources-controls {
+    grid-template-columns: 1fr;
   }
 
   .learn-hero {

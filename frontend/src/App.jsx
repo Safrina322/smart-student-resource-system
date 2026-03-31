@@ -20,6 +20,7 @@ import AdminAddCourse from "./pages/AdminAddCourse.jsx";
 import AdminLogin from "./pages/AdminLogin.jsx";
 import AdminRequests from "./pages/AdminRequests.jsx";
 import AdminManageLessons from "./pages/AdminManageLessons.jsx";
+import AdminAuditLogs from "./pages/AdminAuditLogs.jsx";
 function App() {
   return (
     <Router>
@@ -40,10 +41,12 @@ function App() {
           <Route path="/upload" element={<ProtectedRoute><UploadResourcePage /></ProtectedRoute>} />
           <Route path="/resources" element={<ResourceListPage />} />
           <Route path="/resources/:id" element={<CourseLearningPage />} />
+          <Route path="/course/:id" element={<CourseLearningPage />} />
           <Route path="/admin" element={<AdminLogin />} />
           <Route path="/about" element={<AboutPage />} />
           <Route path="/admin/requests" element={<AdminRequests />}/>
           <Route path="/admin/lessons" element={<ProtectedAdminRoute><AdminManageLessons /></ProtectedAdminRoute>} />
+          <Route path="/admin/audit-logs" element={<ProtectedAdminRoute><AdminAuditLogs /></ProtectedAdminRoute>} />
         </Routes>
       </div>
 

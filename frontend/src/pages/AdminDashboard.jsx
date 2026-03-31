@@ -251,6 +251,11 @@ function AdminDashboard() {
           <p>Edit lesson order, update URLs/files, and clean up old course resources.</p>
         </Link>
 
+        <Link to="/admin/audit-logs" className="admin-action-card">
+          <h3>Audit Logs</h3>
+          <p>Track admin approvals, course changes, and lesson updates.</p>
+        </Link>
+
         <button onClick={handleLogout} className="admin-action-card admin-logout-card">
           <h3>Logout</h3>
           <p>Exit admin session securely.</p>

@@ -3,6 +3,7 @@ import { apiCall, getAuthHeader, getApiUrl } from "../utils/api.js";
 import "../styles/Dashboard.css";
 import { Link, useNavigate } from "react-router-dom";
 import PopularResources from "../components/PopularResources.jsx";
+import NotificationsPanel from "../components/NotificationsPanel.jsx";
 
 function Dashboard() {
   const [courses, setCourses] = useState([]);
@@ -110,6 +111,8 @@ function Dashboard() {
           </div>
         </div>
 
+        <NotificationsPanel />
+
         {/* Popular Resources Section */}
         <PopularResources />
 
@@ -133,7 +136,7 @@ function Dashboard() {
                   Last accessed: {formatDate(continueLearning.last_accessed_at)}
                 </p>
                 <Link 
-                  to={`/course/${continueLearning.course_id}`}
+                  to={`/resources/${continueLearning.course_id}`}
                   className="continue-btn"
                 >
                   Continue Course →
@@ -194,7 +197,7 @@ function Dashboard() {
                     <td>{course.duration}</td>
                     <td>
                       <Link 
-                        to={`/course/${course.id}`}
+                        to={`/resources/${course.id}`}
                         className="view-course-link"
                       >
                         View

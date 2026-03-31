@@ -71,7 +71,7 @@ function PopularResources() {
                     <div className="popularity-fill" style={{width: `${Math.min(100, (course.popularity_score || 0) / 50)}%`}}></div>
                   </div>
                   <p className="unique-users">👥 {course.unique_users} learners</p>
-                  <Link to={`/course/${course.id}`} className="view-course-btn">
+                  <Link to={`/resources/${course.id}`} className="view-course-btn">
                     View Course
                   </Link>
                 </div>
@@ -104,7 +104,7 @@ function PopularResources() {
                     <span>👁️ {course.recent_views} views</span>
                     <span>👥 {course.unique_users} learners</span>
                   </div>
-                  <Link to={`/course/${course.id}`} className="trending-btn">
+                  <Link to={`/resources/${course.id}`} className="trending-btn">
                     Explore →
                   </Link>
                 </div>

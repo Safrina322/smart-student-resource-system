@@ -13,6 +13,8 @@ import analyticsRoutes from "./routes/analyticsRoutes.js";
 import adminAnalyticsRoutes from "./routes/adminAnalyticsRoutes.js";
 import userLearningRoutes from "./routes/userLearningRoutes.js";
 import popularResourcesRoutes from "./routes/popularResourcesRoutes.js";
+import userNotificationRoutes from "./routes/userNotificationRoutes.js";
+import adminAuditRoutes from "./routes/adminAuditRoutes.js";
 dotenv.config();
 
 const app = express();
@@ -111,6 +113,71 @@ const ensureExtendedLearningSchema = () => {
       }
     }
   );
+
+  db.query(
+    `CREATE TABLE IF NOT EXISTS request_status_history (
+      id INT AUTO_INCREMENT PRIMARY KEY,
+      request_id INT NOT NULL,
+      status VARCHAR(50) NOT NULL,
+      note TEXT,
+      changed_by_admin_id INT NULL,
+      changed_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+      FOREIGN KEY (request_id) REFERENCES resource_requests(id) ON DELETE CASCADE,
+      INDEX idx_request_status_history_request_id (request_id),
+      INDEX idx_request_status_history_status (status),
+      INDEX idx_request_status_history_changed_at (changed_at)
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4`,
+    (tableErr) => {
+      if (tableErr) {
+        console.error("⚠️ Schema migration warning:", tableErr.message);
+      }
+    }
+  );
+
+  db.query(
+    `CREATE TABLE IF NOT EXISTS user_notifications (
+      id INT AUTO_INCREMENT PRIMARY KEY,
+      user_id INT NOT NULL,
+      type VARCHAR(50) DEFAULT 'info',
+      title VARCHAR(255) NOT NULL,
+      message TEXT NOT NULL,
+      meta TEXT,
+      is_read TINYINT(1) DEFAULT 0,
+      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+      read_at TIMESTAMP NULL,
+      FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+      INDEX idx_user_notifications_user_id (user_id),
+      INDEX idx_user_notifications_read (is_read),
+      INDEX idx_user_notifications_created_at (created_at)
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4`,
+    (tableErr) => {
+      if (tableErr) {
+        console.error("⚠️ Schema migration warning:", tableErr.message);
+      }
+    }
+  );
+
+  db.query(
+    `CREATE TABLE IF NOT EXISTS admin_audit_logs (
+      id INT AUTO_INCREMENT PRIMARY KEY,
+      admin_id INT NULL,
+      action_type VARCHAR(100) NOT NULL,
+      target_type VARCHAR(100) NOT NULL,
+      target_id INT NULL,
+      details TEXT,
+      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+      FOREIGN KEY (admin_id) REFERENCES admin(id) ON DELETE SET NULL,
+      INDEX idx_admin_audit_admin_id (admin_id),
+      INDEX idx_admin_audit_action (action_type),
+      INDEX idx_admin_audit_target (target_type),
+      INDEX idx_admin_audit_created_at (created_at)
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4`,
+    (tableErr) => {
+      if (tableErr) {
+        console.error("⚠️ Schema migration warning:", tableErr.message);
+      }
+    }
+  );
 };
 
 ensureExtendedLearningSchema();
@@ -129,6 +196,8 @@ app.use("/api/analytics", analyticsRoutes);
 app.use("/api/admin/analytics", adminAnalyticsRoutes);
 app.use("/api/user", userLearningRoutes);
 app.use("/api/popular", popularResourcesRoutes);
+app.use("/api/notifications", userNotificationRoutes);
+app.use("/api/admin/audit", adminAuditRoutes);
 
 // 🔓 expose images folder
 app.use("/api/admin/courses", adminCourseRoutes);

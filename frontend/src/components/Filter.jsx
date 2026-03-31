@@ -1,8 +1,23 @@
-function Filter({ label = "Filter" }) {
+function Filter({
+  value = "",
+  onChange,
+  options = [],
+  placeholder = "All",
+  className = "",
+}) {
   return (
-    <select style={{ padding: "5px", margin: "5px" }}>
-      <option>{label} 1</option>
-      <option>{label} 2</option>
+    <select
+      value={value}
+      onChange={(event) => onChange?.(event.target.value)}
+      className={className}
+      style={{ padding: "10px", margin: "0" }}
+    >
+      <option value="">{placeholder}</option>
+      {options.map((option) => (
+        <option key={option} value={option}>
+          {option}
+        </option>
+      ))}
     </select>
   );
 }

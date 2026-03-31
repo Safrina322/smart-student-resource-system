@@ -77,6 +77,19 @@ const storage = multer.diskStorage({
 
 const upload = multer({ storage });
 
+const addRequestHistoryEntry = ({ requestId, status, note = null, adminId = null }) => {
+  db.query(
+    `INSERT INTO request_status_history (request_id, status, note, changed_by_admin_id)
+     VALUES (?, ?, ?, ?)`,
+    [requestId, status, note, adminId],
+    (historyErr) => {
+      if (historyErr) {
+        console.error("⚠️ Request history write warning:", historyErr.message);
+      }
+    }
+  );
+};
+
 router.post("/", authMiddleware, upload.single("image"), async (req, res) => {
   try {
     const {
@@ -147,11 +160,23 @@ router.post("/", authMiddleware, upload.single("image"), async (req, res) => {
             resource_url,
             Number(lesson_order) || 1,
           ],
-          (err) => {
+          (err, insertResult) => {
             if (err) {
               console.error(err);
               return res.status(500).json({ message: "Server error" });
             }
+
+            addRequestHistoryEntry({
+              requestId: insertResult.insertId,
+              status: "submitted",
+              note: "Request submitted by student",
+            });
+
+            addRequestHistoryEntry({
+              requestId: insertResult.insertId,
+              status: "pending",
+              note: "Request is under admin review",
+            });
 
             res.json({ message: "Request submitted successfully" });
           }
@@ -162,6 +187,81 @@ router.post("/", authMiddleware, upload.single("image"), async (req, res) => {
     console.error(err);
     res.status(500).json({ message: "Server error" });
   }
+});
+
+router.get("/mine", authMiddleware, (req, res) => {
+  const userId = req.user?.id;
+
+  if (!userId) {
+    return res.status(401).json({ message: "User not authenticated" });
+  }
+
+  db.query(
+    `SELECT
+      rr.id,
+      rr.title,
+      rr.subject,
+      rr.semester,
+      rr.type,
+      rr.status,
+      rr.message,
+      rr.created_at,
+      rr.updated_at,
+      rr.course_id,
+      c.title AS course_title
+    FROM resource_requests rr
+    LEFT JOIN courses c ON c.id = rr.course_id
+    WHERE rr.user_id = ?
+    ORDER BY rr.created_at DESC`,
+    [userId],
+    (reqErr, requestRows) => {
+      if (reqErr) {
+        console.error("❌ Request timeline query error:", reqErr.message);
+        return res.status(500).json({ message: "Failed to fetch your requests" });
+      }
+
+      if (!requestRows.length) {
+        return res.json({ requests: [] });
+      }
+
+      const requestIds = requestRows.map((item) => item.id);
+
+      db.query(
+        `SELECT
+          h.id,
+          h.request_id,
+          h.status,
+          h.note,
+          h.changed_by_admin_id,
+          h.changed_at
+        FROM request_status_history h
+        WHERE h.request_id IN (?)
+        ORDER BY h.changed_at ASC`,
+        [requestIds],
+        (historyErr, historyRows) => {
+          if (historyErr) {
+            console.error("❌ Request history query error:", historyErr.message);
+            return res.status(500).json({ message: "Failed to fetch request history" });
+          }
+
+          const historyByRequestId = historyRows.reduce((acc, entry) => {
+            if (!acc[entry.request_id]) {
+              acc[entry.request_id] = [];
+            }
+            acc[entry.request_id].push(entry);
+            return acc;
+          }, {});
+
+          const requests = requestRows.map((requestItem) => ({
+            ...requestItem,
+            timeline: historyByRequestId[requestItem.id] || [],
+          }));
+
+          return res.json({ requests });
+        }
+      );
+    }
+  );
 });
 
 export default router;
