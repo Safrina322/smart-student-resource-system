@@ -1,8 +1,10 @@
 import { useState } from "react";
 import { apiCall } from "../utils/api.js";
+import { useNavigate } from "react-router-dom";
 import "../styles/LoginPage.css";
 
 function AdminLogin() {
+  const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
@@ -51,11 +53,9 @@ function AdminLogin() {
         "adminName",
         buildAdminDisplayName(data.admin?.name, data.admin?.email || email)
       );
+      window.dispatchEvent(new Event("auth-changed"));
 
-      // ✅ Refresh page to ensure navbar updates
-      setTimeout(() => {
-        window.location.href = "/admin/dashboard";
-      }, 100);
+      navigate("/admin/dashboard");
     } catch (err) {
       setError(`❌ ${err.message || "Admin login failed. Check credentials."}`);
     } finally {

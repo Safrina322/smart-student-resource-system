@@ -133,12 +133,12 @@ function AboutPage() {
             <Link className="cta-btn primary" to="/register">
               Get Started Now
             </Link>
-            <a
+            <Link
               className="cta-btn secondary"
-              href="mailto:support@smartstudent.com?subject=SmartStudent%20Support"
+              to="/contact"
             >
               Contact Our Team
-            </a>
+            </Link>
           </div>
         </div>
       </section>

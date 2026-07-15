@@ -1,9 +1,11 @@
-import { Link } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
 import logo from "../assets/icon.jpg";
 import "../styles/Navbar.css";
 
 function Navbar() {
+  const navigate = useNavigate();
+  const location = useLocation();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [profileDropdown, setProfileDropdown] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -25,10 +27,10 @@ function Navbar() {
     return cleanedName || "Admin";
   };
 
-  useEffect(() => {
+  const refreshAuthState = () => {
     const token = localStorage.getItem("token");
     const adminToken = localStorage.getItem("adminToken");
-    
+
     if (adminToken) {
       setIsAdmin(true);
       setIsLoggedIn(true);
@@ -42,23 +44,51 @@ function Navbar() {
     } else {
       setIsLoggedIn(false);
       setIsAdmin(false);
+      setUserName("");
+      setAdminName("");
     }
+  };
+
+  useEffect(() => {
+    refreshAuthState();
+    setProfileDropdown(false);
+  }, [location.pathname]);
+
+  useEffect(() => {
+    const handleStorage = () => refreshAuthState();
+    const handleAuthChanged = () => refreshAuthState();
+
+    window.addEventListener("storage", handleStorage);
+    window.addEventListener("auth-changed", handleAuthChanged);
+
+    return () => {
+      window.removeEventListener("storage", handleStorage);
+      window.removeEventListener("auth-changed", handleAuthChanged);
+    };
   }, []);
 
   const handleLogout = () => {
     localStorage.removeItem("token");
     localStorage.removeItem("userName");
     localStorage.removeItem("user");
+    localStorage.removeItem("adminToken");
+    localStorage.removeItem("adminName");
+    localStorage.removeItem("adminEmail");
+    window.dispatchEvent(new Event("auth-changed"));
     setProfileDropdown(false);
-    window.location.href = "/";
+    navigate("/");
   };
 
   const handleAdminLogout = () => {
     localStorage.removeItem("adminToken");
     localStorage.removeItem("adminName");
     localStorage.removeItem("adminEmail");
+    localStorage.removeItem("token");
+    localStorage.removeItem("userName");
+    localStorage.removeItem("user");
+    window.dispatchEvent(new Event("auth-changed"));
     setProfileDropdown(false);
-    window.location.href = "/";
+    navigate("/");
   };
 
   const toggleMobileMenu = () => {

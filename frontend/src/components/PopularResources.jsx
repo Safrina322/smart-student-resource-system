@@ -3,6 +3,22 @@ import { Link } from "react-router-dom";
 import { apiCall, getApiUrl } from "../utils/api";
 import "../styles/PopularResources.css";
 
+const FALLBACK_IMAGE =
+  "data:image/svg+xml;charset=UTF-8," +
+  encodeURIComponent(`
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 360">
+      <defs>
+        <linearGradient id="g" x1="0" x2="1" y1="0" y2="1">
+          <stop offset="0%" stop-color="#0f172a" />
+          <stop offset="100%" stop-color="#2563eb" />
+        </linearGradient>
+      </defs>
+      <rect width="600" height="360" rx="24" fill="url(#g)"/>
+      <text x="60" y="170" fill="#e0f2fe" font-family="Arial, sans-serif" font-size="34" font-weight="700">Course preview</text>
+      <text x="60" y="214" fill="#bfdbfe" font-family="Arial, sans-serif" font-size="20">Image unavailable</text>
+    </svg>
+  `);
+
 function PopularResources() {
   const [popular, setPopular] = useState([]);
   const [trending, setTrending] = useState([]);
@@ -31,7 +47,7 @@ function PopularResources() {
   };
 
   const resolveImageUrl = (image) => {
-    if (!image) return "https://via.placeholder.com/250x180?text=Course";
+    if (!image) return FALLBACK_IMAGE;
     if (image.startsWith("http://") || image.startsWith("https://")) {
       return image;
     }
@@ -55,7 +71,7 @@ function PopularResources() {
             {popular.slice(0, 5).map((course) => (
               <div key={course.id} className="popular-card">
                 <img 
-                  src={resolveImageUrl(course.image)} 
+                  src={resolveImageUrl(course.image || course.image_url || course.imagePath)} 
                   alt={course.title}
                   className="popular-image"
                 />
@@ -91,7 +107,7 @@ function PopularResources() {
               <div key={course.id} className="trending-card">
                 <div className="trending-image-wrapper">
                   <img 
-                    src={resolveImageUrl(course.image)} 
+                    src={resolveImageUrl(course.image || course.image_url || course.imagePath)} 
                     alt={course.title}
                     className="trending-image"
                   />

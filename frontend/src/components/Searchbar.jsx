@@ -11,7 +11,7 @@ function SearchBar({
       onChange={(event) => onChange?.(event.target.value)}
       placeholder={placeholder}
       className={className}
-      style={{ padding: "10px", width: "100%" }}
+      aria-label={placeholder}
     />
   );
 }

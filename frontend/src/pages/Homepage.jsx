@@ -214,7 +214,7 @@ function HomePage() {
               </button>
               <button 
                 className="cta-button secondary"
-                onClick={() => window.location.href = "mailto:support@smartstudent.com?subject=SmartStudent%20Support"}
+                onClick={() => navigate("/contact")}
               >
                 Contact Our Team
               </button>

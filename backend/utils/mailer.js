@@ -60,3 +60,47 @@ export const sendRequestStatusEmail = async ({
     html,
   });
 };
+
+export const isSmtpReady = () => smtpConfigured && Boolean(transporter);
+
+export const sendAdminReportEmail = async ({
+  to,
+  frequency,
+  rangeDays,
+  csvContent,
+  fileName,
+}) => {
+  if (!to) {
+    throw new Error("Report email recipient is required");
+  }
+
+  if (!smtpConfigured || !transporter) {
+    throw new Error("SMTP is not configured for scheduled reports");
+  }
+
+  const readableFrequency = frequency === "weekly" ? "Weekly" : "Daily";
+  const subject = `SmartStudent ${readableFrequency} Analytics Report (${rangeDays}d)`;
+
+  const html = `
+    <div style="font-family: Arial, sans-serif; line-height: 1.6; color: #111827;">
+      <h2 style="margin-bottom: 12px;">SmartStudent Admin Report</h2>
+      <p>Your ${readableFrequency.toLowerCase()} analytics report is attached as CSV.</p>
+      <p><strong>Range:</strong> Last ${rangeDays} days</p>
+      <p style="margin-top: 20px;">Regards,<br/>SmartStudent Platform</p>
+    </div>
+  `;
+
+  await transporter.sendMail({
+    from: MAIL_FROM || SMTP_USER,
+    to,
+    subject,
+    html,
+    attachments: [
+      {
+        filename: fileName,
+        content: csvContent,
+        contentType: "text/csv",
+      },
+    ],
+  });
+};

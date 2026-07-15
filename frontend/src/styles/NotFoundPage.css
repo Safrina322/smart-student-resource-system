@@ -1,0 +1,77 @@
+.not-found-page {
+  min-height: calc(100vh - 80px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 32px 20px;
+  background: radial-gradient(circle at 20% 20%, rgba(0, 212, 255, 0.18), transparent 40%),
+    radial-gradient(circle at 80% 0%, rgba(0, 255, 204, 0.14), transparent 45%),
+    linear-gradient(135deg, #050912 0%, #0d1528 100%);
+}
+
+.not-found-card {
+  width: 100%;
+  max-width: 620px;
+  background: rgba(10, 14, 39, 0.85);
+  border: 1px solid rgba(0, 212, 255, 0.35);
+  border-radius: 18px;
+  padding: 42px 28px;
+  color: #dbe7ff;
+  text-align: center;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.35);
+}
+
+.not-found-code {
+  font-size: clamp(56px, 10vw, 96px);
+  line-height: 1;
+  margin: 0 0 8px;
+  font-weight: 800;
+  letter-spacing: 2px;
+  color: #00d4ff;
+}
+
+.not-found-card h1 {
+  margin: 0 0 10px;
+  color: #ffffff;
+}
+
+.not-found-card p {
+  margin: 0 auto;
+  max-width: 520px;
+  color: #b4c2df;
+}
+
+.not-found-actions {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  margin-top: 24px;
+  flex-wrap: wrap;
+}
+
+.not-found-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 10px 16px;
+  border-radius: 8px;
+  text-decoration: none;
+  font-weight: 600;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.not-found-btn:hover {
+  transform: translateY(-1px);
+}
+
+.not-found-btn.primary {
+  background: linear-gradient(135deg, #00d4ff, #0099ff);
+  color: #ffffff;
+  box-shadow: 0 10px 22px rgba(0, 153, 255, 0.3);
+}
+
+.not-found-btn.secondary {
+  background: transparent;
+  border: 1px solid rgba(0, 212, 255, 0.45);
+  color: #dbe7ff;
+}

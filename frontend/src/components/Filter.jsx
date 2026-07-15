@@ -10,7 +10,7 @@ function Filter({
       value={value}
       onChange={(event) => onChange?.(event.target.value)}
       className={className}
-      style={{ padding: "10px", margin: "0" }}
+      aria-label={placeholder}
     >
       <option value="">{placeholder}</option>
       {options.map((option) => (

@@ -15,6 +15,7 @@ import userLearningRoutes from "./routes/userLearningRoutes.js";
 import popularResourcesRoutes from "./routes/popularResourcesRoutes.js";
 import userNotificationRoutes from "./routes/userNotificationRoutes.js";
 import adminAuditRoutes from "./routes/adminAuditRoutes.js";
+import { startReportScheduler } from "./utils/reportScheduler.js";
 dotenv.config();
 
 const app = express();
@@ -178,15 +179,195 @@ const ensureExtendedLearningSchema = () => {
       }
     }
   );
+
+  db.query(
+    `CREATE TABLE IF NOT EXISTS resources (
+      id INT AUTO_INCREMENT PRIMARY KEY,
+      title VARCHAR(255) NOT NULL,
+      description TEXT,
+      category VARCHAR(100),
+      image_url VARCHAR(500),
+      resource_link VARCHAR(500) NOT NULL,
+      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+      INDEX idx_resources_category (category),
+      INDEX idx_resources_created_at (created_at)
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4`,
+    (tableErr) => {
+      if (tableErr) {
+        console.error("⚠️ Schema migration warning:", tableErr.message);
+      }
+    }
+  );
+
+  db.query(
+    `CREATE TABLE IF NOT EXISTS report_schedules (
+      id INT AUTO_INCREMENT PRIMARY KEY,
+      admin_id INT NOT NULL,
+      frequency ENUM('daily', 'weekly') DEFAULT 'daily',
+      time_of_day CHAR(5) DEFAULT '09:00',
+      range_days INT DEFAULT 30,
+      recipient_email VARCHAR(255),
+      is_active TINYINT(1) DEFAULT 1,
+      next_run_at DATETIME NULL,
+      last_run_at DATETIME NULL,
+      last_error TEXT,
+      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+      updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+      FOREIGN KEY (admin_id) REFERENCES admin(id) ON DELETE CASCADE,
+      UNIQUE KEY uniq_report_schedule_admin (admin_id),
+      INDEX idx_report_schedules_next_run (next_run_at),
+      INDEX idx_report_schedules_active (is_active)
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4`,
+    (tableErr) => {
+      if (tableErr) {
+        console.error("⚠️ Schema migration warning:", tableErr.message);
+      }
+    }
+  );
+
+  db.query(
+    `CREATE TABLE IF NOT EXISTS report_generation_history (
+      id INT AUTO_INCREMENT PRIMARY KEY,
+      admin_id INT NULL,
+      schedule_id INT NULL,
+      report_type VARCHAR(100) DEFAULT 'analytics',
+      format VARCHAR(20) DEFAULT 'csv',
+      range_days INT DEFAULT 30,
+      status ENUM('success', 'failed') DEFAULT 'success',
+      recipient_email VARCHAR(255),
+      file_name VARCHAR(255),
+      error_message TEXT,
+      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+      FOREIGN KEY (admin_id) REFERENCES admin(id) ON DELETE SET NULL,
+      FOREIGN KEY (schedule_id) REFERENCES report_schedules(id) ON DELETE SET NULL,
+      INDEX idx_report_history_created_at (created_at),
+      INDEX idx_report_history_admin_id (admin_id),
+      INDEX idx_report_history_status (status)
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4`,
+    (tableErr) => {
+      if (tableErr) {
+        console.error("⚠️ Schema migration warning:", tableErr.message);
+      }
+    }
+  );
 };
 
 ensureExtendedLearningSchema();
 
-// ✅ Configure CORS to only allow frontend
-app.use(cors({
-  origin: process.env.FRONTEND_URL,
-  credentials: true
-}));
+// ✅ ADD MISSING COLUMNS TO RESOURCES TABLE
+const ensureResourcesColumns = () => {
+  const columnsToAdd = [
+    { name: "description", definition: "description TEXT" },
+  ];
+
+  columnsToAdd.forEach(({ name, definition }) => {
+    db.query(`SHOW COLUMNS FROM resources LIKE ?`, [name], (checkErr, result) => {
+      if (checkErr) {
+        console.error(`⚠️ Column check error for ${name}:`, checkErr.message);
+        return;
+      }
+
+      if (result.length > 0) {
+        console.log(`✅ Column '${name}' already exists`);
+        return;
+      }
+
+      db.query(`ALTER TABLE resources ADD COLUMN ${definition}`, (alterErr) => {
+        if (alterErr) {
+          console.error(`❌ Failed to add column '${name}':`, alterErr.message);
+        } else {
+          console.log(`✅ Added column '${name}' to resources table`);
+        }
+      });
+    });
+  });
+};
+
+ensureResourcesColumns();
+startReportScheduler();
+
+const seedResources = () => {
+  db.query("SELECT COUNT(*) AS count FROM resources", (countErr, countRows) => {
+    if (countErr) {
+      console.error("❌ Resource seed error:", countErr.message);
+      return;
+    }
+
+    const resourceCount = countRows[0]?.count || 0;
+    console.log(`📊 Current resources in DB: ${resourceCount}`);
+    
+    if (resourceCount > 0) {
+      console.log("✅ Resources already exist, skipping seed");
+      return;
+    }
+
+    console.log("🌱 Seeding sample resources...");
+    const sampleResources = [
+      [
+        "MDN Web Docs - HTML",
+        "Official HTML guide and reference from Mozilla.",
+        "Web Development",
+        "https://upload.wikimedia.org/wikipedia/commons/6/61/HTML5_logo_and_wordmark.svg",
+        "https://developer.mozilla.org/en-US/docs/Learn/HTML/Introduction_to_HTML",
+      ],
+      [
+        "freeCodeCamp - JavaScript Basics",
+        "Free interactive lessons to learn JavaScript fundamentals.",
+        "Programming",
+        "https://design-style-guide.freecodecamp.org/downloads/fcc_secondary_large.png",
+        "https://www.freecodecamp.org/learn/javascript-algorithms-and-data-structures-v8/",
+      ],
+      [
+        "Khan Academy - Algebra 1",
+        "Step-by-step algebra lessons, practice, and quizzes.",
+        "Mathematics",
+        "https://upload.wikimedia.org/wikipedia/commons/4/43/Khan_Academy_logo.svg",
+        "https://www.khanacademy.org/math/algebra",
+      ],
+      [
+        "Google Digital Garage",
+        "Free courses in digital skills, career growth, and productivity tools.",
+        "Career Skills",
+        "https://upload.wikimedia.org/wikipedia/commons/2/2f/Google_2015_logo.svg",
+        "https://grow.google/intl/en_in/",
+      ],
+      [
+        "Coursera - AI for Everyone",
+        "Beginner-friendly introduction to artificial intelligence concepts.",
+        "Artificial Intelligence",
+        "https://upload.wikimedia.org/wikipedia/commons/e/e5/Coursera_logo.svg",
+        "https://www.coursera.org/learn/ai-for-everyone",
+      ],
+    ];
+
+    db.query(
+      `INSERT INTO resources (title, description, category, image_url, resource_link)
+       VALUES ?`,
+      [sampleResources],
+      (insertErr) => {
+        if (insertErr) {
+          console.error("❌ Resource seed error:", insertErr.message);
+        } else {
+          console.log("✅ Sample resources seeded successfully");
+        }
+      }
+    );
+  });
+};
+
+// ✅ Configure CORS for the frontend app
+const corsOptions = {
+  origin: process.env.FRONTEND_URL || "http://localhost:5173",
+  credentials: false,
+  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+  allowedHeaders: ["Content-Type", "Authorization"],
+};
+app.use(cors(corsOptions));
+
+// Seed resources after a short delay to ensure DB is ready
+setTimeout(() => {
+  seedResources();
+}, 1000);
 
 app.use(express.json());
 app.use("/api/admin", adminAuthRoutes);

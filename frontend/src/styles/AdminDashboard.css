@@ -263,6 +263,147 @@
   box-shadow: 0 16px 30px rgba(2, 6, 23, 0.45);
 }
 
+.admin-report-card {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.admin-report-controls {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 8px;
+  margin-top: 6px;
+}
+
+.admin-report-controls label {
+  color: #a5f3fc;
+  font-size: 0.82rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.admin-report-controls select {
+  border: 1px solid rgba(148, 163, 184, 0.4);
+  background: rgba(2, 6, 23, 0.5);
+  color: #e5e7eb;
+  border-radius: 10px;
+  padding: 10px 12px;
+  font-size: 0.92rem;
+}
+
+.admin-report-controls input[type="time"],
+.admin-report-controls input[type="email"] {
+  border: 1px solid rgba(148, 163, 184, 0.4);
+  background: rgba(2, 6, 23, 0.5);
+  color: #e5e7eb;
+  border-radius: 10px;
+  padding: 10px 12px;
+  font-size: 0.92rem;
+}
+
+.schedule-toggle {
+  display: inline-flex;
+  gap: 8px;
+  align-items: center;
+  color: #cbd5e1;
+  font-size: 0.9rem;
+}
+
+.report-btn-row {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.report-download-btn {
+  border: 1px solid rgba(34, 211, 238, 0.5);
+  background: linear-gradient(160deg, rgba(8, 145, 178, 0.9), rgba(14, 116, 144, 0.9));
+  color: #ecfeff;
+  border-radius: 10px;
+  padding: 10px 12px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: transform 0.2s ease, filter 0.2s ease;
+}
+
+.report-download-btn:hover:enabled {
+  transform: translateY(-1px);
+  filter: brightness(1.08);
+}
+
+.report-download-btn:disabled {
+  cursor: not-allowed;
+  opacity: 0.7;
+}
+
+.report-secondary-btn {
+  border: 1px solid rgba(148, 163, 184, 0.4);
+  background: rgba(15, 23, 42, 0.9);
+  color: #e2e8f0;
+  border-radius: 10px;
+  padding: 10px 12px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.report-secondary-btn:disabled {
+  cursor: not-allowed;
+  opacity: 0.65;
+}
+
+.report-error {
+  margin: 2px 0 0;
+  color: #fecaca;
+  font-size: 0.88rem;
+}
+
+.admin-history-card {
+  grid-column: 1 / -1;
+}
+
+.report-history-list {
+  display: grid;
+  gap: 8px;
+}
+
+.history-row {
+  border: 1px solid rgba(148, 163, 184, 0.22);
+  border-radius: 10px;
+  padding: 10px;
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.history-row > div {
+  display: grid;
+  gap: 2px;
+}
+
+.history-row span {
+  color: #94a3b8;
+  font-size: 0.84rem;
+}
+
+.history-row small {
+  color: #94a3b8;
+}
+
+.history-status {
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  font-weight: 700;
+}
+
+.history-status.success {
+  color: #67e8f9;
+}
+
+.history-status.failed {
+  color: #fda4af;
+}
+
 .admin-logout-card {
   border-color: rgba(248, 113, 113, 0.35);
   background: linear-gradient(160deg, rgba(69, 10, 10, 0.9), rgba(127, 29, 29, 0.65));

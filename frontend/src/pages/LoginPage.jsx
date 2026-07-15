@@ -1,9 +1,10 @@
 import { useState } from "react";
 import { apiCall } from "../utils/api.js";
 import "../styles/LoginPage.css";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 function LoginPage() {
+  const navigate = useNavigate();
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
@@ -33,11 +34,9 @@ function LoginPage() {
       // ✅ save token
       localStorage.setItem("token", data.token);
       localStorage.setItem("userName", data.user?.username || "User");
+      window.dispatchEvent(new Event("auth-changed"));
 
-      // ✅ Refresh page to ensure navbar updates
-      setTimeout(() => {
-        window.location.href = "/dashboard";
-      }, 100);
+      navigate("/dashboard");
     } catch (err) {
       setError(`❌ ${err.message || "Login failed. Check credentials."}`);
     } finally {
