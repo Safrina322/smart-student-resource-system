@@ -255,6 +255,62 @@ const ensureExtendedLearningSchema = () => {
 
 ensureExtendedLearningSchema();
 
+// Expands the role model from 2 roles (student/admin) to 5: users gets
+// lecturer/moderator alongside student; admin gets a dept_admin/sysadmin
+// tier via a new column. No existing FK relationships change.
+const ensureRoleModel = () => {
+  db.query("SHOW COLUMNS FROM users LIKE 'role'", (checkErr, result) => {
+    if (checkErr) {
+      console.error("⚠️ Role schema check warning:", checkErr.message);
+      return;
+    }
+
+    const currentType = result[0]?.Type || "";
+    if (currentType.includes("lecturer") && currentType.includes("moderator")) {
+      console.log("✅ users.role already includes lecturer/moderator");
+      return;
+    }
+
+    db.query(
+      "ALTER TABLE users MODIFY COLUMN role ENUM('student','lecturer','moderator') DEFAULT 'student'",
+      (alterErr) => {
+        if (alterErr) {
+          console.error("⚠️ Role schema migration warning:", alterErr.message);
+        } else {
+          console.log("✅ Expanded users.role to student/lecturer/moderator");
+        }
+      }
+    );
+  });
+
+  db.query("SHOW COLUMNS FROM admin LIKE 'role'", (checkErr, result) => {
+    if (checkErr) {
+      console.error("⚠️ Admin role schema check warning:", checkErr.message);
+      return;
+    }
+
+    if (result.length > 0) {
+      console.log("✅ Column 'role' already exists on admin");
+      return;
+    }
+
+    // Existing admin rows predate the dept_admin/sysadmin split; they were
+    // the platform's only administrators, so they become sysadmin here.
+    db.query(
+      "ALTER TABLE admin ADD COLUMN role ENUM('dept_admin','sysadmin') DEFAULT 'sysadmin'",
+      (alterErr) => {
+        if (alterErr) {
+          console.error("⚠️ Admin role migration warning:", alterErr.message);
+        } else {
+          console.log("✅ Added role column to admin table (existing admins -> sysadmin)");
+        }
+      }
+    );
+  });
+};
+
+ensureRoleModel();
+
 // ✅ ADD MISSING COLUMNS TO RESOURCES TABLE
 const ensureResourcesColumns = () => {
   const columnsToAdd = [

@@ -3,8 +3,16 @@ import jwt from "jsonwebtoken";
 import { AppError } from "../utils/AppError.js";
 import * as adminRepository from "../repositories/adminRepository.js";
 
+// `role: "admin"` stays a fixed generic tier for backward compatibility
+// with adminAuth.js and anything else already checking for it;
+// `adminRole` carries the granular dept_admin/sysadmin distinction for
+// the new requireRole middleware.
 const signToken = (admin) =>
-  jwt.sign({ adminId: admin.id, role: "admin" }, process.env.JWT_SECRET, { expiresIn: "1d" });
+  jwt.sign(
+    { adminId: admin.id, role: "admin", adminRole: admin.role || "sysadmin" },
+    process.env.JWT_SECRET,
+    { expiresIn: "1d" }
+  );
 
 export const login = async ({ email, password }) => {
   const admin = await adminRepository.findByEmail(email);
@@ -32,6 +40,6 @@ export const login = async ({ email, password }) => {
   const token = signToken(admin);
   return {
     token,
-    admin: { id: admin.id, name: admin.name, email: admin.email },
+    admin: { id: admin.id, name: admin.name, email: admin.email, role: admin.role || "sysadmin" },
   };
 };
