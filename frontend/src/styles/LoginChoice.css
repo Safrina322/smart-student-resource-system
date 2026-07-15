@@ -63,14 +63,14 @@
 
 /* User Card Styling */
 .choice-card.user-card {
-  border-color: #00d4ff;
-  box-shadow: 0 0 20px rgba(0, 212, 255, 0.1);
+  border-color: var(--color-accent-cyan);
+  box-shadow: 0 0 20px rgba(var(--color-accent-cyan-rgb), 0.1);
 }
 
 .choice-card.user-card:hover {
-  border-color: #00ffcc;
-  background: linear-gradient(135deg, rgba(0, 212, 255, 0.1) 0%, rgba(0, 255, 204, 0.05) 100%);
-  box-shadow: 0 0 40px rgba(0, 212, 255, 0.3);
+  border-color: var(--color-accent-cyan);
+  background: linear-gradient(135deg, rgba(var(--color-accent-cyan-rgb), 0.1) 0%, rgba(var(--color-accent-cyan-rgb), 0.05) 100%);
+  box-shadow: 0 0 40px rgba(var(--color-accent-cyan-rgb), 0.3);
   transform: translateY(-10px);
 }
 
@@ -112,7 +112,7 @@
 }
 
 .choice-card.user-card h3 {
-  color: #00ffcc;
+  color: var(--color-accent-cyan);
 }
 
 .choice-card.admin-card h3 {
@@ -144,14 +144,14 @@
 }
 
 .choice-card.user-card .choice-btn {
-  border-color: #00d4ff;
-  color: #00d4ff;
+  border-color: var(--color-accent-cyan);
+  color: var(--color-accent-cyan);
 }
 
 .choice-card.user-card:hover .choice-btn {
-  background: linear-gradient(135deg, #00d4ff, #00ffcc);
+  background: linear-gradient(135deg, var(--color-accent-cyan), var(--color-accent-cyan));
   color: #0a0e27;
-  border-color: #00ffcc;
+  border-color: var(--color-accent-cyan);
   font-weight: 700;
 }
 
@@ -172,7 +172,7 @@
 .choice-footer {
   text-align: center;
   padding-top: 30px;
-  border-top: 1px solid rgba(0, 212, 255, 0.2);
+  border-top: 1px solid rgba(var(--color-accent-cyan-rgb), 0.2);
   display: flex;
   justify-content: center;
   gap: 40px;
@@ -186,7 +186,7 @@
 
 .choice-footer p a,
 .choice-footer a {
-  color: #00d4ff;
+  color: var(--color-accent-cyan);
   text-decoration: none;
   font-weight: 600;
   transition: color 0.3s ease;
@@ -194,7 +194,7 @@
 
 .choice-footer p a:hover,
 .choice-footer a:hover {
-  color: #00ffcc;
+  color: var(--color-accent-cyan);
   text-decoration: underline;
 }
 

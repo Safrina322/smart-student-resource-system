@@ -22,7 +22,7 @@
   left: 0;
   right: 0;
   bottom: 0;
-  background: radial-gradient(circle at 30% 20%, rgba(0, 255, 204, 0.1) 0%, transparent 50%),
+  background: radial-gradient(circle at 30% 20%, rgba(var(--color-accent-cyan-rgb), 0.1) 0%, transparent 50%),
               radial-gradient(circle at 70% 80%, rgba(255, 255, 255, 0.05) 0%, transparent 50%);
   z-index: 0;
 }
@@ -38,7 +38,7 @@
   font-size: 4rem;
   font-weight: 800;
   margin-bottom: 20px;
-  background: linear-gradient(90deg, #ffffff, #00ffcc);
+  background: linear-gradient(90deg, #ffffff, var(--color-accent-cyan));
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
@@ -70,7 +70,7 @@
 .stat h3 {
   font-size: 3rem;
   font-weight: 700;
-  color: #00ffcc;
+  color: var(--color-accent-cyan);
   margin-bottom: 5px;
 }
 
@@ -131,7 +131,7 @@
   left: 0;
   right: 0;
   bottom: 0;
-  background: linear-gradient(45deg, rgba(0, 255, 204, 0.2), rgba(255, 255, 255, 0.1));
+  background: linear-gradient(45deg, rgba(var(--color-accent-cyan-rgb), 0.2), rgba(255, 255, 255, 0.1));
   z-index: 1;
   mix-blend-mode: overlay;
 }
@@ -185,8 +185,8 @@
 .value-card:hover {
   transform: translateY(-15px);
   background: #1a1a1a;
-  border-color: #00ffcc;
-  box-shadow: 0 15px 30px rgba(0, 255, 204, 0.1);
+  border-color: var(--color-accent-cyan);
+  box-shadow: 0 15px 30px rgba(var(--color-accent-cyan-rgb), 0.1);
 }
 
 .value-icon {
@@ -238,7 +238,7 @@
   height: 100px;
   border-radius: 50%;
   margin: 0 auto 25px;
-  background: linear-gradient(135deg, #00ffcc, #0099ff);
+  background: linear-gradient(135deg, var(--color-accent-cyan), var(--color-accent));
   display: flex;
   align-items: center;
   justify-content: center;
@@ -264,7 +264,7 @@
 }
 
 .team-role {
-  color: #00ffcc;
+  color: var(--color-accent-cyan);
   font-weight: 600;
   margin-bottom: 15px;
   font-size: 1.1rem;
@@ -292,7 +292,7 @@
   left: 0;
   right: 0;
   bottom: 0;
-  background: radial-gradient(circle at 50% 50%, rgba(0, 255, 204, 0.1) 0%, transparent 70%);
+  background: radial-gradient(circle at 50% 50%, rgba(var(--color-accent-cyan-rgb), 0.1) 0%, transparent 70%);
   z-index: 0;
 }
 
@@ -334,14 +334,14 @@
 }
 
 .cta-btn.primary {
-  background: #00ffcc;
+  background: var(--color-accent-cyan);
   color: #000000;
 }
 
 .cta-btn.primary:hover {
   background: #ffffff;
   transform: translateY(-5px);
-  box-shadow: 0 10px 20px rgba(0, 255, 204, 0.3);
+  box-shadow: 0 10px 20px rgba(var(--color-accent-cyan-rgb), 0.3);
 }
 
 .cta-btn.secondary {
@@ -353,7 +353,7 @@
 .cta-btn.secondary:hover {
   background: rgba(255, 255, 255, 0.1);
   transform: translateY(-5px);
-  border-color: #00ffcc;
+  border-color: var(--color-accent-cyan);
 }
 
 /* ANIMATIONS */

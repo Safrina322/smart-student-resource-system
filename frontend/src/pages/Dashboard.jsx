@@ -4,6 +4,7 @@ import "../styles/Dashboard.css";
 import { Link, useNavigate } from "react-router-dom";
 import PopularResources from "../components/PopularResources.jsx";
 import NotificationsPanel from "../components/NotificationsPanel.jsx";
+import { SkeletonTableRows } from "../components/Skeleton.jsx";
 
 function Dashboard() {
   const [courses, setCourses] = useState([]);
@@ -172,9 +173,7 @@ function Dashboard() {
         <section className="recent-section">
           <h2>Recent Courses</h2>
 
-          {loading ? (
-            <p style={{ textAlign: "center" }}>Loading courses...</p>
-          ) : courses.length === 0 ? (
+          {!loading && courses.length === 0 ? (
             <p style={{ textAlign: "center", color: "#666" }}>No courses available yet</p>
           ) : (
             <table className="resources-table">
@@ -189,22 +188,26 @@ function Dashboard() {
               </thead>
 
               <tbody>
-                {courses.slice(0, 5).map((course) => (
-                  <tr key={course.id}>
-                    <td>{course.title}</td>
-                    <td>{course.subject}</td>
-                    <td>{course.level}</td>
-                    <td>{course.duration}</td>
-                    <td>
-                      <Link 
-                        to={`/resources/${course.id}`}
-                        className="view-course-link"
-                      >
-                        View
-                      </Link>
-                    </td>
-                  </tr>
-                ))}
+                {loading ? (
+                  <SkeletonTableRows rows={5} columns={5} />
+                ) : (
+                  courses.slice(0, 5).map((course) => (
+                    <tr key={course.id}>
+                      <td>{course.title}</td>
+                      <td>{course.subject}</td>
+                      <td>{course.level}</td>
+                      <td>{course.duration}</td>
+                      <td>
+                        <Link
+                          to={`/resources/${course.id}`}
+                          className="view-course-link"
+                        >
+                          View
+                        </Link>
+                      </td>
+                    </tr>
+                  ))
+                )}
               </tbody>
 
             </table>

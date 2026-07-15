@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { apiCall, getApiUrl } from "../utils/api";
 import "../styles/PopularResources.css";
+import { SkeletonCard } from "./Skeleton.jsx";
 
 const FALLBACK_IMAGE =
   "data:image/svg+xml;charset=UTF-8," +
@@ -55,7 +56,19 @@ function PopularResources() {
   };
 
   if (loading) {
-    return <div className="popular-resources-container"><p>Loading popular resources...</p></div>;
+    return (
+      <div className="popular-resources-container">
+        <section className="popular-section">
+          <h2>⭐ Most Popular Courses</h2>
+          <p className="section-subtitle">Based on views and user engagement</p>
+          <div className="popular-grid">
+            {Array.from({ length: 3 }).map((_, index) => (
+              <SkeletonCard key={index} />
+            ))}
+          </div>
+        </section>
+      </div>
+    );
   }
 
   return (

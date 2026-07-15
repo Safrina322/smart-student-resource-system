@@ -1,55 +1,74 @@
 import "../styles/Homepage.css";
 import homelogo from "../assets/home.jpg";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { motion } from "framer-motion";
+import {
+  HiOutlineRocketLaunch,
+  HiOutlineSparkles,
+  HiOutlineBookOpen,
+  HiOutlineBolt,
+  HiOutlineLockClosed,
+  HiOutlineUserGroup,
+  HiOutlineCalendarDays,
+  HiOutlineUsers,
+} from "react-icons/hi2";
+
+const fadeUp = {
+  hidden: { opacity: 0, y: 24 },
+  show: { opacity: 1, y: 0 },
+};
 
 function HomePage() {
   const navigate = useNavigate();
   const [activeFeature, setActiveFeature] = useState(0);
-  const [scrollY, setScrollY] = useState(0);
-  
+
   const features = [
-    { 
-      icon: "📚", 
-      title: "Centralized Resources", 
-      desc: "Access notes, PDFs, and materials in one organized place.", 
-      colorClass: "color-1" 
+    {
+      icon: HiOutlineBookOpen,
+      title: "Centralized Resources",
+      desc: "Access notes, PDFs, and materials in one organized place.",
+      colorClass: "color-1",
     },
-    { 
-      icon: "⚡", 
-      title: "Fast & Easy", 
-      desc: "Simple interface designed specifically for students' workflow.", 
-      colorClass: "color-2" 
+    {
+      icon: HiOutlineBolt,
+      title: "Fast & Easy",
+      desc: "Simple interface designed specifically for students' workflow.",
+      colorClass: "color-2",
     },
-    { 
-      icon: "🔒", 
-      title: "Secure System", 
-      desc: "Safe login and protected content with encrypted storage.", 
-      colorClass: "color-3" 
+    {
+      icon: HiOutlineLockClosed,
+      title: "Secure System",
+      desc: "Safe login and protected content with encrypted storage.",
+      colorClass: "color-3",
     },
-    { 
-      icon: "🤝", 
-      title: "Collaborative", 
-      desc: "Share and collaborate with peers in real-time.", 
-      colorClass: "color-4" 
+    {
+      icon: HiOutlineUserGroup,
+      title: "Collaborative",
+      desc: "Share and collaborate with peers in real-time.",
+      colorClass: "color-4",
     },
   ];
 
-  useEffect(() => {
-    const handleScroll = () => setScrollY(window.scrollY);
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
-
   return (
     <div className="home">
-      
+
       {/* HERO SECTION */}
       <section className="hero">
-        <div className="hero-text">
+        <motion.div
+          className="hero-text"
+          initial="hidden"
+          animate="show"
+          variants={fadeUp}
+          transition={{ duration: 0.6, ease: "easeOut" }}
+        >
           <div className="tagline">
-            <span className="tag">🚀 Future Ready</span>
-            <span className="tag">✨ Smart Learning</span>
+            <span className="tag">
+              <HiOutlineRocketLaunch className="tag-icon" /> Future Ready
+            </span>
+            <span className="tag">
+              <HiOutlineSparkles className="tag-icon" /> Smart Learning
+            </span>
           </div>
           <h1>
             <span className="gradient-text">Smart Student</span>
@@ -74,7 +93,7 @@ function HomePage() {
               Browse Resources
             </button>
           </div>
-          
+
           <div className="hero-stats">
             <div className="stat-item">
               <h4>10K+</h4>
@@ -89,62 +108,80 @@ function HomePage() {
               <p>Rating</p>
             </div>
           </div>
-        </div>
+        </motion.div>
 
-        <div className="hero-image">
+        <motion.div
+          className="hero-image"
+          initial={{ opacity: 0, scale: 0.92 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 0.7, ease: "easeOut", delay: 0.15 }}
+        >
           <div className="image-container">
-            <img 
-              src={homelogo} 
-              alt="Smart Student Platform" 
+            <img
+              src={homelogo}
+              alt="Smart Student Platform"
               className="main-image"
             />
             <div className="image-overlay"></div>
-            
+
             {/* Floating Cards around image */}
             <div className="floating-card card-1">
-              <div className="card-icon">📚</div>
+              <div className="card-icon"><HiOutlineBookOpen /></div>
               <p>Study Materials</p>
             </div>
             <div className="floating-card card-2">
-              <div className="card-icon">📅</div>
+              <div className="card-icon"><HiOutlineCalendarDays /></div>
               <p>Schedule</p>
             </div>
             <div className="floating-card card-3">
-              <div className="card-icon">👥</div>
+              <div className="card-icon"><HiOutlineUsers /></div>
               <p>Collaborate</p>
             </div>
           </div>
-        </div>
+        </motion.div>
       </section>
 
       {/* FEATURES SECTION */}
       <section className="features">
-        <div className="section-header">
+        <motion.div
+          className="section-header"
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, amount: 0.4 }}
+          transition={{ duration: 0.5 }}
+        >
           <span className="section-subtitle">Why Choose Us</span>
           <h2>Transform Your Learning Experience</h2>
           <p className="section-description">
             Discover features designed to make your academic journey smoother and more productive
           </p>
-        </div>
+        </motion.div>
 
         <div className="feature-grid">
-          {features.map((feature, index) => (
-            <div 
-              key={index}
-              className={`feature-card ${feature.colorClass} ${activeFeature === index ? 'active' : ''}`}
-              onMouseEnter={() => setActiveFeature(index)}
-              onClick={() => setActiveFeature(index)}
-            >
-              <div className="feature-icon">{feature.icon}</div>
-              <div className="feature-content">
-                <h3>{feature.title}</h3>
-                <p>{feature.desc}</p>
-                <div className="feature-hover">
-                  <span className="learn-more">Learn more →</span>
+          {features.map((feature, index) => {
+            const Icon = feature.icon;
+            return (
+              <motion.div
+                key={feature.title}
+                className={`feature-card ${feature.colorClass} ${activeFeature === index ? 'active' : ''}`}
+                onMouseEnter={() => setActiveFeature(index)}
+                onClick={() => setActiveFeature(index)}
+                initial={{ opacity: 0, y: 24 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, amount: 0.3 }}
+                transition={{ duration: 0.4, delay: index * 0.08 }}
+              >
+                <div className="feature-icon"><Icon /></div>
+                <div className="feature-content">
+                  <h3>{feature.title}</h3>
+                  <p>{feature.desc}</p>
+                  <div className="feature-hover">
+                    <span className="learn-more">Learn more →</span>
+                  </div>
                 </div>
-              </div>
-            </div>
-          ))}
+              </motion.div>
+            );
+          })}
         </div>
 
         {/* Feature Details */}
@@ -167,7 +204,7 @@ function HomePage() {
           <h2>What Students Say</h2>
           <p>Join thousands of successful students worldwide</p>
         </div>
-        
+
         <div className="testimonial-cards">
           <div className="testimonial-card">
             <div className="testimonial-content">
@@ -182,7 +219,7 @@ function HomePage() {
             </div>
             <div className="rating">★★★★★</div>
           </div>
-          
+
           <div className="testimonial-card">
             <div className="testimonial-content">
               <p>"Collaborating with classmates has never been easier. Highly recommended!"</p>
@@ -206,13 +243,13 @@ function HomePage() {
             <h2>Take the Next Step in Your Learning Journey</h2>
             <p>Start now or connect with our team for guidance, support, and onboarding help.</p>
             <div className="cta-buttons">
-              <button 
+              <button
                 className="cta-button primary"
                 onClick={() => navigate("/login")}
               >
                 Get Started Now →
               </button>
-              <button 
+              <button
                 className="cta-button secondary"
                 onClick={() => navigate("/contact")}
               >

@@ -7,12 +7,12 @@
   width: 100%;
   height: 70px;
   background: linear-gradient(90deg, #0a0e27 0%, #151d35 100%);
-  border-bottom: 2px solid #00d4ff;
+  border-bottom: 2px solid var(--color-accent-cyan);
   display: flex;
   justify-content: center;
   align-items: center;
   z-index: 1000;
-  box-shadow: 0 4px 20px rgba(0, 212, 255, 0.1);
+  box-shadow: 0 4px 20px rgba(var(--color-accent-cyan-rgb), 0.1);
 }
 
 .nav-container {
@@ -50,13 +50,13 @@
   height: 45px;
   width: 45px;
   border-radius: 8px;
-  box-shadow: 0 2px 8px rgba(0, 212, 255, 0.3);
+  box-shadow: 0 2px 8px rgba(var(--color-accent-cyan-rgb), 0.3);
 }
 
 .logo-text {
   font-size: 24px;
   font-weight: 800;
-  background: linear-gradient(90deg, #00ffcc, #00d4ff, #0099ff);
+  background: linear-gradient(90deg, var(--color-accent-cyan), var(--color-accent-cyan), var(--color-accent));
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -87,35 +87,35 @@
 }
 
 .nav-link:hover {
-  color: #00ffcc;
-  background: rgba(0, 255, 204, 0.1);
+  color: var(--color-accent-cyan);
+  background: rgba(var(--color-accent-cyan-rgb), 0.1);
   padding: 8px 15px;
 }
 
 /* Login Button - Special Styling */
 .login-btn {
-  background: linear-gradient(135deg, #00d4ff, #0099ff);
+  background: linear-gradient(135deg, var(--color-accent-cyan), var(--color-accent));
   color: white !important;
   padding: 10px 20px;
   border-radius: 8px;
   font-weight: 600;
-  box-shadow: 0 4px 15px rgba(0, 212, 255, 0.3);
+  box-shadow: 0 4px 15px rgba(var(--color-accent-cyan-rgb), 0.3);
 }
 
 .login-btn:hover {
-  background: linear-gradient(135deg, #00ffcc, #00b8ff);
-  box-shadow: 0 6px 20px rgba(0, 212, 255, 0.5);
+  background: linear-gradient(135deg, var(--color-accent-cyan), #00b8ff);
+  box-shadow: 0 6px 20px rgba(var(--color-accent-cyan-rgb), 0.5);
   transform: translateY(-2px);
 }
 
 /* Admin Links */
 .nav-link.admin {
-  color: #ffd700;
+  color: var(--color-gold);
 }
 
 .nav-link.admin:hover {
-  color: #ffed4e;
-  background: rgba(255, 215, 0, 0.1);
+  color: var(--color-gold-light);
+  background: rgba(var(--color-gold-rgb), 0.1);
 }
 
 /* ===== DROPDOWN MENU ===== */
@@ -125,26 +125,26 @@
 }
 
 .profile-btn {
-  background: rgba(0, 212, 255, 0.15);
-  border: 1px solid #00d4ff;
-  color: #00ffcc !important;
+  background: rgba(var(--color-accent-cyan-rgb), 0.15);
+  border: 1px solid var(--color-accent-cyan);
+  color: var(--color-accent-cyan) !important;
 }
 
 .profile-btn:hover {
-  background: rgba(0, 212, 255, 0.25);
-  border-color: #00ffcc;
+  background: rgba(var(--color-accent-cyan-rgb), 0.25);
+  border-color: var(--color-accent-cyan);
 }
 
 .profile-btn.admin-profile {
-  background: rgba(255, 215, 0, 0.15);
-  border: 1px solid #ffd700;
-  color: #ffd700 !important;
+  background: rgba(var(--color-gold-rgb), 0.15);
+  border: 1px solid var(--color-gold);
+  color: var(--color-gold) !important;
 }
 
 .profile-btn.admin-profile:hover {
-  background: rgba(255, 215, 0, 0.25);
-  border-color: #ffed4e;
-  color: #ffed4e !important;
+  background: rgba(var(--color-gold-rgb), 0.25);
+  border-color: var(--color-gold-light);
+  color: var(--color-gold-light) !important;
 }
 
 .dropdown-menu {
@@ -152,7 +152,7 @@
   top: 100%;
   right: 0;
   background: linear-gradient(135deg, #0a0e27 0%, #151d35 100%);
-  border: 1px solid #00d4ff;
+  border: 1px solid var(--color-accent-cyan);
   border-radius: 8px;
   padding: 10px 0;
   min-width: 200px;
@@ -177,18 +177,18 @@
 }
 
 .dropdown-item:hover {
-  background: rgba(0, 255, 204, 0.1);
-  color: #00ffcc;
+  background: rgba(var(--color-accent-cyan-rgb), 0.1);
+  color: var(--color-accent-cyan);
 }
 
 .dropdown-item.logout {
-  color: #ff6b6b;
-  border-top: 1px solid rgba(255, 107, 107, 0.2);
+  color: var(--color-danger-strong);
+  border-top: 1px solid rgba(var(--color-danger-strong-rgb), 0.2);
 }
 
 .dropdown-item.logout:hover {
-  background: rgba(255, 107, 107, 0.15);
-  color: #ff8888;
+  background: rgba(var(--color-danger-strong-rgb), 0.15);
+  color: var(--color-danger);
 }
 
 /* ===== HAMBURGER MENU ===== */
@@ -204,7 +204,7 @@
 .hamburger span {
   width: 25px;
   height: 3px;
-  background: #00ffcc;
+  background: var(--color-accent-cyan);
   border-radius: 3px;
   transition: all 0.3s ease;
 }
@@ -243,7 +243,7 @@
     max-height: 0;
     overflow: hidden;
     transition: max-height 0.3s ease;
-    border-bottom: 2px solid #00d4ff;
+    border-bottom: 2px solid var(--color-accent-cyan);
   }
 
   .nav-menu.active {
@@ -254,12 +254,12 @@
     width: 100%;
     padding: 15px 20px;
     border-radius: 0;
-    border-bottom: 1px solid rgba(0, 212, 255, 0.1);
+    border-bottom: 1px solid rgba(var(--color-accent-cyan-rgb), 0.1);
     justify-content: flex-start;
   }
 
   .nav-link:hover {
-    background: rgba(0, 212, 255, 0.15);
+    background: rgba(var(--color-accent-cyan-rgb), 0.15);
   }
 
   .login-btn {
@@ -319,14 +319,4 @@
 
 .dropdown-menu {
   animation: slideDown 0.3s ease;
-}
-  color: white;
-  border: none;
-  padding: 8px 14px;
-  border-radius: 6px;
-  cursor: pointer;
-}
-
-.logout-btn:hover {
-  background: darkred;
 }
