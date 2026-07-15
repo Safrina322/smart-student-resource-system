@@ -1,5 +1,6 @@
 import express from "express";
 import cors from "cors";
+import helmet from "helmet";
 import dotenv from "dotenv";
 import db from "./db.js";
 import authRoutes from "./routes/authRoutes.js";
@@ -365,6 +366,15 @@ const corsOptions = {
   methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
   allowedHeaders: ["Content-Type", "Authorization"],
 };
+// crossOriginResourcePolicy is relaxed because the frontend (port 5173) and
+// this API/static file server (port 5000) are different origins; helmet's
+// default "same-origin" policy would block the frontend from loading
+// /images and /lesson-files.
+app.use(
+  helmet({
+    crossOriginResourcePolicy: { policy: "cross-origin" },
+  })
+);
 app.use(cors(corsOptions));
 
 // Seed resources after a short delay to ensure DB is ready
@@ -398,9 +408,13 @@ app.use("/api", (req, res) => {
   res.status(404).json({ message: `API route not found: ${req.method} ${req.originalUrl}` });
 });
 
+// eslint-disable-next-line no-unused-vars
 app.use((err, req, res, next) => {
-  console.error("❌ API Error:", err);
-  res.status(500).json({ message: "Internal server error" });
+  const statusCode = err.statusCode || 500;
+  if (statusCode >= 500) {
+    console.error("❌ API Error:", err);
+  }
+  res.status(statusCode).json({ message: err.message || "Internal server error" });
 });
 
 

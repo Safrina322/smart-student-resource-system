@@ -1,15 +1,6 @@
-import db from "../db.js";
+import { queryAsync } from "../db.js";
 
-export const queryAsync = (sql, values = []) =>
-  new Promise((resolve, reject) => {
-    db.query(sql, values, (err, rows) => {
-      if (err) {
-        reject(err);
-        return;
-      }
-      resolve(rows || []);
-    });
-  });
+export { queryAsync };
 
 export const csvEscape = (value) => {
   if (value === null || value === undefined) return "";

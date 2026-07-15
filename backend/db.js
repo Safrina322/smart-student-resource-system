@@ -25,5 +25,18 @@ db.getConnection((err, connection) => {
   }
 });
 
+// Promise wrapper around the callback pool so repositories/services can use
+// async/await instead of nested callbacks.
+export const queryAsync = (sql, values = []) =>
+  new Promise((resolve, reject) => {
+    db.query(sql, values, (err, rows) => {
+      if (err) {
+        reject(err);
+        return;
+      }
+      resolve(rows);
+    });
+  });
+
 export default db;
 
