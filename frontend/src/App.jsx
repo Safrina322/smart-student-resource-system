@@ -1,4 +1,5 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { AuthProvider } from "./context/AuthContext.jsx";
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
 import ScrollToTop from "./components/ScrollToTop.jsx";
@@ -26,6 +27,7 @@ import AdminAuditLogs from "./pages/AdminAuditLogs.jsx";
 import NotFoundPage from "./pages/NotFoundPage.jsx";
 function App() {
   return (
+    <AuthProvider>
     <Router>
       <ScrollToTop />
       <Navbar />
@@ -61,6 +63,7 @@ function App() {
 
 
     </Router>
+    </AuthProvider>
   );
 }
 

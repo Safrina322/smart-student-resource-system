@@ -1,83 +1,7 @@
-// import { useState } from "react";
-// import "../styles/LoginPage.css";
-// import { Link } from "react-router-dom";
-
-
-// function LoginPage() {
-//   const [pwd1, setPwd1] = useState("");
-//   const [pwd2, setPwd2] = useState("");
-//   const [same, setSame] = useState(true);
-
-//   function handlePwd1Change(event) {
-//     setPwd1(event.target.value);
-//   }
-
-//   function handlePwd2Change(event) {
-//     setPwd2(event.target.value);
-//     setSame(pwd1 === event.target.value);
-//   }
-
-//   return (
-//     <div className="login-page">
-//       <form className="login-form">
-//         <h2>Create Account</h2>
-
-//         <div className="mb-3">
-//           <label className="form-label">Username</label>
-//           <input type="text" className="form-control" />
-//         </div>
-
-//         <div className="mb-3">
-//           <label className="form-label">Email address</label>
-//           <input type="email" className="form-control" />
-//         </div>
-
-//         <div className="mb-3">
-//           <label className="form-label">Password</label>
-//           <input
-//             type="password"
-//             className="form-control"
-//             value={pwd1}
-//             onChange={handlePwd1Change}
-//           />
-//         </div>
-
-//         <div className="mb-3">
-//           <label className="form-label">Re-enter Password</label>
-//           <input
-//             type="password"
-//             className="form-control"
-//             value={pwd2}
-//             onChange={handlePwd2Change}
-//           />
-//         </div>
-
-//         {!same && <p className="password-error">Passwords do not match!</p>}
-
-//         <div className="mb-3 form-check">
-//           <input type="checkbox" className="form-check-input" />
-//           <label className="form-check-label">I Agree</label>
-//         </div>
-
-//         <button type="submit" className="btn btn-primary">
-//           Create an Account
-//         </button>
-//         <p className="switch-auth">
-//   Already have an account?{" "}
-//   <Link to="/already">Login</Link>
-
-// </p>
-
-//       </form>
-//     </div>
-//   );
-// }
-
-// export default LoginPage;
-
 import { useState } from "react";
 import "../styles/LoginPage.css";
 import { Link, useNavigate } from "react-router-dom";
+import { useAuth } from "../hooks/useAuth.js";
 
 function RegisterPage() {
   const [username, setUsername] = useState("");
@@ -85,40 +9,28 @@ function RegisterPage() {
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
+  const { register } = useAuth();
 
   const handleRegister = async (e) => {
     e.preventDefault();
+    setError("");
 
     if (password !== confirmPassword) {
       setError("Passwords do not match");
       return;
     }
 
+    setLoading(true);
+
     try {
-      const res = await fetch("http://localhost:5000/api/auth/register", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          username,
-          email,
-          password,
-        }),
-      });
-
-      const data = await res.json();
-
-      if (!res.ok) {
-        setError(data.message || "Registration failed");
-        return;
-      }
-
-      // ✅ Registration success → go to login
+      await register({ username, email, password });
       navigate("/login");
     } catch (err) {
-      setError("Server error. Try again later.");
+      setError(err.message || "Registration failed");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -173,8 +85,8 @@ function RegisterPage() {
           />
         </div>
 
-        <button type="submit" className="btn btn-primary">
-          Create an Account
+        <button type="submit" className="btn btn-primary" disabled={loading}>
+          {loading ? "Creating account..." : "Create an Account"}
         </button>
 
         <p className="switch-auth">

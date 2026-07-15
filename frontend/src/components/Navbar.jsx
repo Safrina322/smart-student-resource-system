@@ -2,91 +2,26 @@ import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
 import logo from "../assets/icon.jpg";
 import "../styles/Navbar.css";
+import { useAuth } from "../hooks/useAuth.js";
 
 function Navbar() {
   const navigate = useNavigate();
   const location = useLocation();
+  const { user, admin, isAuthenticated, isAdminAuthenticated, logout } = useAuth();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [profileDropdown, setProfileDropdown] = useState(false);
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [isAdmin, setIsAdmin] = useState(false);
-  const [userName, setUserName] = useState("");
-  const [adminName, setAdminName] = useState("");
 
-  const buildAdminDisplayName = (name, email) => {
-    const cleanedName = (name || "").trim();
-    if (cleanedName && cleanedName.toLowerCase() !== "admin user") {
-      return cleanedName;
-    }
-
-    const mail = (email || "").trim().toLowerCase();
-    if (mail.includes("@")) {
-      return mail.split("@")[0];
-    }
-
-    return cleanedName || "Admin";
-  };
-
-  const refreshAuthState = () => {
-    const token = localStorage.getItem("token");
-    const adminToken = localStorage.getItem("adminToken");
-
-    if (adminToken) {
-      setIsAdmin(true);
-      setIsLoggedIn(true);
-      const storedAdminName = localStorage.getItem("adminName") || "";
-      const storedAdminEmail = localStorage.getItem("adminEmail") || "";
-      setAdminName(buildAdminDisplayName(storedAdminName, storedAdminEmail));
-    } else if (token) {
-      setIsLoggedIn(true);
-      setIsAdmin(false);
-      setUserName(localStorage.getItem("userName") || "User");
-    } else {
-      setIsLoggedIn(false);
-      setIsAdmin(false);
-      setUserName("");
-      setAdminName("");
-    }
-  };
+  const isLoggedIn = isAuthenticated || isAdminAuthenticated;
+  const isAdmin = isAdminAuthenticated;
+  const userName = user?.username || "";
+  const adminName = admin?.name || "";
 
   useEffect(() => {
-    refreshAuthState();
     setProfileDropdown(false);
   }, [location.pathname]);
 
-  useEffect(() => {
-    const handleStorage = () => refreshAuthState();
-    const handleAuthChanged = () => refreshAuthState();
-
-    window.addEventListener("storage", handleStorage);
-    window.addEventListener("auth-changed", handleAuthChanged);
-
-    return () => {
-      window.removeEventListener("storage", handleStorage);
-      window.removeEventListener("auth-changed", handleAuthChanged);
-    };
-  }, []);
-
   const handleLogout = () => {
-    localStorage.removeItem("token");
-    localStorage.removeItem("userName");
-    localStorage.removeItem("user");
-    localStorage.removeItem("adminToken");
-    localStorage.removeItem("adminName");
-    localStorage.removeItem("adminEmail");
-    window.dispatchEvent(new Event("auth-changed"));
-    setProfileDropdown(false);
-    navigate("/");
-  };
-
-  const handleAdminLogout = () => {
-    localStorage.removeItem("adminToken");
-    localStorage.removeItem("adminName");
-    localStorage.removeItem("adminEmail");
-    localStorage.removeItem("token");
-    localStorage.removeItem("userName");
-    localStorage.removeItem("user");
-    window.dispatchEvent(new Event("auth-changed"));
+    logout();
     setProfileDropdown(false);
     navigate("/");
   };
@@ -183,9 +118,9 @@ function Navbar() {
                 </button>
                 {profileDropdown && (
                   <div className="dropdown-menu">
-                    <button 
+                    <button
                       className="dropdown-item logout"
-                      onClick={handleAdminLogout}
+                      onClick={handleLogout}
                     >
                       🚪 Admin Logout
                     </button>

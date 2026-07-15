@@ -1,10 +1,11 @@
 import { useState } from "react";
-import { apiCall } from "../utils/api.js";
 import "../styles/LoginPage.css";
 import { Link, useNavigate } from "react-router-dom";
+import { useAuth } from "../hooks/useAuth.js";
 
 function LoginPage() {
   const navigate = useNavigate();
+  const { login } = useAuth();
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
@@ -22,20 +23,7 @@ function LoginPage() {
     setLoading(true);
 
     try {
-      const data = await apiCall("/api/auth/login", {
-        method: "POST",
-        body: JSON.stringify({ username, password }),
-      });
-
-      // ✅ Clear any old admin session
-      localStorage.removeItem("adminToken");
-      localStorage.removeItem("adminName");
-
-      // ✅ save token
-      localStorage.setItem("token", data.token);
-      localStorage.setItem("userName", data.user?.username || "User");
-      window.dispatchEvent(new Event("auth-changed"));
-
+      await login({ username, password });
       navigate("/dashboard");
     } catch (err) {
       setError(`❌ ${err.message || "Login failed. Check credentials."}`);

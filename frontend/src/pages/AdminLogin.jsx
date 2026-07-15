@@ -1,28 +1,15 @@
 import { useState } from "react";
-import { apiCall } from "../utils/api.js";
 import { useNavigate } from "react-router-dom";
 import "../styles/LoginPage.css";
+import { useAuth } from "../hooks/useAuth.js";
 
 function AdminLogin() {
   const navigate = useNavigate();
+  const { adminLogin } = useAuth();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
-
-  const buildAdminDisplayName = (name, emailValue) => {
-    const cleanedName = (name || "").trim();
-    if (cleanedName && cleanedName.toLowerCase() !== "admin user") {
-      return cleanedName;
-    }
-
-    const mail = (emailValue || "").trim().toLowerCase();
-    if (mail.includes("@")) {
-      return mail.split("@")[0];
-    }
-
-    return cleanedName || "Admin";
-  };
 
   const handleLogin = async (e) => {
     e.preventDefault();
@@ -36,25 +23,7 @@ function AdminLogin() {
     setLoading(true);
 
     try {
-      const data = await apiCall("/api/admin/login", {
-        method: "POST",
-        body: JSON.stringify({ email, password }),
-      });
-
-      // ✅ Clear any old student session
-      localStorage.removeItem("token");
-      localStorage.removeItem("userName");
-      localStorage.removeItem("user");
-
-      // ✅ Save admin token and info
-      localStorage.setItem("adminToken", data.token);
-      localStorage.setItem("adminEmail", data.admin?.email || email);
-      localStorage.setItem(
-        "adminName",
-        buildAdminDisplayName(data.admin?.name, data.admin?.email || email)
-      );
-      window.dispatchEvent(new Event("auth-changed"));
-
+      await adminLogin({ email, password });
       navigate("/admin/dashboard");
     } catch (err) {
       setError(`❌ ${err.message || "Admin login failed. Check credentials."}`);
