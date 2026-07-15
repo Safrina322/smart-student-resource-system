@@ -258,6 +258,9 @@ ensureExtendedLearningSchema();
 const ensureResourcesColumns = () => {
   const columnsToAdd = [
     { name: "description", definition: "description TEXT" },
+    { name: "category", definition: "category VARCHAR(100)" },
+    { name: "image_url", definition: "image_url VARCHAR(500)" },
+    { name: "resource_link", definition: "resource_link VARCHAR(500)" },
   ];
 
   columnsToAdd.forEach(({ name, definition }) => {
@@ -410,7 +413,10 @@ app.listen(PORT, () => {
 });
 
 
-// 🔥 ADD THIS AT THE VERY BOTTOM
 process.on("uncaughtException", (err) => {
   console.error("❌ Uncaught Exception:", err);
+});
+
+process.on("unhandledRejection", (err) => {
+  console.error("❌ Unhandled Promise Rejection:", err);
 });
