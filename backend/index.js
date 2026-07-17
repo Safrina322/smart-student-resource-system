@@ -578,8 +578,19 @@ db.query(
 );
 
 // ✅ Configure CORS for the frontend app
+// Vite picks the next free port (5174, 5175, ...) whenever 5173 is already
+// taken by another process, which silently breaks a fixed-origin CORS check
+// with a generic "network error" in the browser. In development, allow any
+// localhost port instead of hardcoding one; production still locks to the
+// configured FRONTEND_URL.
+const isProduction = process.env.NODE_ENV === "production";
 const corsOptions = {
-  origin: process.env.FRONTEND_URL || "http://localhost:5173",
+  origin: (origin, callback) => {
+    if (!origin) return callback(null, true); // same-origin / non-browser requests (curl, server-to-server)
+    if (origin === process.env.FRONTEND_URL) return callback(null, true);
+    if (!isProduction && /^http:\/\/localhost:\d+$/.test(origin)) return callback(null, true);
+    callback(new Error(`Not allowed by CORS: ${origin}`));
+  },
   credentials: false,
   methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
   allowedHeaders: ["Content-Type", "Authorization"],
