@@ -1,49 +1,9 @@
-// import { useEffect } from "react";
-// import { useNavigate, Link } from "react-router-dom";
-// import "../styles/AdminDashboard.css";
-
-// function AdminDashboard() {
-//   const navigate = useNavigate();
-
-//   useEffect(() => {
-//     const token = localStorage.getItem("adminToken");
-//     if (!token) {
-//       navigate("/admin/login");
-//     }
-//   }, []);
-
-//   const handleLogout = () => {
-//     localStorage.removeItem("adminToken");
-//     navigate("/admin/login");
-//   };
-
-//   return (
-//     <div className="admin-container">
-//       <h2 className="admin-title">Admin Dashboard</h2>
-
-//       <div className="admin-cards">
-//         <Link to="/admin/add-course" className="admin-card">
-//           Add Course
-//         </Link>
-
-//         <Link to="/admin/requests" className="admin-card">
-//           Manage Requests
-//         </Link>
-
-//         <button onClick={handleLogout} className="admin-card logout-btn">
-//           Logout
-//         </button>
-//       </div>
-//     </div>
-//   );
-// }
-
-// export default AdminDashboard;
-
 import { useEffect, useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { apiCall, getApiUrl, getAuthHeader } from "../utils/api";
 import "../styles/AdminDashboard.css";
+import ActivityTrendChart from "../components/charts/ActivityTrendChart.jsx";
+import TopSubjectsChart from "../components/charts/TopSubjectsChart.jsx";
 
 function AdminDashboard() {
   const navigate = useNavigate();
@@ -163,17 +123,6 @@ function AdminDashboard() {
       setScheduleError("Could not load schedule.");
     }
   };
-
-  const maxActivity = Math.max(
-    1,
-    ...(trends.approvalsByDay || []),
-    ...(trends.resourceOpensByDay || [])
-  );
-
-  const maxSubjectCount = Math.max(
-    1,
-    ...((trends.topSubjects || []).map((item) => item.count || 0))
-  );
 
   const handleLogout = () => {
     localStorage.removeItem("adminToken");
@@ -328,61 +277,26 @@ function AdminDashboard() {
           <h3>7-Day Activity</h3>
           <p>Approvals and resource opens over the last week.</p>
 
-          <div className="activity-chart">
-            {(trends.labels || []).map((label, idx) => {
-              const approvals = trends.approvalsByDay?.[idx] || 0;
-              const opens = trends.resourceOpensByDay?.[idx] || 0;
-
-              return (
-                <div className="activity-col" key={`${label}-${idx}`}>
-                  <div className="activity-bars">
-                    <span
-                      className="bar approvals"
-                      style={{ height: `${Math.max(6, (approvals / maxActivity) * 100)}%` }}
-                      title={`Approvals: ${approvals}`}
-                    />
-                    <span
-                      className="bar opens"
-                      style={{ height: `${Math.max(6, (opens / maxActivity) * 100)}%` }}
-                      title={`Opens: ${opens}`}
-                    />
-                  </div>
-                  <small>{label}</small>
-                </div>
-              );
-            })}
-          </div>
-
-          <div className="chart-legend">
-            <span><i className="dot approvals"></i>Approvals</span>
-            <span><i className="dot opens"></i>Resource Opens</span>
-          </div>
+          {(trends.labels || []).length === 0 ? (
+            <p className="chart-empty">No activity data yet.</p>
+          ) : (
+            <ActivityTrendChart
+              labels={trends.labels || []}
+              approvalsByDay={trends.approvalsByDay || []}
+              resourceOpensByDay={trends.resourceOpensByDay || []}
+            />
+          )}
         </article>
 
         <article className="admin-chart-card">
           <h3>Top Subjects</h3>
           <p>Current distribution across published courses.</p>
 
-          <div className="subject-bars">
-            {(trends.topSubjects || []).length === 0 ? (
-              <p className="chart-empty">No subject data yet.</p>
-            ) : (
-              (trends.topSubjects || []).map((item) => (
-                <div className="subject-row" key={item.subject}>
-                  <div className="subject-labels">
-                    <span>{item.subject}</span>
-                    <span>{item.count}</span>
-                  </div>
-                  <div className="subject-track">
-                    <span
-                      className="subject-fill"
-                      style={{ width: `${(item.count / maxSubjectCount) * 100}%` }}
-                    />
-                  </div>
-                </div>
-              ))
-            )}
-          </div>
+          {(trends.topSubjects || []).length === 0 ? (
+            <p className="chart-empty">No subject data yet.</p>
+          ) : (
+            <TopSubjectsChart subjects={trends.topSubjects || []} />
+          )}
         </article>
       </section>
 

@@ -3,6 +3,7 @@ import { useState, useEffect } from "react";
 import logo from "../assets/icon.jpg";
 import "../styles/Navbar.css";
 import { useAuth } from "../hooks/useAuth.js";
+import GlobalSearch from "./GlobalSearch.jsx";
 
 function Navbar() {
   const navigate = useNavigate();
@@ -45,6 +46,8 @@ function Navbar() {
             <span className="logo-text">SmartStudent</span>
           </Link>
         </div>
+
+        <GlobalSearch />
 
         {/* Hamburger Menu Icon */}
         <div className="hamburger" onClick={toggleMobileMenu}>

@@ -1,0 +1,136 @@
+.global-search {
+  position: relative;
+  width: 260px;
+  margin: 0 16px;
+}
+
+.global-search-input-wrap {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(2, 6, 23, 0.5);
+  border: 1px solid var(--color-border);
+  border-radius: 999px;
+  padding: 7px 14px;
+  transition: border-color 0.2s ease;
+}
+
+.global-search-input-wrap:focus-within {
+  border-color: var(--color-accent-cyan);
+}
+
+.global-search-icon {
+  color: var(--color-text-muted);
+  flex-shrink: 0;
+}
+
+.global-search-input-wrap input {
+  flex: 1;
+  background: none;
+  border: none;
+  outline: none;
+  color: var(--color-text);
+  font-size: 0.85rem;
+  min-width: 0;
+}
+
+.global-search-clear {
+  background: none;
+  border: none;
+  color: var(--color-text-muted);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+}
+
+.global-search-dropdown {
+  position: absolute;
+  top: calc(100% + 8px);
+  left: 0;
+  width: 340px;
+  max-width: 90vw;
+  max-height: 420px;
+  overflow-y: auto;
+  background: var(--color-surface-strong);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-md);
+  padding: 14px;
+  z-index: 2000;
+}
+
+.global-search-section {
+  margin-bottom: 14px;
+}
+
+.global-search-section:last-child {
+  margin-bottom: 0;
+}
+
+.global-search-section h4 {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--color-text-muted);
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 8px;
+}
+
+.global-search-chip {
+  display: inline-block;
+  background: rgba(148, 163, 184, 0.12);
+  border: 1px solid var(--color-border);
+  color: var(--color-text-secondary);
+  border-radius: 999px;
+  padding: 5px 12px;
+  font-size: 0.8rem;
+  margin: 0 6px 6px 0;
+  cursor: pointer;
+}
+
+.global-search-chip:hover {
+  border-color: var(--color-accent-cyan);
+  color: var(--color-text);
+}
+
+.global-search-result {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  text-align: left;
+  background: none;
+  border: none;
+  padding: 8px 6px;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+}
+
+.global-search-result:hover {
+  background: rgba(148, 163, 184, 0.1);
+}
+
+.global-search-result-title {
+  color: var(--color-text);
+  font-size: 0.9rem;
+}
+
+.global-search-result-subtitle {
+  color: var(--color-text-muted);
+  font-size: 0.75rem;
+}
+
+.global-search-empty {
+  color: var(--color-text-muted);
+  font-size: 0.85rem;
+  text-align: center;
+  padding: 8px 0;
+}
+
+@media (max-width: 900px) {
+  .global-search {
+    width: 100%;
+    margin: 10px 0;
+  }
+}

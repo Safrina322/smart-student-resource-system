@@ -19,6 +19,7 @@ import userNotificationRoutes from "./routes/userNotificationRoutes.js";
 import adminAuditRoutes from "./routes/adminAuditRoutes.js";
 import lecturerResourceRoutes from "./routes/lecturerResourceRoutes.js";
 import moderationRoutes from "./routes/moderationRoutes.js";
+import searchRoutes from "./routes/searchRoutes.js";
 import { startReportScheduler } from "./utils/reportScheduler.js";
 dotenv.config();
 
@@ -558,6 +559,24 @@ const seedDemoRoleAccounts = () => {
   });
 };
 
+db.query(
+  `CREATE TABLE IF NOT EXISTS search_logs (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    query VARCHAR(255) NOT NULL,
+    user_id INT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    INDEX idx_search_logs_query (query),
+    INDEX idx_search_logs_created_at (created_at)
+  ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4`,
+  (tableErr) => {
+    if (tableErr) {
+      console.error("⚠️ search_logs migration warning:", tableErr.message);
+    } else {
+      console.log("✅ search_logs table ready");
+    }
+  }
+);
+
 // ✅ Configure CORS for the frontend app
 const corsOptions = {
   origin: process.env.FRONTEND_URL || "http://localhost:5173",
@@ -594,6 +613,7 @@ app.use("/api/notifications", userNotificationRoutes);
 app.use("/api/admin/audit", adminAuditRoutes);
 app.use("/api/lecturer/resources", lecturerResourceRoutes);
 app.use("/api/moderation", moderationRoutes);
+app.use("/api/search", searchRoutes);
 
 // 🔓 expose images folder
 app.use("/api/admin/courses", adminCourseRoutes);
