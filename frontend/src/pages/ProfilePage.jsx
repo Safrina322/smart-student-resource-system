@@ -1,0 +1,173 @@
+import { useEffect, useState } from "react";
+import { useForm } from "react-hook-form";
+import "../styles/ProfilePage.css";
+import { useAuth } from "../hooks/useAuth.js";
+
+function ProfilePage() {
+  const { fetchProfile, updateProfile, changePassword } = useAuth();
+  const [loading, setLoading] = useState(true);
+  const [profileMessage, setProfileMessage] = useState("");
+  const [passwordMessage, setPasswordMessage] = useState("");
+
+  const profileForm = useForm({
+    defaultValues: {
+      firstName: "",
+      lastName: "",
+      phone: "",
+      semester: "",
+      courseBranch: "",
+    },
+  });
+
+  const passwordForm = useForm({
+    defaultValues: { currentPassword: "", newPassword: "", confirmPassword: "" },
+  });
+
+  useEffect(() => {
+    fetchProfile()
+      .then((profile) => {
+        profileForm.reset({
+          firstName: profile.firstName || "",
+          lastName: profile.lastName || "",
+          phone: profile.phone || "",
+          semester: profile.semester || "",
+          courseBranch: profile.courseBranch || "",
+        });
+      })
+      .finally(() => setLoading(false));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  const onSaveProfile = async (values) => {
+    setProfileMessage("");
+    try {
+      const data = await updateProfile(values);
+      setProfileMessage(data.message);
+    } catch (err) {
+      setProfileMessage(err.message || "Could not update profile.");
+    }
+  };
+
+  const newPassword = passwordForm.watch("newPassword");
+
+  const onChangePassword = async ({ currentPassword, newPassword }) => {
+    setPasswordMessage("");
+    try {
+      const data = await changePassword({ currentPassword, newPassword });
+      setPasswordMessage(data.message);
+      passwordForm.reset();
+    } catch (err) {
+      setPasswordMessage(err.message || "Could not change password.");
+    }
+  };
+
+  if (loading) {
+    return (
+      <div className="profile-page">
+        <p style={{ color: "var(--color-text-muted)", textAlign: "center", paddingTop: 60 }}>
+          Loading profile...
+        </p>
+      </div>
+    );
+  }
+
+  return (
+    <div className="profile-page">
+      <h1>Profile Settings</h1>
+
+      <section className="profile-card">
+        <h2>Profile Information</h2>
+        <form onSubmit={profileForm.handleSubmit(onSaveProfile)}>
+          {profileMessage && <p className="profile-message">{profileMessage}</p>}
+
+          <div className="profile-grid">
+            <div className="profile-field">
+              <label>First Name</label>
+              <input type="text" {...profileForm.register("firstName")} />
+            </div>
+            <div className="profile-field">
+              <label>Last Name</label>
+              <input type="text" {...profileForm.register("lastName")} />
+            </div>
+            <div className="profile-field">
+              <label>Phone</label>
+              <input type="text" {...profileForm.register("phone")} />
+            </div>
+            <div className="profile-field">
+              <label>Semester</label>
+              <input type="number" min="1" max="12" {...profileForm.register("semester")} />
+            </div>
+            <div className="profile-field profile-field-wide">
+              <label>Course / Branch</label>
+              <input type="text" {...profileForm.register("courseBranch")} />
+            </div>
+          </div>
+
+          <button type="submit" className="profile-btn-primary" disabled={profileForm.formState.isSubmitting}>
+            {profileForm.formState.isSubmitting ? "Saving..." : "Save Changes"}
+          </button>
+        </form>
+      </section>
+
+      <section className="profile-card">
+        <h2>Change Password</h2>
+        <form onSubmit={passwordForm.handleSubmit(onChangePassword)}>
+          {passwordMessage && <p className="profile-message">{passwordMessage}</p>}
+
+          <div className="profile-grid">
+            <div className="profile-field profile-field-wide">
+              <label>Current Password</label>
+              <input
+                type="password"
+                {...passwordForm.register("currentPassword", { required: "Current password is required" })}
+              />
+              {passwordForm.formState.errors.currentPassword && (
+                <span className="profile-error">
+                  {passwordForm.formState.errors.currentPassword.message}
+                </span>
+              )}
+            </div>
+            <div className="profile-field">
+              <label>New Password</label>
+              <input
+                type="password"
+                {...passwordForm.register("newPassword", {
+                  required: "New password is required",
+                  minLength: { value: 6, message: "Must be at least 6 characters" },
+                })}
+              />
+              {passwordForm.formState.errors.newPassword && (
+                <span className="profile-error">{passwordForm.formState.errors.newPassword.message}</span>
+              )}
+            </div>
+            <div className="profile-field">
+              <label>Confirm New Password</label>
+              <input
+                type="password"
+                {...passwordForm.register("confirmPassword", {
+                  required: "Please confirm your new password",
+                  validate: (value) => value === newPassword || "Passwords do not match",
+                })}
+              />
+              {passwordForm.formState.errors.confirmPassword && (
+                <span className="profile-error">
+                  {passwordForm.formState.errors.confirmPassword.message}
+                </span>
+              )}
+            </div>
+          </div>
+
+          <button
+            type="submit"
+            className="profile-btn-primary"
+            disabled={passwordForm.formState.isSubmitting}
+          >
+            {passwordForm.formState.isSubmitting ? "Updating..." : "Change Password"}
+          </button>
+        </form>
+      </section>
+    </div>
+  );
+}
+
+export default ProfilePage;

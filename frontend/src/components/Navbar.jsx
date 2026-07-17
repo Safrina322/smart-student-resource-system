@@ -82,7 +82,9 @@ function Navbar() {
                 Upload
               </Link>
 
-              <span className="nav-link profile-btn">👤 {userName}</span>
+              <Link to="/profile" className="nav-link profile-btn" onClick={closeMobileMenu}>
+                👤 {userName}
+              </Link>
               <button className="nav-link profile-btn" onClick={handleLogout}>
                 🚪 Logout
               </button>

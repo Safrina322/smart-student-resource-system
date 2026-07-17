@@ -63,6 +63,71 @@ export const sendRequestStatusEmail = async ({
 
 export const isSmtpReady = () => smtpConfigured && Boolean(transporter);
 
+const frontendUrl = () => process.env.FRONTEND_URL || "http://localhost:5173";
+
+export const sendVerificationEmail = async ({ to, name, token }) => {
+  if (!to) return;
+
+  if (!smtpConfigured || !transporter) {
+    console.warn("⚠️ Email skipped: SMTP not configured.");
+    return;
+  }
+
+  const verifyUrl = `${frontendUrl()}/verify-email/${token}`;
+  const html = `
+    <div style="font-family: Arial, sans-serif; line-height: 1.6; color: #111827;">
+      <h2 style="margin-bottom: 12px;">Hi ${name || "there"},</h2>
+      <p>Thanks for signing up for SmartStudent. Confirm your email address to activate your account:</p>
+      <p style="margin: 24px 0;">
+        <a href="${verifyUrl}" style="background: #6366f1; color: #fff; padding: 12px 24px; border-radius: 8px; text-decoration: none; font-weight: 600;">
+          Verify Email
+        </a>
+      </p>
+      <p>Or paste this link into your browser: ${verifyUrl}</p>
+      <p style="margin-top: 20px;">Thanks,<br/>SmartStudent Team</p>
+    </div>
+  `;
+
+  await transporter.sendMail({
+    from: MAIL_FROM || SMTP_USER,
+    to,
+    subject: "Verify your SmartStudent email address",
+    html,
+  });
+};
+
+export const sendPasswordResetEmail = async ({ to, name, token }) => {
+  if (!to) return;
+
+  if (!smtpConfigured || !transporter) {
+    console.warn("⚠️ Email skipped: SMTP not configured.");
+    return;
+  }
+
+  const resetUrl = `${frontendUrl()}/reset-password/${token}`;
+  const html = `
+    <div style="font-family: Arial, sans-serif; line-height: 1.6; color: #111827;">
+      <h2 style="margin-bottom: 12px;">Hi ${name || "there"},</h2>
+      <p>We received a request to reset your SmartStudent password. This link expires in 1 hour.</p>
+      <p style="margin: 24px 0;">
+        <a href="${resetUrl}" style="background: #6366f1; color: #fff; padding: 12px 24px; border-radius: 8px; text-decoration: none; font-weight: 600;">
+          Reset Password
+        </a>
+      </p>
+      <p>Or paste this link into your browser: ${resetUrl}</p>
+      <p>If you didn't request this, you can safely ignore this email.</p>
+      <p style="margin-top: 20px;">Thanks,<br/>SmartStudent Team</p>
+    </div>
+  `;
+
+  await transporter.sendMail({
+    from: MAIL_FROM || SMTP_USER,
+    to,
+    subject: "Reset your SmartStudent password",
+    html,
+  });
+};
+
 export const sendAdminReportEmail = async ({
   to,
   frequency,

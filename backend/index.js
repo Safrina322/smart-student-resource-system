@@ -311,6 +311,72 @@ const ensureRoleModel = () => {
 
 ensureRoleModel();
 
+// Adds email verification + password reset support to users, and password
+// reset support to admin. Self-registered users start unverified; existing
+// rows (created before this column existed) are marked verified so nobody
+// already using the app gets locked out.
+const ensureAuthColumns = () => {
+  const userColumns = [
+    { name: "email_verified", definition: "email_verified TINYINT(1) DEFAULT 0" },
+    { name: "email_verification_token", definition: "email_verification_token VARCHAR(255) NULL" },
+    { name: "password_reset_token", definition: "password_reset_token VARCHAR(255) NULL" },
+    { name: "password_reset_expires", definition: "password_reset_expires DATETIME NULL" },
+  ];
+
+  userColumns.forEach(({ name, definition }) => {
+    db.query("SHOW COLUMNS FROM users LIKE ?", [name], (checkErr, result) => {
+      if (checkErr) {
+        console.error(`⚠️ Auth column check error for users.${name}:`, checkErr.message);
+        return;
+      }
+      if (result.length > 0) return;
+
+      db.query(`ALTER TABLE users ADD COLUMN ${definition}`, (alterErr) => {
+        if (alterErr) {
+          console.error(`❌ Failed to add users.${name}:`, alterErr.message);
+          return;
+        }
+        console.log(`✅ Added column 'users.${name}'`);
+
+        if (name === "email_verified") {
+          db.query("UPDATE users SET email_verified = 1 WHERE email_verified = 0", (backfillErr) => {
+            if (backfillErr) {
+              console.error("⚠️ email_verified backfill warning:", backfillErr.message);
+            } else {
+              console.log("✅ Backfilled existing users as email_verified");
+            }
+          });
+        }
+      });
+    });
+  });
+
+  const adminColumns = [
+    { name: "password_reset_token", definition: "password_reset_token VARCHAR(255) NULL" },
+    { name: "password_reset_expires", definition: "password_reset_expires DATETIME NULL" },
+  ];
+
+  adminColumns.forEach(({ name, definition }) => {
+    db.query("SHOW COLUMNS FROM admin LIKE ?", [name], (checkErr, result) => {
+      if (checkErr) {
+        console.error(`⚠️ Auth column check error for admin.${name}:`, checkErr.message);
+        return;
+      }
+      if (result.length > 0) return;
+
+      db.query(`ALTER TABLE admin ADD COLUMN ${definition}`, (alterErr) => {
+        if (alterErr) {
+          console.error(`❌ Failed to add admin.${name}:`, alterErr.message);
+        } else {
+          console.log(`✅ Added column 'admin.${name}'`);
+        }
+      });
+    });
+  });
+};
+
+ensureAuthColumns();
+
 // ✅ ADD MISSING COLUMNS TO RESOURCES TABLE
 const ensureResourcesColumns = () => {
   const columnsToAdd = [

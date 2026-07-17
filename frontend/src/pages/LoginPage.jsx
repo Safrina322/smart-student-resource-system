@@ -8,6 +8,7 @@ function LoginPage() {
   const { login } = useAuth();
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
+  const [rememberMe, setRememberMe] = useState(false);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
@@ -23,7 +24,7 @@ function LoginPage() {
     setLoading(true);
 
     try {
-      await login({ username, password });
+      await login({ username, password, rememberMe });
       navigate("/dashboard");
     } catch (err) {
       setError(`❌ ${err.message || "Login failed. Check credentials."}`);
@@ -61,10 +62,24 @@ function LoginPage() {
           />
         </div>
 
+        <div className="mb-3 form-check">
+          <input
+            type="checkbox"
+            className="form-check-input"
+            id="rememberMe"
+            checked={rememberMe}
+            onChange={(e) => setRememberMe(e.target.checked)}
+          />
+          <label className="form-check-label" htmlFor="rememberMe">Remember me</label>
+        </div>
+
         <button type="submit" className="btn btn-primary" disabled={loading}>
           {loading ? "Logging in..." : "Login"}
         </button>
 
+        <p className="switch-auth">
+          <Link to="/forgot-password">Forgot password?</Link>
+        </p>
         <p className="switch-auth">
           Don’t have an account? <Link to="/register">Register</Link>
         </p>
