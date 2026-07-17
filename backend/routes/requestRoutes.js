@@ -1,81 +1,11 @@
-// import express from "express";
-// import db from "../db.js";
-
-
-// const existing = await db.query(
-//   "SELECT id FROM resource_requests WHERE title=? AND subject=? AND semester=? AND status='pending'",
-//   [title, subject, semester]
-// );
-
-// if (existing[0].length > 0) {
-//   return res.status(400).json({ message: "Request already exists" });
-// }
-
-
-// const router = express.Router();
-
-// router.post("/", async (req, res) => {
-//   try {
-//     const { title, subject, semester, type, message } = req.body;
-
-//     if (!title || !subject || !semester || !type) {
-//       return res.status(400).json({ message: "Missing required fields" });
-//     }
-
-//     const sql = `
-//       INSERT INTO resource_requests
-//       (title, subject, semester, type, message, status)
-//       VALUES (?, ?, ?, ?, ?, 'pending')
-//     `;
-
-//     db.query(
-//       sql,
-//       [title, subject, semester, type, message],
-//       (err) => {
-//         if (err) {
-//           console.error("❌ DB ERROR:", err);
-//           return res.status(500).json({ message: "Database error" });
-//         }
-
-//         res.json({ message: "Request submitted successfully" });
-//       }
-//     );
-//   } catch (error) {
-//     console.error("❌ SERVER ERROR:", error);
-//     res.status(500).json({ message: "Internal server error" });
-//   }
-// });
-// export default router;
-
 import express from "express";
-import multer from "multer";
-import fs from "fs";
-import path from "path";
-import { fileURLToPath } from "url";
 import db from "../db.js";
 import authMiddleware from "../middleware/authMiddleware.js";
+import createCloudinaryUploader from "../middleware/cloudinaryUpload.js";
 
 const router = express.Router();
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-const imagesDir = path.join(__dirname, "..", "images");
-
-if (!fs.existsSync(imagesDir)) {
-  fs.mkdirSync(imagesDir, { recursive: true });
-}
-
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    cb(null, imagesDir);
-  },
-  filename: (req, file, cb) => {
-    const uniqueName = Date.now() + "-" + file.originalname;
-    cb(null, uniqueName);
-  },
-});
-
-const upload = multer({ storage });
+const upload = createCloudinaryUploader("request-images");
 
 const addRequestHistoryEntry = ({ requestId, status, note = null, adminId = null }) => {
   db.query(
@@ -106,7 +36,7 @@ router.post("/", authMiddleware, upload.single("image"), async (req, res) => {
       resource_url,
       lesson_order,
     } = req.body;
-    const image = req.file ? req.file.filename : "";
+    const image = req.file ? req.file.secure_url : ""; // Cloudinary secure_url
     const userId = req.user?.id;
     const semesterNumber = Number.parseInt(String(semester).replace(/[^0-9]/g, ""), 10);
 

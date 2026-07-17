@@ -1,43 +1,35 @@
 import express from "express";
 import multer from "multer";
-import fs from "fs";
-import path from "path";
-import { fileURLToPath } from "url";
+import CloudinaryStorage from "multer-storage-cloudinary";
+import { cloudinaryPkg } from "../utils/cloudinary.js";
 import db from "../db.js";
 import adminAuth from "../middleware/adminAuth.js";
 import { logAdminAction } from "../utils/auditLogger.js";
 
 const router = express.Router();
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-const imagesDir = path.join(__dirname, "..", "images");
-const lessonFilesDir = path.join(__dirname, "..", "lesson-files");
-
-if (!fs.existsSync(imagesDir)) {
-  fs.mkdirSync(imagesDir, { recursive: true });
-}
-
-if (!fs.existsSync(lessonFilesDir)) {
-  fs.mkdirSync(lessonFilesDir, { recursive: true });
-}
-
-/* ---------- Image storage config ---------- */
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    if (file.fieldname === "resource_file") {
-      cb(null, lessonFilesDir);
-      return;
-    }
-    cb(null, imagesDir);
-  },
-  filename: (req, file, cb) => {
-    const uniqueName = Date.now() + "-" + file.originalname;
-    cb(null, uniqueName);
+/* ---------- Cloudinary storage config ---------- */
+// One shared storage instance for both fields in the "add course" form;
+// which Cloudinary folder a file lands in depends on which field it came
+// through (course cover image vs. the first lesson's resource file).
+const storage = new CloudinaryStorage({
+  cloudinary: cloudinaryPkg,
+  // multer-storage-cloudinary calls this Node-callback style (req, file, cb)
+  // internally via run-parallel, not as a function that returns a value -
+  // omitting cb() here would hang every upload waiting for a callback that
+  // never fires.
+  params: (req, file, cb) => {
+    cb(null, {
+      folder:
+        file.fieldname === "resource_file"
+          ? "smartstudent/lesson-files"
+          : "smartstudent/course-images",
+      resource_type: "auto",
+    });
   },
 });
 
-const upload = multer({ storage });
+const upload = multer({ storage, limits: { fileSize: 25 * 1024 * 1024 } });
 
 /* ---------- Add Course API ---------- */
 router.post(
@@ -68,9 +60,9 @@ router.post(
       return res.status(400).json({ message: "Image required" });
     }
 
-    const image = imageFile.filename;
+    const image = imageFile.secure_url; // Cloudinary secure_url
     const resolvedResourceUrl = resourceFile
-      ? `/lesson-files/${resourceFile.filename}`
+      ? resourceFile.secure_url // Cloudinary secure_url
       : (resource_url || "");
 
     if (!lesson_title || !resource_type || !resolvedResourceUrl) {
@@ -139,7 +131,7 @@ router.post(
       lesson_order,
     } = req.body;
 
-    const fileUrl = req.file ? `/lesson-files/${req.file.filename}` : "";
+    const fileUrl = req.file ? req.file.secure_url : ""; // Cloudinary secure_url
     const finalUrl = fileUrl || (resource_url || "");
 
     if (!lesson_title || !resource_type || !finalUrl) {
