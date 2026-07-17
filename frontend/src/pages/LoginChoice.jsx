@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom";
 import "../styles/LoginChoice.css";
+import DemoAccountSwitcher from "../components/DemoAccountSwitcher.jsx";
 
 function LoginChoice() {
   return (
@@ -29,6 +30,8 @@ function LoginChoice() {
             <button className="choice-btn">Continue as Admin →</button>
           </Link>
         </div>
+
+        <DemoAccountSwitcher />
 
         {/* Additional Info */}
         <div className="choice-footer">

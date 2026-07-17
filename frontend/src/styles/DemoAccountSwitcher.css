@@ -1,0 +1,102 @@
+.demo-switcher {
+  margin-top: 32px;
+  padding-top: 28px;
+  border-top: 1px solid var(--color-border);
+}
+
+.demo-switcher-header {
+  text-align: center;
+  margin-bottom: 18px;
+}
+
+.demo-switcher-header span {
+  color: var(--color-text);
+  font-weight: 600;
+  font-size: 1rem;
+}
+
+.demo-switcher-header p {
+  color: var(--color-text-muted);
+  font-size: 0.85rem;
+  margin-top: 4px;
+}
+
+.demo-switcher-error {
+  text-align: center;
+  color: var(--color-danger-strong);
+  font-size: 0.85rem;
+  margin-bottom: 12px;
+}
+
+.demo-switcher-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 14px;
+}
+
+.demo-switcher-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  padding: 16px 10px;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  position: relative;
+}
+
+.demo-switcher-card:hover:not(:disabled) {
+  transform: translateY(-3px);
+  border-color: var(--color-accent-cyan);
+  box-shadow: var(--shadow-md);
+}
+
+.demo-switcher-card:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.demo-switcher-icon {
+  font-size: 1.8rem;
+}
+
+.demo-role-student .demo-switcher-icon { color: var(--color-accent-cyan); }
+.demo-role-lecturer .demo-switcher-icon { color: var(--color-accent); }
+.demo-role-moderator .demo-switcher-icon { color: var(--color-accent-violet); }
+.demo-role-admin .demo-switcher-icon { color: var(--color-gold); }
+
+.demo-switcher-label {
+  color: var(--color-text);
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+
+.demo-switcher-desc {
+  color: var(--color-text-muted);
+  font-size: 0.72rem;
+  text-align: center;
+  line-height: 1.3;
+}
+
+.demo-switcher-loading {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(2, 6, 23, 0.85);
+  border-radius: var(--radius-md);
+  color: var(--color-accent-cyan);
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+@media (max-width: 700px) {
+  .demo-switcher-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
