@@ -15,6 +15,7 @@ function Navbar() {
   const isAdmin = isAdminAuthenticated;
   const userName = user?.username || "";
   const adminName = admin?.name || "";
+  const role = user?.role || "student";
 
   useEffect(() => {
     setProfileDropdown(false);
@@ -69,18 +70,35 @@ function Navbar() {
             </Link>
           )}
 
-          {/* User Logged In */}
+          {/* User Logged In (student / lecturer / moderator) */}
           {isLoggedIn && !isAdmin && (
             <>
               <Link to="/resources" className="nav-link" onClick={closeMobileMenu}>
                 Resources
               </Link>
-              <Link to="/dashboard" className="nav-link" onClick={closeMobileMenu}>
-                Dashboard
-              </Link>
-              <Link to="/upload" className="nav-link" onClick={closeMobileMenu}>
-                Upload
-              </Link>
+
+              {role === "lecturer" && (
+                <Link to="/lecturer/dashboard" className="nav-link" onClick={closeMobileMenu}>
+                  Lecturer Dashboard
+                </Link>
+              )}
+
+              {role === "moderator" && (
+                <Link to="/moderator/dashboard" className="nav-link" onClick={closeMobileMenu}>
+                  Review Queue
+                </Link>
+              )}
+
+              {role === "student" && (
+                <>
+                  <Link to="/dashboard" className="nav-link" onClick={closeMobileMenu}>
+                    Dashboard
+                  </Link>
+                  <Link to="/upload" className="nav-link" onClick={closeMobileMenu}>
+                    Upload
+                  </Link>
+                </>
+              )}
 
               <Link to="/profile" className="nav-link profile-btn" onClick={closeMobileMenu}>
                 👤 {userName}

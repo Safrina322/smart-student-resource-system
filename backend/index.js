@@ -2,6 +2,7 @@ import express from "express";
 import cors from "cors";
 import helmet from "helmet";
 import dotenv from "dotenv";
+import bcrypt from "bcryptjs";
 import db from "./db.js";
 import authRoutes from "./routes/authRoutes.js";
 import resourceRoutes from "./routes/resourceRoute.js";
@@ -16,6 +17,8 @@ import userLearningRoutes from "./routes/userLearningRoutes.js";
 import popularResourcesRoutes from "./routes/popularResourcesRoutes.js";
 import userNotificationRoutes from "./routes/userNotificationRoutes.js";
 import adminAuditRoutes from "./routes/adminAuditRoutes.js";
+import lecturerResourceRoutes from "./routes/lecturerResourceRoutes.js";
+import moderationRoutes from "./routes/moderationRoutes.js";
 import { startReportScheduler } from "./utils/reportScheduler.js";
 dotenv.config();
 
@@ -377,6 +380,47 @@ const ensureAuthColumns = () => {
 
 ensureAuthColumns();
 
+// Lecturer-uploaded resources, moderated separately from the existing
+// student resource_requests pipeline (which is a request-for-content flow
+// with lesson fields) since lecturer uploads are direct, trusted content
+// contributions with a different shape and review path.
+db.query(
+  `CREATE TABLE IF NOT EXISTS lecturer_resources (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    uploader_id INT NOT NULL,
+    title VARCHAR(255) NOT NULL,
+    description TEXT,
+    subject VARCHAR(100),
+    department VARCHAR(100),
+    semester INT,
+    course_id INT NULL,
+    resource_type ENUM('PDF','Video','Link','Image','ZIP','Document') DEFAULT 'PDF',
+    resource_link VARCHAR(500) NOT NULL,
+    tags VARCHAR(255),
+    status ENUM('pending','approved','rejected','flagged') DEFAULT 'pending',
+    reviewed_by INT NULL,
+    review_comment TEXT,
+    views INT DEFAULT 0,
+    downloads INT DEFAULT 0,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    reviewed_at TIMESTAMP NULL,
+    FOREIGN KEY (uploader_id) REFERENCES users(id) ON DELETE CASCADE,
+    FOREIGN KEY (course_id) REFERENCES courses(id) ON DELETE SET NULL,
+    FOREIGN KEY (reviewed_by) REFERENCES users(id) ON DELETE SET NULL,
+    INDEX idx_lecturer_resources_status (status),
+    INDEX idx_lecturer_resources_uploader (uploader_id),
+    INDEX idx_lecturer_resources_created_at (created_at)
+  ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4`,
+  (tableErr) => {
+    if (tableErr) {
+      console.error("⚠️ lecturer_resources migration warning:", tableErr.message);
+    } else {
+      console.log("✅ lecturer_resources table ready");
+    }
+  }
+);
+
 // ✅ ADD MISSING COLUMNS TO RESOURCES TABLE
 const ensureResourcesColumns = () => {
   const columnsToAdd = [
@@ -481,6 +525,39 @@ const seedResources = () => {
   });
 };
 
+// Self-registration only creates students, so lecturer/moderator accounts
+// have no signup path yet - seed one of each with known credentials so the
+// role-gated dashboards are demoable without a manual DB insert.
+const seedDemoRoleAccounts = () => {
+  const demoAccounts = [
+    { username: "demo.lecturer", email: "demo.lecturer@smartstudent.dev", role: "lecturer" },
+    { username: "demo.moderator", email: "demo.moderator@smartstudent.dev", role: "moderator" },
+  ];
+
+  demoAccounts.forEach(async ({ username, email, role }) => {
+    db.query("SELECT id FROM users WHERE username = ?", [username], async (checkErr, rows) => {
+      if (checkErr) {
+        console.error(`⚠️ Demo account check error for ${username}:`, checkErr.message);
+        return;
+      }
+      if (rows.length > 0) return;
+
+      const hashedPassword = await bcrypt.hash("Demo@12345", 10);
+      db.query(
+        "INSERT INTO users (username, email, password, role, email_verified) VALUES (?, ?, ?, ?, 1)",
+        [username, email, hashedPassword, role],
+        (insertErr) => {
+          if (insertErr) {
+            console.error(`❌ Failed to seed demo ${role}:`, insertErr.message);
+          } else {
+            console.log(`✅ Seeded demo ${role} account: ${username} / Demo@12345`);
+          }
+        }
+      );
+    });
+  });
+};
+
 // ✅ Configure CORS for the frontend app
 const corsOptions = {
   origin: process.env.FRONTEND_URL || "http://localhost:5173",
@@ -499,9 +576,10 @@ app.use(
 );
 app.use(cors(corsOptions));
 
-// Seed resources after a short delay to ensure DB is ready
+// Seed resources/demo accounts after a short delay to ensure DB is ready
 setTimeout(() => {
   seedResources();
+  seedDemoRoleAccounts();
 }, 1000);
 
 app.use(express.json());
@@ -514,6 +592,8 @@ app.use("/api/user", userLearningRoutes);
 app.use("/api/popular", popularResourcesRoutes);
 app.use("/api/notifications", userNotificationRoutes);
 app.use("/api/admin/audit", adminAuditRoutes);
+app.use("/api/lecturer/resources", lecturerResourceRoutes);
+app.use("/api/moderation", moderationRoutes);
 
 // 🔓 expose images folder
 app.use("/api/admin/courses", adminCourseRoutes);

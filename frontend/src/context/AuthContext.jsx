@@ -1,5 +1,5 @@
 import { createContext, useCallback, useMemo, useState } from "react";
-import { isTokenExpired } from "../utils/jwt.js";
+import { isTokenExpired, parseJwtPayload } from "../utils/jwt.js";
 import {
   registerUser,
   loginUser,
@@ -34,6 +34,7 @@ const readInitialState = () => {
   const adminToken = localStorage.getItem("adminToken");
 
   if (adminToken && !isTokenExpired(adminToken)) {
+    const payload = parseJwtPayload(adminToken);
     return {
       user: null,
       admin: {
@@ -42,13 +43,15 @@ const readInitialState = () => {
           localStorage.getItem("adminEmail")
         ),
         email: localStorage.getItem("adminEmail") || "",
+        adminRole: payload?.adminRole || "sysadmin",
       },
     };
   }
 
   if (token && !isTokenExpired(token)) {
+    const payload = parseJwtPayload(token);
     return {
-      user: { username: localStorage.getItem("userName") || "User" },
+      user: { username: localStorage.getItem("userName") || "User", role: payload?.role || "student" },
       admin: null,
     };
   }
@@ -78,7 +81,10 @@ export function AuthProvider({ children }) {
     localStorage.setItem("token", data.token);
     localStorage.setItem("userName", data.user?.username || "User");
 
-    setState({ user: { username: data.user?.username || "User" }, admin: null });
+    setState({
+      user: { username: data.user?.username || "User", role: data.user?.role || "student" },
+      admin: null,
+    });
     return data;
   }, []);
 
@@ -95,7 +101,10 @@ export function AuthProvider({ children }) {
     const displayName = buildAdminDisplayName(data.admin?.name, data.admin?.email || email);
     localStorage.setItem("adminName", displayName);
 
-    setState({ user: null, admin: { name: displayName, email: data.admin?.email || email } });
+    setState({
+      user: null,
+      admin: { name: displayName, email: data.admin?.email || email, adminRole: data.admin?.role || "sysadmin" },
+    });
     return data;
   }, []);
 
@@ -123,7 +132,7 @@ export function AuthProvider({ children }) {
     const data = await updateMyProfile(profile);
     if (data.profile?.username) {
       localStorage.setItem("userName", data.profile.username);
-      setState((prev) => ({ ...prev, user: { username: data.profile.username } }));
+      setState((prev) => ({ ...prev, user: { ...prev.user, username: data.profile.username } }));
     }
     return data;
   }, []);

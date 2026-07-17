@@ -29,6 +29,8 @@ import ForgotPasswordPage from "./pages/ForgotPasswordPage.jsx";
 import ResetPasswordPage from "./pages/ResetPasswordPage.jsx";
 import VerifyEmailPage from "./pages/VerifyEmailPage.jsx";
 import ProfilePage from "./pages/ProfilePage.jsx";
+import LecturerDashboard from "./pages/LecturerDashboard.jsx";
+import ModeratorDashboard from "./pages/ModeratorDashboard.jsx";
 function App() {
   return (
     <AuthProvider>
@@ -47,6 +49,14 @@ function App() {
           <Route path="/reset-password/:token" element={<ResetPasswordPage />} />
           <Route path="/verify-email/:token" element={<VerifyEmailPage />} />
           <Route path="/profile" element={<ProtectedRoute><ProfilePage /></ProtectedRoute>} />
+          <Route
+            path="/lecturer/dashboard"
+            element={<ProtectedRoute allowRoles={["lecturer"]}><LecturerDashboard /></ProtectedRoute>}
+          />
+          <Route
+            path="/moderator/dashboard"
+            element={<ProtectedRoute allowRoles={["moderator"]}><ModeratorDashboard /></ProtectedRoute>}
+          />
           <Route path="/admin/add-course" element={<ProtectedAdminRoute><AdminAddCourse /></ProtectedAdminRoute>} />
           <Route path="/admin/login" element={<AdminLogin />} />
           <Route path="/dashboard"element={<ProtectedRoute><Dashboard /></ProtectedRoute>}/>
