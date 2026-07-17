@@ -121,6 +121,9 @@ function Navbar() {
               <Link to="/admin/dashboard" className="nav-link admin" onClick={closeMobileMenu}>
                 Admin Dashboard
               </Link>
+              <Link to="/admin/users" className="nav-link admin" onClick={closeMobileMenu}>
+                Manage Users
+              </Link>
               <Link to="/admin/requests" className="nav-link admin" onClick={closeMobileMenu}>
                 Manage Requests
               </Link>

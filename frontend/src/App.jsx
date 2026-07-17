@@ -31,6 +31,7 @@ import VerifyEmailPage from "./pages/VerifyEmailPage.jsx";
 import ProfilePage from "./pages/ProfilePage.jsx";
 import LecturerDashboard from "./pages/LecturerDashboard.jsx";
 import ModeratorDashboard from "./pages/ModeratorDashboard.jsx";
+import AdminManageUsers from "./pages/AdminManageUsers.jsx";
 function App() {
   return (
     <AuthProvider>
@@ -71,6 +72,7 @@ function App() {
           <Route path="/admin/requests" element={<ProtectedAdminRoute><AdminRequests /></ProtectedAdminRoute>} />
           <Route path="/admin/lessons" element={<ProtectedAdminRoute><AdminManageLessons /></ProtectedAdminRoute>} />
           <Route path="/admin/audit-logs" element={<ProtectedAdminRoute><AdminAuditLogs /></ProtectedAdminRoute>} />
+          <Route path="/admin/users" element={<ProtectedAdminRoute><AdminManageUsers /></ProtectedAdminRoute>} />
           <Route path="*" element={<NotFoundPage />} />
         </Routes>
       </div>

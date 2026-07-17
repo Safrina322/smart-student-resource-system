@@ -20,6 +20,7 @@ import adminAuditRoutes from "./routes/adminAuditRoutes.js";
 import lecturerResourceRoutes from "./routes/lecturerResourceRoutes.js";
 import moderationRoutes from "./routes/moderationRoutes.js";
 import searchRoutes from "./routes/searchRoutes.js";
+import adminUserRoutes from "./routes/adminUserRoutes.js";
 import { startReportScheduler } from "./utils/reportScheduler.js";
 dotenv.config();
 
@@ -592,7 +593,7 @@ const corsOptions = {
     callback(new Error(`Not allowed by CORS: ${origin}`));
   },
   credentials: false,
-  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+  methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
   allowedHeaders: ["Content-Type", "Authorization"],
 };
 // crossOriginResourcePolicy is relaxed because the frontend (port 5173) and
@@ -625,6 +626,7 @@ app.use("/api/admin/audit", adminAuditRoutes);
 app.use("/api/lecturer/resources", lecturerResourceRoutes);
 app.use("/api/moderation", moderationRoutes);
 app.use("/api/search", searchRoutes);
+app.use("/api/admin/users", adminUserRoutes);
 
 // 🔓 expose images folder
 app.use("/api/admin/courses", adminCourseRoutes);

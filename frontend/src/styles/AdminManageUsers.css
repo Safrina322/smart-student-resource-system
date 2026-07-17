@@ -1,0 +1,227 @@
+.manage-users-page {
+  min-height: 100vh;
+  padding: 32px clamp(16px, 4vw, 48px);
+  color: var(--color-text);
+}
+
+.manage-users-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  flex-wrap: wrap;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.manage-users-header h1 {
+  font-size: 1.8rem;
+  margin-bottom: 4px;
+}
+
+.manage-users-header p {
+  color: var(--color-text-muted);
+}
+
+.manage-users-back {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  text-decoration: none;
+  color: var(--color-text-secondary);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  padding: 8px 14px;
+  font-weight: 600;
+  transition: all 0.2s ease;
+}
+
+.manage-users-back:hover {
+  border-color: var(--color-accent-cyan);
+  color: var(--color-text);
+}
+
+.manage-users-filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 18px;
+}
+
+.manage-users-search {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  padding: 8px 14px;
+  flex: 1;
+  min-width: 220px;
+  color: var(--color-text-muted);
+}
+
+.manage-users-search input {
+  flex: 1;
+  background: none;
+  border: none;
+  outline: none;
+  color: var(--color-text);
+  font-size: 0.9rem;
+}
+
+.manage-users-filters select {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  padding: 8px 14px;
+  color: var(--color-text-secondary);
+  font-size: 0.9rem;
+}
+
+.manage-users-error {
+  color: var(--color-danger-strong);
+  margin-bottom: 12px;
+}
+
+.manage-users-feedback {
+  color: var(--color-accent-cyan);
+  margin-bottom: 12px;
+}
+
+.manage-users-table-wrap {
+  overflow-x: auto;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--color-border);
+  background: var(--color-surface);
+}
+
+.manage-users-table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 820px;
+}
+
+.manage-users-table th,
+.manage-users-table td {
+  padding: 14px;
+  text-align: left;
+  border-bottom: 1px solid var(--color-border);
+  vertical-align: middle;
+}
+
+.manage-users-table th {
+  color: var(--color-text-muted);
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.manage-users-table tbody tr:hover {
+  background: rgba(148, 163, 184, 0.05);
+}
+
+.manage-users-empty {
+  text-align: center;
+  color: var(--color-text-muted);
+  padding: 32px !important;
+}
+
+.role-badge {
+  display: inline-block;
+  padding: 3px 10px;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: capitalize;
+}
+
+.role-badge.role-student {
+  background: rgba(var(--color-accent-cyan-rgb), 0.15);
+  color: var(--color-accent-cyan);
+}
+
+.role-badge.role-lecturer {
+  background: rgba(var(--color-accent-rgb), 0.15);
+  color: var(--color-accent);
+}
+
+.role-badge.role-moderator {
+  background: rgba(var(--color-accent-violet-rgb), 0.15);
+  color: var(--color-accent-violet);
+}
+
+.status-badge {
+  display: inline-block;
+  padding: 3px 10px;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.status-badge.active {
+  background: rgba(52, 211, 153, 0.15);
+  color: var(--color-success);
+}
+
+.status-badge.inactive {
+  background: rgba(var(--color-danger-strong-rgb), 0.15);
+  color: var(--color-danger);
+}
+
+.manage-users-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.manage-users-actions select {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  padding: 6px 10px;
+  color: var(--color-text-secondary);
+  font-size: 0.82rem;
+}
+
+.deactivate-btn,
+.activate-btn {
+  border: none;
+  border-radius: var(--radius-sm);
+  padding: 6px 12px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.deactivate-btn {
+  background: rgba(var(--color-danger-strong-rgb), 0.15);
+  color: var(--color-danger);
+}
+
+.deactivate-btn:hover {
+  background: rgba(var(--color-danger-strong-rgb), 0.25);
+}
+
+.activate-btn {
+  background: rgba(52, 211, 153, 0.15);
+  color: var(--color-success);
+}
+
+.activate-btn:hover {
+  background: rgba(52, 211, 153, 0.25);
+}
+
+.manage-users-actions button:disabled,
+.manage-users-actions select:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+@media (max-width: 700px) {
+  .manage-users-filters {
+    flex-direction: column;
+  }
+}

@@ -441,6 +441,11 @@ function AdminDashboard() {
           <p>Create a new course with image, first lesson, and resource links/files.</p>
         </Link>
 
+        <Link to="/admin/users" className="admin-action-card">
+          <h3>Manage Users</h3>
+          <p>Search, change roles, and activate or deactivate student, lecturer, and moderator accounts.</p>
+        </Link>
+
         <Link to="/admin/requests" className="admin-action-card">
           <h3>Manage Requests</h3>
           <p>Approve or reject pending student requests and trigger notification emails.</p>
