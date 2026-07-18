@@ -3,6 +3,8 @@ import { Link, useNavigate } from "react-router-dom";
 import { apiCall, getApiUrl, getAuthHeader } from "../utils/api.js";
 import SearchBar from "../components/Searchbar.jsx";
 import Filter from "../components/Filter.jsx";
+import StarRating from "../components/StarRating.jsx";
+import { listResources as listHubResources } from "../services/resourceHubService.js";
 import "../styles/Resources.css";
 
 const FALLBACK_IMAGE =
@@ -34,6 +36,8 @@ function ResourceListPage() {
   const [searchTerm, setSearchTerm] = useState("");
   const [subjectFilter, setSubjectFilter] = useState("");
   const [levelFilter, setLevelFilter] = useState("");
+  const [hubResources, setHubResources] = useState([]);
+  const [hubLoading, setHubLoading] = useState(true);
 
   const onlineResources = [
     {
@@ -85,6 +89,10 @@ function ResourceListPage() {
 
   useEffect(() => {
     fetchAllData();
+    listHubResources()
+      .then((data) => setHubResources(Array.isArray(data) ? data : []))
+      .catch(() => setHubResources([]))
+      .finally(() => setHubLoading(false));
   }, []);
 
   const getSessionContext = () => {
@@ -273,6 +281,28 @@ function ResourceListPage() {
     });
   }, [onlineResources, searchTerm]);
 
+  const filteredHubResources = useMemo(() => {
+    const keyword = searchTerm.trim().toLowerCase();
+
+    return hubResources.filter((resource) => {
+      const title = (resource.title || "").toLowerCase();
+      const subject = (resource.subject || "").toLowerCase();
+      const description = (resource.description || "").toLowerCase();
+      const tags = (resource.tags || "").toLowerCase();
+
+      const matchesKeyword =
+        !keyword ||
+        title.includes(keyword) ||
+        subject.includes(keyword) ||
+        description.includes(keyword) ||
+        tags.includes(keyword);
+
+      const matchesSubject = !subjectFilter || resource.subject === subjectFilter;
+
+      return matchesKeyword && matchesSubject;
+    });
+  }, [hubResources, searchTerm, subjectFilter]);
+
   const statusMessages = [courseError, resourceError].filter(Boolean);
   const totalVisibleResources = filteredOnlineResources.length + filteredResources.length;
 
@@ -365,6 +395,45 @@ function ResourceListPage() {
             </article>
           ))}
         </div>
+      </section>
+
+      <section className="online-resources-section">
+        <div className="section-heading">
+          <div>
+            <p className="section-kicker">Community</p>
+            <h2>Lecturer-Contributed Resources</h2>
+          </div>
+          <p className="section-note">
+            Verified uploads from lecturers — rate, bookmark, and discuss with other students.
+          </p>
+        </div>
+
+        {hubLoading ? (
+          <p className="empty-saved-resources">Loading community resources...</p>
+        ) : filteredHubResources.length === 0 ? (
+          <p className="empty-saved-resources">No community resources match your search yet.</p>
+        ) : (
+          <div className="online-resources-grid">
+            {filteredHubResources.map((resource) => (
+              <Link
+                key={resource.id}
+                to={`/resource-hub/${resource.id}`}
+                className="online-resource-card"
+              >
+                <div className="online-resource-top">
+                  <span className="badge">{resource.resource_type}</span>
+                  <span className="meta-pill">{resource.subject || "General"}</span>
+                </div>
+                <h3>{resource.title}</h3>
+                <p>{resource.description}</p>
+                <div className="online-resource-footer">
+                  <StarRating value={Number(resource.average_rating) || 0} size="0.85rem" />
+                  <span>by {resource.uploader_name}</span>
+                </div>
+              </Link>
+            ))}
+          </div>
+        )}
       </section>
 
       <section className="saved-resources-section">

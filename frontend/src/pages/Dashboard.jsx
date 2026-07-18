@@ -5,6 +5,7 @@ import { Link, useNavigate } from "react-router-dom";
 import PopularResources from "../components/PopularResources.jsx";
 import NotificationsPanel from "../components/NotificationsPanel.jsx";
 import { SkeletonTableRows } from "../components/Skeleton.jsx";
+import { listMyBookmarks } from "../services/resourceHubService.js";
 
 function Dashboard() {
   const [courses, setCourses] = useState([]);
@@ -12,6 +13,7 @@ function Dashboard() {
   const [error, setError] = useState("");
   const [continueLearning, setContinueLearning] = useState(null);
   const [recentActivity, setRecentActivity] = useState([]);
+  const [bookmarks, setBookmarks] = useState([]);
   const token = localStorage.getItem("token");
   const navigate = useNavigate();
 
@@ -22,6 +24,9 @@ function Dashboard() {
     }
     fetchCourses();
     fetchLearningProgress();
+    listMyBookmarks()
+      .then((data) => setBookmarks(Array.isArray(data) ? data : []))
+      .catch(() => setBookmarks([]));
   }, [token, navigate]);
 
   const fetchCourses = async () => {
@@ -164,6 +169,30 @@ function Dashboard() {
                     <span className="activity-time">{formatDate(activity.created_at)}</span>
                   </div>
                 </div>
+              ))}
+            </div>
+          </section>
+        )}
+
+        {/* Bookmarked Resources */}
+        {bookmarks.length > 0 && (
+          <section className="recent-activity-section">
+            <h2>🔖 Bookmarked Resources</h2>
+            <div className="activity-list">
+              {bookmarks.map((bookmark) => (
+                <Link
+                  key={bookmark.id}
+                  to={`/resource-hub/${bookmark.id}`}
+                  className="activity-item"
+                  style={{ textDecoration: "none", color: "inherit" }}
+                >
+                  <div className="activity-icon">🔖</div>
+                  <div className="activity-content">
+                    <h4>{bookmark.title}</h4>
+                    <p className="activity-lesson">{bookmark.subject}</p>
+                    <span className="activity-type">{bookmark.resource_type}</span>
+                  </div>
+                </Link>
               ))}
             </div>
           </section>

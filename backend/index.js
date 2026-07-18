@@ -21,6 +21,7 @@ import lecturerResourceRoutes from "./routes/lecturerResourceRoutes.js";
 import moderationRoutes from "./routes/moderationRoutes.js";
 import searchRoutes from "./routes/searchRoutes.js";
 import adminUserRoutes from "./routes/adminUserRoutes.js";
+import resourceHubRoutes from "./routes/resourceHubRoutes.js";
 import { startReportScheduler } from "./utils/reportScheduler.js";
 dotenv.config();
 
@@ -423,6 +424,65 @@ db.query(
   }
 );
 
+// Comments (with one-level-or-deeper replies via parent_comment_id),
+// ratings (one per user per resource, upserted), and bookmarks for the
+// student-facing resource hub built on top of lecturer_resources.
+db.query(
+  `CREATE TABLE IF NOT EXISTS resource_comments (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    resource_id INT NOT NULL,
+    user_id INT NOT NULL,
+    parent_comment_id INT NULL,
+    comment_text TEXT NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (resource_id) REFERENCES lecturer_resources(id) ON DELETE CASCADE,
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+    FOREIGN KEY (parent_comment_id) REFERENCES resource_comments(id) ON DELETE CASCADE,
+    INDEX idx_resource_comments_resource (resource_id),
+    INDEX idx_resource_comments_parent (parent_comment_id)
+  ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4`,
+  (err) => {
+    if (err) console.error("⚠️ resource_comments migration warning:", err.message);
+    else console.log("✅ resource_comments table ready");
+  }
+);
+
+db.query(
+  `CREATE TABLE IF NOT EXISTS resource_ratings (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    resource_id INT NOT NULL,
+    user_id INT NOT NULL,
+    rating TINYINT NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (resource_id) REFERENCES lecturer_resources(id) ON DELETE CASCADE,
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+    UNIQUE KEY uniq_resource_user_rating (resource_id, user_id),
+    INDEX idx_resource_ratings_resource (resource_id)
+  ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4`,
+  (err) => {
+    if (err) console.error("⚠️ resource_ratings migration warning:", err.message);
+    else console.log("✅ resource_ratings table ready");
+  }
+);
+
+db.query(
+  `CREATE TABLE IF NOT EXISTS resource_bookmarks (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    resource_id INT NOT NULL,
+    user_id INT NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (resource_id) REFERENCES lecturer_resources(id) ON DELETE CASCADE,
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+    UNIQUE KEY uniq_resource_user_bookmark (resource_id, user_id),
+    INDEX idx_resource_bookmarks_user (user_id)
+  ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4`,
+  (err) => {
+    if (err) console.error("⚠️ resource_bookmarks migration warning:", err.message);
+    else console.log("✅ resource_bookmarks table ready");
+  }
+);
+
 // ✅ ADD MISSING COLUMNS TO RESOURCES TABLE
 const ensureResourcesColumns = () => {
   const columnsToAdd = [
@@ -627,6 +687,7 @@ app.use("/api/lecturer/resources", lecturerResourceRoutes);
 app.use("/api/moderation", moderationRoutes);
 app.use("/api/search", searchRoutes);
 app.use("/api/admin/users", adminUserRoutes);
+app.use("/api/resource-hub", resourceHubRoutes);
 
 // 🔓 expose images folder
 app.use("/api/admin/courses", adminCourseRoutes);
