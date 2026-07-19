@@ -1,6 +1,7 @@
 import { AppError } from "../utils/AppError.js";
 import * as commentRepository from "../repositories/commentRepository.js";
 import * as publicResourceRepository from "../repositories/publicResourceRepository.js";
+import { notifyUser } from "./notificationService.js";
 
 // Flat rows -> a tree, nesting replies under their parent by
 // parent_comment_id. Top-level comments (parent_comment_id === null) keep
@@ -32,15 +33,28 @@ export const addComment = async ({ resourceId, userId, parentCommentId, commentT
     throw new AppError("Resource not found", 404);
   }
 
+  let parent = null;
   if (parentCommentId) {
-    const parent = await commentRepository.findById(parentCommentId);
+    parent = await commentRepository.findById(parentCommentId);
     if (!parent || parent.resource_id !== Number(resourceId)) {
       throw new AppError("Parent comment not found on this resource", 400);
     }
   }
 
   const id = await commentRepository.create({ resourceId, userId, parentCommentId, commentText });
-  return commentRepository.findById(id);
+  const comment = await commentRepository.findById(id);
+
+  if (parent && parent.user_id !== userId) {
+    notifyUser({
+      userId: parent.user_id,
+      type: "comment_reply",
+      title: "New reply to your comment",
+      message: `${comment.username || "Someone"} replied on "${resource.title}"`,
+      meta: JSON.stringify({ resourceId: Number(resourceId), commentId: id }),
+    });
+  }
+
+  return comment;
 };
 
 export const deleteComment = async (commentId, requester) => {

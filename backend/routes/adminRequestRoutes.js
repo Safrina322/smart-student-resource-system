@@ -2,7 +2,7 @@ import express from "express";
 import adminAuth from "../middleware/adminAuth.js";
 import db from "../db.js";
 import { sendRequestStatusEmail } from "../utils/mailer.js";
-import { createUserNotification } from "../utils/notifications.js";
+import { notifyUser } from "../services/notificationService.js";
 import { logAdminAction } from "../utils/auditLogger.js";
 
 const router = express.Router();
@@ -105,7 +105,7 @@ router.put("/:id/approve", adminAuth, (req, res) => {
                     console.error("❌ Email send failed (approve):", mailErr.message);
                   });
 
-                  createUserNotification({
+                  notifyUser({
                     userId: request.user_id,
                     type: "request_approved",
                     title: "Request Approved",
@@ -172,7 +172,7 @@ router.put("/:id/approve", adminAuth, (req, res) => {
                       console.error("❌ Email send failed (approve):", mailErr.message);
                     });
 
-                    createUserNotification({
+                    notifyUser({
                       userId: request.user_id,
                       type: "request_approved",
                       title: "Request Approved",
@@ -272,7 +272,7 @@ router.put("/:id/reject", adminAuth, (req, res) => {
             console.error("❌ Email send failed (reject):", mailErr.message);
           });
 
-          createUserNotification({
+          notifyUser({
             userId: request.user_id,
             type: "request_rejected",
             title: "Request Rejected",

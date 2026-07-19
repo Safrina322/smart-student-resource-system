@@ -4,6 +4,7 @@ import logo from "../assets/icon.jpg";
 import "../styles/Navbar.css";
 import { useAuth } from "../hooks/useAuth.js";
 import GlobalSearch from "./GlobalSearch.jsx";
+import NotificationBell from "./NotificationBell.jsx";
 
 function Navbar() {
   const navigate = useNavigate();
@@ -102,6 +103,8 @@ function Navbar() {
                   </Link>
                 </>
               )}
+
+              <NotificationBell />
 
               <Link to="/profile" className="nav-link profile-btn" onClick={closeMobileMenu}>
                 👤 {userName}

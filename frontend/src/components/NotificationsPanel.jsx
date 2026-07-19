@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { apiCall, getAuthHeader } from "../utils/api";
+import { getSocket } from "../services/socketClient.js";
 import "../styles/NotificationsPanel.css";
 
 function NotificationsPanel() {
@@ -9,6 +10,17 @@ function NotificationsPanel() {
 
   useEffect(() => {
     fetchNotifications();
+
+    const socket = getSocket();
+    if (!socket) return;
+
+    const handleNew = (notification) => {
+      setNotifications((prev) => [notification, ...prev].slice(0, 30));
+      setUnreadCount((prev) => prev + 1);
+    };
+
+    socket.on("notification:new", handleNew);
+    return () => socket.off("notification:new", handleNew);
   }, []);
 
   const fetchNotifications = async () => {

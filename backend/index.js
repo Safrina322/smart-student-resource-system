@@ -1,9 +1,13 @@
 import express from "express";
+import http from "http";
+import { Server } from "socket.io";
+import jwt from "jsonwebtoken";
 import cors from "cors";
 import helmet from "helmet";
 import dotenv from "dotenv";
 import bcrypt from "bcryptjs";
 import db from "./db.js";
+import { setIo } from "./utils/socket.js";
 import authRoutes from "./routes/authRoutes.js";
 import resourceRoutes from "./routes/resourceRoute.js";
 import courseRoutes from "./routes/courseRoutes.js";
@@ -717,8 +721,39 @@ app.use((err, req, res, next) => {
 
 
 // START SERVER (LAST)
+// Socket.io needs the raw HTTP server (not the Express app) so it can
+// upgrade connections to WebSockets on the same port.
+const httpServer = http.createServer(app);
+
+const io = new Server(httpServer, {
+  cors: { origin: corsOptions.origin, credentials: false },
+});
+
+// Only student-side (users table) tokens are accepted - notifications are
+// only ever addressed to users.id right now, so there's nothing for an
+// admin-token connection to subscribe to.
+io.use((socket, next) => {
+  const token = socket.handshake.auth?.token;
+  if (!token) return next(new Error("Unauthorized"));
+
+  try {
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    if (!decoded.id) return next(new Error("Unauthorized"));
+    socket.userId = decoded.id;
+    next();
+  } catch {
+    next(new Error("Unauthorized"));
+  }
+});
+
+io.on("connection", (socket) => {
+  socket.join(`user:${socket.userId}`);
+});
+
+setIo(io);
+
 const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => {
+httpServer.listen(PORT, () => {
   console.log(`✅ Server running on port ${PORT}`);
 });
 

@@ -1,5 +1,6 @@
-import { createContext, useCallback, useMemo, useState } from "react";
+import { createContext, useCallback, useEffect, useMemo, useState } from "react";
 import { isTokenExpired, parseJwtPayload } from "../utils/jwt.js";
+import { connectSocket, disconnectSocket } from "../services/socketClient.js";
 import {
   registerUser,
   loginUser,
@@ -73,6 +74,18 @@ const clearAdminSession = () => {
 
 export function AuthProvider({ children }) {
   const [{ user, admin }, setState] = useState(readInitialState);
+
+  // Only student-side sessions get a live socket (notifications are only
+  // ever addressed to users.id) - connects on login/refresh, disconnects
+  // on logout or when an admin session takes over.
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    if (user && token) {
+      connectSocket(token);
+    } else {
+      disconnectSocket();
+    }
+  }, [user]);
 
   const login = useCallback(async ({ username, password, rememberMe }) => {
     const data = await loginUser({ username, password, rememberMe });
