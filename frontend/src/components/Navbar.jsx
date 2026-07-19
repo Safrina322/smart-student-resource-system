@@ -101,6 +101,9 @@ function Navbar() {
                   <Link to="/upload" className="nav-link" onClick={closeMobileMenu}>
                     Upload
                   </Link>
+                  <Link to="/achievements" className="nav-link" onClick={closeMobileMenu}>
+                    Achievements
+                  </Link>
                 </>
               )}
 

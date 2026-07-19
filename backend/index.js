@@ -26,6 +26,7 @@ import moderationRoutes from "./routes/moderationRoutes.js";
 import searchRoutes from "./routes/searchRoutes.js";
 import adminUserRoutes from "./routes/adminUserRoutes.js";
 import resourceHubRoutes from "./routes/resourceHubRoutes.js";
+import achievementRoutes from "./routes/achievementRoutes.js";
 import { startReportScheduler } from "./utils/reportScheduler.js";
 dotenv.config();
 
@@ -692,6 +693,7 @@ app.use("/api/moderation", moderationRoutes);
 app.use("/api/search", searchRoutes);
 app.use("/api/admin/users", adminUserRoutes);
 app.use("/api/resource-hub", resourceHubRoutes);
+app.use("/api/achievements", achievementRoutes);
 
 // 🔓 expose images folder
 app.use("/api/admin/courses", adminCourseRoutes);
