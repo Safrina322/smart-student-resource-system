@@ -6,7 +6,7 @@ import cors from "cors";
 import helmet from "helmet";
 import dotenv from "dotenv";
 import bcrypt from "bcryptjs";
-import db from "./db.js";
+import db, { queryAsync } from "./db.js";
 import { setIo } from "./utils/socket.js";
 import authRoutes from "./routes/authRoutes.js";
 import resourceRoutes from "./routes/resourceRoute.js";
@@ -32,6 +32,120 @@ import { startReportScheduler } from "./utils/reportScheduler.js";
 dotenv.config();
 
 const app = express();
+
+// admin/users/courses/resource_requests were historically created once by
+// hand (see database_setup.sql) rather than by this file, so a brand-new
+// database (e.g. a freshly provisioned host) never got them. Every other
+// migration below assumes these four already exist, so this must finish
+// before anything else runs - hence the top-level await.
+const ensureFoundationalSchema = async () => {
+  await queryAsync(`
+    CREATE TABLE IF NOT EXISTS admin (
+      id INT AUTO_INCREMENT PRIMARY KEY,
+      name VARCHAR(100) NOT NULL,
+      email VARCHAR(100) NOT NULL UNIQUE,
+      password VARCHAR(255) NOT NULL,
+      phone VARCHAR(20),
+      department VARCHAR(100),
+      is_active TINYINT(1) DEFAULT 1,
+      created_at TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP,
+      updated_at TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+      role ENUM('dept_admin','sysadmin') DEFAULT 'sysadmin',
+      password_reset_token VARCHAR(255),
+      password_reset_expires DATETIME,
+      INDEX idx_email (email)
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4
+  `);
+
+  await queryAsync(`
+    CREATE TABLE IF NOT EXISTS users (
+      id INT AUTO_INCREMENT PRIMARY KEY,
+      username VARCHAR(50) NOT NULL UNIQUE,
+      email VARCHAR(100) NOT NULL UNIQUE,
+      password VARCHAR(255) NOT NULL,
+      first_name VARCHAR(100),
+      last_name VARCHAR(100),
+      phone VARCHAR(20),
+      semester INT,
+      course_branch VARCHAR(100),
+      is_active TINYINT(1) DEFAULT 1,
+      role ENUM('student','lecturer','moderator') DEFAULT 'student',
+      created_at TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP,
+      updated_at TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+      password_reset_token VARCHAR(255),
+      email_verified TINYINT(1) DEFAULT 0,
+      email_verification_token VARCHAR(255),
+      password_reset_expires DATETIME,
+      INDEX idx_username (username),
+      INDEX idx_email (email)
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4
+  `);
+
+  await queryAsync(`
+    CREATE TABLE IF NOT EXISTS courses (
+      id INT AUTO_INCREMENT PRIMARY KEY,
+      title VARCHAR(255) NOT NULL UNIQUE,
+      description TEXT,
+      subject VARCHAR(100) NOT NULL,
+      semester INT,
+      level VARCHAR(50) DEFAULT 'Beginner',
+      duration VARCHAR(50),
+      credits INT DEFAULT 3,
+      professor_name VARCHAR(100),
+      professor_email VARCHAR(100),
+      prerequisites VARCHAR(255),
+      course_code VARCHAR(50) UNIQUE,
+      department VARCHAR(100),
+      image VARCHAR(255),
+      is_active TINYINT(1) DEFAULT 1,
+      created_by INT,
+      created_at TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP,
+      updated_at TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+      FOREIGN KEY (created_by) REFERENCES admin(id) ON DELETE SET NULL,
+      INDEX idx_subject (subject),
+      INDEX idx_semester (semester),
+      INDEX idx_department (department),
+      INDEX idx_is_active (is_active)
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4
+  `);
+
+  await queryAsync(`
+    CREATE TABLE IF NOT EXISTS resource_requests (
+      id INT AUTO_INCREMENT PRIMARY KEY,
+      user_id INT,
+      title VARCHAR(255) NOT NULL,
+      subject VARCHAR(100),
+      semester INT,
+      type ENUM('Notes','Video','PDF','Book','Link') DEFAULT 'Notes',
+      message TEXT,
+      status ENUM('pending','approved','rejected') DEFAULT 'pending',
+      course_id INT,
+      approved_by INT,
+      approval_comment TEXT,
+      created_at TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP,
+      updated_at TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+      approved_at TIMESTAMP NULL,
+      description TEXT,
+      level VARCHAR(50),
+      duration VARCHAR(50),
+      image VARCHAR(255),
+      lesson_title VARCHAR(255),
+      lesson_description TEXT,
+      resource_url VARCHAR(500),
+      lesson_order INT DEFAULT 1,
+      FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+      FOREIGN KEY (course_id) REFERENCES courses(id) ON DELETE SET NULL,
+      FOREIGN KEY (approved_by) REFERENCES admin(id) ON DELETE SET NULL,
+      INDEX idx_user_id (user_id),
+      INDEX idx_status (status),
+      INDEX idx_created_at (created_at)
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4
+  `);
+
+  console.log("✅ Foundational tables (admin, users, courses, resource_requests) ready");
+};
+
+await ensureFoundationalSchema();
 
 const ensureExtendedLearningSchema = () => {
   const columnMigrations = [
