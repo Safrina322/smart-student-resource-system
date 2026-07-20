@@ -1,11 +1,14 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { HiOutlineSparkles } from "react-icons/hi2";
 import { apiCall, getApiUrl, getAuthHeader } from "../utils/api.js";
 import SearchBar from "../components/Searchbar.jsx";
 import Filter from "../components/Filter.jsx";
 import StarRating from "../components/StarRating.jsx";
 import { listResources as listHubResources } from "../services/resourceHubService.js";
+import { searchAssist } from "../services/aiService.js";
 import "../styles/Resources.css";
+import "../styles/ResourceAIPanel.css";
 
 const FALLBACK_IMAGE =
   "data:image/svg+xml;charset=UTF-8," +
@@ -38,6 +41,7 @@ function ResourceListPage() {
   const [levelFilter, setLevelFilter] = useState("");
   const [hubResources, setHubResources] = useState([]);
   const [hubLoading, setHubLoading] = useState(true);
+  const [aiAssist, setAiAssist] = useState({ loading: false, answer: null, error: "" });
 
   const onlineResources = [
     {
@@ -94,6 +98,24 @@ function ResourceListPage() {
       .catch(() => setHubResources([]))
       .finally(() => setHubLoading(false));
   }, []);
+
+  // A previous AI answer no longer matches once the query changes.
+  useEffect(() => {
+    setAiAssist({ loading: false, answer: null, error: "" });
+  }, [searchTerm]);
+
+  const handleAskAI = async () => {
+    const query = searchTerm.trim();
+    if (!query || aiAssist.loading) return;
+
+    setAiAssist({ loading: true, answer: null, error: "" });
+    try {
+      const data = await searchAssist(query);
+      setAiAssist({ loading: false, answer: data.answer, error: "" });
+    } catch (err) {
+      setAiAssist({ loading: false, answer: null, error: err.message || "Could not get an AI answer" });
+    }
+  };
 
   const getSessionContext = () => {
     const adminToken = localStorage.getItem("adminToken");
@@ -358,6 +380,21 @@ function ResourceListPage() {
           className="resources-filter-select"
         />
       </div>
+
+      {searchTerm.trim().length >= 2 && (
+        <div className="ai-search-assist">
+          <button className="ai-action-btn secondary" onClick={handleAskAI} disabled={aiAssist.loading}>
+            <HiOutlineSparkles /> {aiAssist.loading ? "Thinking..." : `Ask AI about "${searchTerm.trim()}"`}
+          </button>
+          {aiAssist.error && <p className="ai-tab-error">{aiAssist.error}</p>}
+          {aiAssist.answer && (
+            <div className="ai-search-answer">
+              <HiOutlineSparkles />
+              <p>{aiAssist.answer}</p>
+            </div>
+          )}
+        </div>
+      )}
 
       {statusMessages.length > 0 && (
         <div className="resources-alert" role="alert">

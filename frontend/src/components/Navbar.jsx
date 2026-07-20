@@ -104,6 +104,9 @@ function Navbar() {
                   <Link to="/achievements" className="nav-link" onClick={closeMobileMenu}>
                     Achievements
                   </Link>
+                  <Link to="/study-planner" className="nav-link" onClick={closeMobileMenu}>
+                    ✨ Study Planner
+                  </Link>
                 </>
               )}
 

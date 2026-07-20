@@ -10,6 +10,7 @@ import {
 import { useAuth } from "../hooks/useAuth.js";
 import { parseJwtPayload } from "../utils/jwt.js";
 import StarRating from "../components/StarRating.jsx";
+import ResourceAIPanel from "../components/ResourceAIPanel.jsx";
 import {
   getResource,
   recordDownload,
@@ -258,6 +259,8 @@ function ResourceDetailPage() {
           <HiOutlineArrowDownTray /> Open / Download Resource
         </button>
       </div>
+
+      <ResourceAIPanel resourceId={id} />
 
       <section className="resource-comments-section">
         <h2><HiOutlineChatBubbleLeftRight /> Discussion ({comments.length})</h2>

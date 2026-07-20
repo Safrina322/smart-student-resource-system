@@ -6,6 +6,7 @@ import PopularResources from "../components/PopularResources.jsx";
 import NotificationsPanel from "../components/NotificationsPanel.jsx";
 import { SkeletonTableRows } from "../components/Skeleton.jsx";
 import { listMyBookmarks } from "../services/resourceHubService.js";
+import { getRecommendations } from "../services/aiService.js";
 
 function Dashboard() {
   const [courses, setCourses] = useState([]);
@@ -14,6 +15,8 @@ function Dashboard() {
   const [continueLearning, setContinueLearning] = useState(null);
   const [recentActivity, setRecentActivity] = useState([]);
   const [bookmarks, setBookmarks] = useState([]);
+  const [recommendations, setRecommendations] = useState([]);
+  const [recsLoading, setRecsLoading] = useState(true);
   const token = localStorage.getItem("token");
   const navigate = useNavigate();
 
@@ -27,6 +30,10 @@ function Dashboard() {
     listMyBookmarks()
       .then((data) => setBookmarks(Array.isArray(data) ? data : []))
       .catch(() => setBookmarks([]));
+    getRecommendations()
+      .then((data) => setRecommendations(data.recommendations || []))
+      .catch(() => setRecommendations([]))
+      .finally(() => setRecsLoading(false));
   }, [token, navigate]);
 
   const fetchCourses = async () => {
@@ -169,6 +176,30 @@ function Dashboard() {
                     <span className="activity-time">{formatDate(activity.created_at)}</span>
                   </div>
                 </div>
+              ))}
+            </div>
+          </section>
+        )}
+
+        {/* AI Recommendations */}
+        {!recsLoading && recommendations.length > 0 && (
+          <section className="recent-activity-section">
+            <h2>✨ Recommended for You</h2>
+            <div className="activity-list">
+              {recommendations.map((rec) => (
+                <Link
+                  key={rec.id}
+                  to={`/resource-hub/${rec.id}`}
+                  className="activity-item"
+                  style={{ textDecoration: "none", color: "inherit" }}
+                >
+                  <div className="activity-icon">✨</div>
+                  <div className="activity-content">
+                    <h4>{rec.title}</h4>
+                    <p className="activity-lesson">{rec.reason}</p>
+                    <span className="activity-type">{rec.subject || "General"}</span>
+                  </div>
+                </Link>
               ))}
             </div>
           </section>

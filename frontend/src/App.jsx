@@ -34,6 +34,7 @@ import ModeratorDashboard from "./pages/ModeratorDashboard.jsx";
 import AdminManageUsers from "./pages/AdminManageUsers.jsx";
 import ResourceDetailPage from "./pages/ResourceDetailPage.jsx";
 import AchievementsPage from "./pages/AchievementsPage.jsx";
+import StudyPlannerPage from "./pages/StudyPlannerPage.jsx";
 function App() {
   return (
     <AuthProvider>
@@ -77,6 +78,7 @@ function App() {
           <Route path="/admin/users" element={<ProtectedAdminRoute><AdminManageUsers /></ProtectedAdminRoute>} />
           <Route path="/resource-hub/:id" element={<ResourceDetailPage />} />
           <Route path="/achievements" element={<ProtectedRoute><AchievementsPage /></ProtectedRoute>} />
+          <Route path="/study-planner" element={<ProtectedRoute><StudyPlannerPage /></ProtectedRoute>} />
           <Route path="*" element={<NotFoundPage />} />
         </Routes>
       </div>

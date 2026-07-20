@@ -27,6 +27,7 @@ import searchRoutes from "./routes/searchRoutes.js";
 import adminUserRoutes from "./routes/adminUserRoutes.js";
 import resourceHubRoutes from "./routes/resourceHubRoutes.js";
 import achievementRoutes from "./routes/achievementRoutes.js";
+import aiRoutes from "./routes/aiRoutes.js";
 import { startReportScheduler } from "./utils/reportScheduler.js";
 dotenv.config();
 
@@ -643,6 +644,25 @@ db.query(
   }
 );
 
+db.query(
+  `CREATE TABLE IF NOT EXISTS ai_content_cache (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    resource_id INT NOT NULL,
+    content_type VARCHAR(30) NOT NULL,
+    content_json LONGTEXT NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (resource_id) REFERENCES lecturer_resources(id) ON DELETE CASCADE,
+    UNIQUE KEY uniq_resource_content_type (resource_id, content_type)
+  ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4`,
+  (tableErr) => {
+    if (tableErr) {
+      console.error("⚠️ ai_content_cache migration warning:", tableErr.message);
+    } else {
+      console.log("✅ ai_content_cache table ready");
+    }
+  }
+);
+
 // ✅ Configure CORS for the frontend app
 // Vite picks the next free port (5174, 5175, ...) whenever 5173 is already
 // taken by another process, which silently breaks a fixed-origin CORS check
@@ -694,6 +714,7 @@ app.use("/api/search", searchRoutes);
 app.use("/api/admin/users", adminUserRoutes);
 app.use("/api/resource-hub", resourceHubRoutes);
 app.use("/api/achievements", achievementRoutes);
+app.use("/api/ai", aiRoutes);
 
 // 🔓 expose images folder
 app.use("/api/admin/courses", adminCourseRoutes);
