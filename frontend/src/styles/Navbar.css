@@ -148,6 +148,12 @@
 }
 
 .dropdown-menu {
+  /* Explicit display overrides Bootstrap's own .dropdown-menu (display:
+     none by default, for its own dropdown component) - without this,
+     Bootstrap's value can silently win for this one property once the
+     production build concatenates all CSS together, even though every
+     other property here correctly overrides Bootstrap's. */
+  display: block;
   position: absolute;
   top: 100%;
   right: 0;
