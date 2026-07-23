@@ -1,4 +1,4 @@
-import '../styles/WhyChoose.css';
+import '../styles/Whychoose.css';
 
 function WhyChoose() {
   return (
