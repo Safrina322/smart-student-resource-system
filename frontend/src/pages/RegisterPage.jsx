@@ -11,7 +11,7 @@ function RegisterPage() {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
-  const { register } = useAuth();
+  const { register, login } = useAuth();
 
   const handleRegister = async (e) => {
     e.preventDefault();
@@ -26,7 +26,12 @@ function RegisterPage() {
 
     try {
       await register({ username, email, password });
-      navigate("/login");
+      // Auto-login with the same credentials so the new student lands
+      // straight on their dashboard instead of the login form - the
+      // backend doesn't require email verification to log in, only to
+      // unlock verification-gated features later.
+      await login({ username, password });
+      navigate("/dashboard");
     } catch (err) {
       setError(err.message || "Registration failed");
     } finally {
