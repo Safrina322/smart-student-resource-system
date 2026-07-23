@@ -740,6 +740,32 @@ const seedDemoRoleAccounts = () => {
   });
 };
 
+// The only sysadmin account previously came from a one-time manual run of
+// database_setup.sql, so a fresh database (e.g. a newly provisioned host)
+// had no way to log into the admin panel at all until this ran.
+const seedDefaultAdmin = () => {
+  db.query("SELECT id FROM admin LIMIT 1", async (checkErr, rows) => {
+    if (checkErr) {
+      console.error("⚠️ Admin seed check error:", checkErr.message);
+      return;
+    }
+    if (rows.length > 0) return;
+
+    const hashedPassword = await bcrypt.hash("admin123", 10);
+    db.query(
+      "INSERT INTO admin (name, email, password, department, role) VALUES (?, ?, ?, ?, ?)",
+      ["Admin User", "fathimasafrina57@gmail.com", hashedPassword, "Administration", "sysadmin"],
+      (insertErr) => {
+        if (insertErr) {
+          console.error("❌ Failed to seed default admin:", insertErr.message);
+        } else {
+          console.log("✅ Seeded default admin account: fathimasafrina57@gmail.com / admin123");
+        }
+      }
+    );
+  });
+};
+
 db.query(
   `CREATE TABLE IF NOT EXISTS search_logs (
     id INT AUTO_INCREMENT PRIMARY KEY,
@@ -810,6 +836,7 @@ app.use(cors(corsOptions));
 setTimeout(() => {
   seedResources();
   seedDemoRoleAccounts();
+  seedDefaultAdmin();
 }, 1000);
 
 app.use(express.json());
