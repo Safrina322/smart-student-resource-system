@@ -98,12 +98,6 @@ function Navbar() {
                   <Link to="/dashboard" className="nav-link" onClick={closeMobileMenu}>
                     Dashboard
                   </Link>
-                  <Link to="/upload" className="nav-link" onClick={closeMobileMenu}>
-                    Upload
-                  </Link>
-                  <Link to="/achievements" className="nav-link" onClick={closeMobileMenu}>
-                    Achievements
-                  </Link>
                   <Link to="/study-planner" className="nav-link" onClick={closeMobileMenu}>
                     ✨ Study Planner
                   </Link>
@@ -112,12 +106,36 @@ function Navbar() {
 
               <NotificationBell />
 
-              <Link to="/profile" className="nav-link profile-btn" onClick={closeMobileMenu}>
-                👤 {userName}
-              </Link>
-              <button className="nav-link profile-btn" onClick={handleLogout}>
-                🚪 Logout
-              </button>
+              {/* Profile Dropdown - secondary links live here so the
+                  top-level row stays short at every screen width */}
+              <div className="nav-dropdown">
+                <button
+                  className="nav-link profile-btn"
+                  onClick={() => setProfileDropdown(!profileDropdown)}
+                >
+                  👤 {userName} ▼
+                </button>
+                {profileDropdown && (
+                  <div className="dropdown-menu">
+                    <Link to="/profile" className="dropdown-item" onClick={closeMobileMenu}>
+                      My Profile
+                    </Link>
+                    {role === "student" && (
+                      <>
+                        <Link to="/upload" className="dropdown-item" onClick={closeMobileMenu}>
+                          Upload
+                        </Link>
+                        <Link to="/achievements" className="dropdown-item" onClick={closeMobileMenu}>
+                          Achievements
+                        </Link>
+                      </>
+                    )}
+                    <button className="dropdown-item logout" onClick={handleLogout}>
+                      🚪 Logout
+                    </button>
+                  </div>
+                )}
+              </div>
             </>
           )}
 
@@ -130,22 +148,11 @@ function Navbar() {
               <Link to="/admin/dashboard" className="nav-link admin" onClick={closeMobileMenu}>
                 Admin Dashboard
               </Link>
-              <Link to="/admin/users" className="nav-link admin" onClick={closeMobileMenu}>
-                Manage Users
-              </Link>
-              <Link to="/admin/requests" className="nav-link admin" onClick={closeMobileMenu}>
-                Manage Requests
-              </Link>
-              <Link to="/admin/add-course" className="nav-link admin" onClick={closeMobileMenu}>
-                Add Course
-              </Link>
-              <Link to="/admin/lessons" className="nav-link admin" onClick={closeMobileMenu}>
-                Manage Lessons
-              </Link>
 
-              {/* Admin Profile Dropdown */}
+              {/* Admin Profile Dropdown - management links live here so the
+                  top-level row stays short at every screen width */}
               <div className="nav-dropdown">
-                <button 
+                <button
                   className="nav-link profile-btn admin-profile"
                   onClick={() => setProfileDropdown(!profileDropdown)}
                 >
@@ -153,10 +160,19 @@ function Navbar() {
                 </button>
                 {profileDropdown && (
                   <div className="dropdown-menu">
-                    <button
-                      className="dropdown-item logout"
-                      onClick={handleLogout}
-                    >
+                    <Link to="/admin/users" className="dropdown-item" onClick={closeMobileMenu}>
+                      Manage Users
+                    </Link>
+                    <Link to="/admin/requests" className="dropdown-item" onClick={closeMobileMenu}>
+                      Manage Requests
+                    </Link>
+                    <Link to="/admin/add-course" className="dropdown-item" onClick={closeMobileMenu}>
+                      Add Course
+                    </Link>
+                    <Link to="/admin/lessons" className="dropdown-item" onClick={closeMobileMenu}>
+                      Manage Lessons
+                    </Link>
+                    <button className="dropdown-item logout" onClick={handleLogout}>
                       🚪 Admin Logout
                     </button>
                   </div>
