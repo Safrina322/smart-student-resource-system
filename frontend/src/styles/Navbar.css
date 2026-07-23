@@ -63,33 +63,56 @@
   letter-spacing: 1px;
 }
 
-/* ===== NAVIGATION MENU ===== */
+/* ===== NAVIGATION MENU =====
+   Some roles (admin especially) accumulate more top-level links than any
+   single row can hold at any realistic viewport width, so the collapsible
+   hamburger menu is the permanent behavior rather than a mobile-only
+   fallback - see the always-on rules below instead of a max-width gate. */
 
 .nav-menu {
+  position: absolute;
+  top: 70px;
+  left: 0;
+  width: 100%;
+  background: #0a0e27;
   display: flex;
-  align-items: center;
-  gap: 10px;
-  margin-left: auto;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 0;
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.3s ease;
+  border-bottom: 2px solid var(--color-accent-cyan);
+}
+
+.nav-menu.active {
+  max-height: 80vh;
+  overflow-y: auto;
 }
 
 .nav-link {
+  display: block;
+  width: 100%;
   color: #e0e0e0;
   text-decoration: none;
   font-size: 15px;
   font-weight: 500;
-  padding: 8px 15px;
-  border-radius: 6px;
+  padding: 15px 20px;
+  border-radius: 0;
+  border-bottom: 1px solid rgba(var(--color-accent-cyan-rgb), 0.1);
   transition: all 0.3s ease;
   cursor: pointer;
   background: none;
-  border: none;
+  border-left: none;
+  border-right: none;
+  border-top: none;
   white-space: nowrap;
+  text-align: left;
 }
 
 .nav-link:hover {
   color: var(--color-accent-cyan);
-  background: rgba(var(--color-accent-cyan-rgb), 0.1);
-  padding: 8px 15px;
+  background: rgba(var(--color-accent-cyan-rgb), 0.15);
 }
 
 /* Login Button - Special Styling */
@@ -100,6 +123,8 @@
   border-radius: 8px;
   font-weight: 600;
   box-shadow: 0 4px 15px rgba(var(--color-accent-cyan-rgb), 0.3);
+  margin: 10px 20px;
+  width: calc(100% - 40px);
 }
 
 .login-btn:hover {
@@ -194,7 +219,7 @@
 /* ===== HAMBURGER MENU ===== */
 
 .hamburger {
-  display: none;
+  display: flex;
   flex-direction: column;
   cursor: pointer;
   gap: 6px;
@@ -230,45 +255,6 @@
 
   .nav-logo {
     margin-right: 0;
-  }
-
-  .nav-menu {
-    position: absolute;
-    top: 70px;
-    left: 0;
-    width: 100%;
-    background: #0a0e27;
-    flex-direction: column;
-    gap: 0;
-    max-height: 0;
-    overflow: hidden;
-    transition: max-height 0.3s ease;
-    border-bottom: 2px solid var(--color-accent-cyan);
-  }
-
-  .nav-menu.active {
-    max-height: 500px;
-  }
-
-  .nav-link {
-    width: 100%;
-    padding: 15px 20px;
-    border-radius: 0;
-    border-bottom: 1px solid rgba(var(--color-accent-cyan-rgb), 0.1);
-    justify-content: flex-start;
-  }
-
-  .nav-link:hover {
-    background: rgba(var(--color-accent-cyan-rgb), 0.15);
-  }
-
-  .login-btn {
-    margin: 10px 20px;
-    width: calc(100% - 40px);
-  }
-
-  .hamburger {
-    display: flex;
   }
 
   .logo-text {

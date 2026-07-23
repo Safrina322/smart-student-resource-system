@@ -1,6 +1,8 @@
 .global-search {
   position: relative;
   width: 260px;
+  min-width: 0;
+  flex-shrink: 1;
   margin: 0 16px;
 }
 
@@ -132,5 +134,12 @@
   .global-search {
     width: 100%;
     margin: 10px 0;
+  }
+}
+
+@media (max-width: 480px) {
+  .global-search {
+    width: 90px;
+    margin: 0 8px;
   }
 }
