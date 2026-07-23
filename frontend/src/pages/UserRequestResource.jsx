@@ -151,12 +151,6 @@ function RequestResource() {
       <div className="upload-card">
         <h2>Request a Resource</h2>
 
-        {status && (
-          <p style={{ textAlign: "center", marginBottom: "10px" }}>
-            {status}
-          </p>
-        )}
-
         <form onSubmit={handleSubmit}>
           <label>Title</label>
           <input
@@ -282,6 +276,12 @@ function RequestResource() {
           <button disabled={loading}>
             {loading ? "Sending..." : "Send Request"}
           </button>
+
+          {status && (
+            <p className="upload-status-message" role="status">
+              {status}
+            </p>
+          )}
         </form>
 
         <section className="request-timeline-section">
