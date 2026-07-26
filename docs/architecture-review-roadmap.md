@@ -305,8 +305,19 @@ this is the analysis and plan only, per your request.
 4. No Content-Security-Policy customization beyond Helmet's defaults — worth
    an explicit policy once the deployed frontend origin is stable, rather
    than relying on defaults.
-5. No dependency vulnerability scanning in CI (no `npm audit`/Dependabot
-   step in `.github/workflows/ci.yml`).
+5. ~~No dependency vulnerability scanning in CI~~ — **done (Phase 2):**
+   `npm audit --omit=dev --audit-level=high` runs in both CI jobs. Two known
+   findings are deliberately not CI-blocking and need tracking:
+   - `react-router`/`react-router-dom` (frontend, production dependency):
+     moderate-severity open-redirect and constructor-injection advisories,
+     fixed only in v7 — the v6 line has no further patches. Upgrading is a
+     real major-version migration (data router APIs changed), not a
+     `npm audit fix`; worth scoping as its own task rather than forcing it
+     under this one.
+   - A transitive `eslint` devDependency (`brace-expansion`, high severity):
+     dev-tooling only, never ships, not attacker-reachable for this project.
+     Fixable via `npm audit fix --force` (bumps eslint to v10, breaking) if
+     wanted, but not worth forcing blind given the real-world risk is ~zero.
 6. Seeded demo credentials in source (flagged above under Database, security
    angle: acceptable for a demo, but should never reach a database that also
    holds real user data).
@@ -481,9 +492,10 @@ interviewer reading the code cold. Later phases are progressively more
    `lecturer_resources` are three deliberately different things, or begin
    consolidating the legacy `resources` table into the `lecturer_resources`
    model if it's genuinely redundant.
-5. **Add `npm audit` (or Dependabot) to CI.** One line in the existing
-   GitHub Actions workflow; catches known-vulnerable dependencies before
-   they ship.
+5. ~~**Add `npm audit` (or Dependabot) to CI.**~~ **Done.** Scoped to
+   production dependencies at high/critical severity so it's a real gate,
+   not a performative one — see the Security section above for the two
+   known findings it deliberately doesn't block on yet.
 6. **Add response caching / pagination to list-heavy endpoints** — course
    catalog, resource hub listing, admin request lists.
 7. **Generate an OpenAPI spec from the existing Zod schemas** rather than

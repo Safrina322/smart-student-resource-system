@@ -21,6 +21,13 @@ jobs:
           cache: npm
           cache-dependency-path: backend/package-lock.json
       - run: npm ci
+      # Gated on production dependencies + high/critical only: a devDependency
+      # (e.g. a transitive eslint dependency) having a known issue shouldn't
+      # block shipping since it never reaches a deployed environment, and a
+      # moderate-severity finding on a dependency that needs a deliberate
+      # major-version migration to fix shouldn't either - this still catches
+      # any new high/critical issue in what actually ships.
+      - run: npm audit --omit=dev --audit-level=high
       - run: npm test
 
   frontend:
@@ -37,6 +44,7 @@ jobs:
           cache: npm
           cache-dependency-path: frontend/package-lock.json
       - run: npm ci
+      - run: npm audit --omit=dev --audit-level=high
       - run: npm run lint
       - run: npm test
       - run: npm run build
