@@ -1,4 +1,5 @@
-import { createContext, useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
+import { AuthContext } from "./authContextObject.js";
 import { isTokenExpired, parseJwtPayload } from "../utils/jwt.js";
 import { connectSocket, disconnectSocket } from "../services/socketClient.js";
 import {
@@ -13,8 +14,6 @@ import {
   getMyProfile,
   updateMyProfile,
 } from "../services/authService.js";
-
-export const AuthContext = createContext(null);
 
 const buildAdminDisplayName = (name, email) => {
   const cleanedName = (name || "").trim();

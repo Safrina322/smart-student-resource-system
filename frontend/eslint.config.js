@@ -24,6 +24,10 @@ export default defineConfig([
     },
     rules: {
       'no-unused-vars': ['error', { varsIgnorePattern: '^[A-Z_]' }],
+      // Fires on legitimate fetch-on-dependency-change effects (e.g. debounced
+      // search) where setLoading(true) synchronously kicks off the request.
+      // Kept visible as a warning rather than silenced outright.
+      'react-hooks/set-state-in-effect': 'warn',
     },
   },
 ])

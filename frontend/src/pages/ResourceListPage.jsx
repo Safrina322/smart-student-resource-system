@@ -91,14 +91,6 @@ function ResourceListPage() {
     },
   ];
 
-  useEffect(() => {
-    fetchAllData();
-    listHubResources()
-      .then((data) => setHubResources(Array.isArray(data) ? data : []))
-      .catch(() => setHubResources([]))
-      .finally(() => setHubLoading(false));
-  }, []);
-
   // A previous AI answer no longer matches once the query changes.
   useEffect(() => {
     setAiAssist({ loading: false, answer: null, error: "" });
@@ -211,6 +203,14 @@ function ResourceListPage() {
     }
     setLoading(false);
   };
+
+  useEffect(() => {
+    fetchAllData();
+    listHubResources()
+      .then((data) => setHubResources(Array.isArray(data) ? data : []))
+      .catch(() => setHubResources([]))
+      .finally(() => setHubLoading(false));
+  }, []);
 
   const handleImageError = (e) => {
     e.target.src = FALLBACK_IMAGE;

@@ -20,22 +20,6 @@ function Dashboard() {
   const token = localStorage.getItem("token");
   const navigate = useNavigate();
 
-  useEffect(() => {
-    if (!token) {
-      navigate("/login");
-      return;
-    }
-    fetchCourses();
-    fetchLearningProgress();
-    listMyBookmarks()
-      .then((data) => setBookmarks(Array.isArray(data) ? data : []))
-      .catch(() => setBookmarks([]));
-    getRecommendations()
-      .then((data) => setRecommendations(data.recommendations || []))
-      .catch(() => setRecommendations([]))
-      .finally(() => setRecsLoading(false));
-  }, [token, navigate]);
-
   const fetchCourses = async () => {
     setLoading(true);
     setError("");
@@ -61,11 +45,27 @@ function Dashboard() {
       if (data.recentActivity) {
         setRecentActivity(data.recentActivity);
       }
-    } catch (err) {
+    } catch {
       // Silently ignore errors for optional feature
       console.log("Could not load learning progress");
     }
   };
+
+  useEffect(() => {
+    if (!token) {
+      navigate("/login");
+      return;
+    }
+    fetchCourses();
+    fetchLearningProgress();
+    listMyBookmarks()
+      .then((data) => setBookmarks(Array.isArray(data) ? data : []))
+      .catch(() => setBookmarks([]));
+    getRecommendations()
+      .then((data) => setRecommendations(data.recommendations || []))
+      .catch(() => setRecommendations([]))
+      .finally(() => setRecsLoading(false));
+  }, [token, navigate]);
 
   const resolveImageUrl = (image) => {
     if (!image) return "https://via.placeholder.com/300x200?text=Course";

@@ -1,5 +1,5 @@
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import logo from "../assets/icon.jpg";
 import "../styles/Navbar.css";
 import { useAuth } from "../hooks/useAuth.js";
@@ -12,16 +12,20 @@ function Navbar() {
   const { user, admin, isAuthenticated, isAdminAuthenticated, logout } = useAuth();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [profileDropdown, setProfileDropdown] = useState(false);
+  // Close the profile dropdown when the route changes. Adjusting state
+  // during render (React's documented pattern for this) instead of in a
+  // useEffect avoids the extra post-mount render an effect would cause.
+  const [lastPathname, setLastPathname] = useState(location.pathname);
+  if (location.pathname !== lastPathname) {
+    setLastPathname(location.pathname);
+    setProfileDropdown(false);
+  }
 
   const isLoggedIn = isAuthenticated || isAdminAuthenticated;
   const isAdmin = isAdminAuthenticated;
   const userName = user?.username || "";
   const adminName = admin?.name || "";
   const role = user?.role || "student";
-
-  useEffect(() => {
-    setProfileDropdown(false);
-  }, [location.pathname]);
 
   const handleLogout = () => {
     logout();

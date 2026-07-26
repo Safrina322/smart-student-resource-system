@@ -2,6 +2,7 @@ import "../styles/Homepage.css";
 import homelogo from "../assets/home.jpg";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+// eslint-disable-next-line no-unused-vars -- used as <motion.div>; the JSX-member-expression form isn't resolved as a usage by no-unused-vars
 import { motion } from "framer-motion";
 import {
   HiOutlineRocketLaunch,

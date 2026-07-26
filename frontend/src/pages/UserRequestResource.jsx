@@ -110,7 +110,7 @@ function RequestResource() {
         payload.append("image", imageFile);
       }
 
-      const data = await apiCall("/api/requests", {
+      await apiCall("/api/requests", {
         method: "POST",
         headers: getAuthHeader("token"),
         body: payload,

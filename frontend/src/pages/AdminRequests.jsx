@@ -7,11 +7,6 @@ function AdminRequests() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [actionError, setActionError] = useState("");
-  const adminToken = localStorage.getItem("adminToken");
-
-  useEffect(() => {
-    fetchRequests();
-  }, []);
 
   const fetchRequests = async () => {
     setLoading(true);
@@ -27,10 +22,14 @@ function AdminRequests() {
     setLoading(false);
   };
 
+  useEffect(() => {
+    fetchRequests();
+  }, []);
+
   const handleApprove = async (id) => {
     setActionError("");
     try {
-      const data = await apiCall(`/api/admin/requests/${id}/approve`, {
+      await apiCall(`/api/admin/requests/${id}/approve`, {
         method: "PUT",
         headers: getAuthHeader("adminToken"),
       });
@@ -44,7 +43,7 @@ function AdminRequests() {
   const handleReject = async (id) => {
     setActionError("");
     try {
-      const data = await apiCall(`/api/admin/requests/${id}/reject`, {
+      await apiCall(`/api/admin/requests/${id}/reject`, {
         method: "PUT",
         headers: getAuthHeader("adminToken"),
       });

@@ -29,7 +29,6 @@ const ACTIVITY_LABELS = {
 
 function AchievementsPage() {
   const [achievements, setAchievements] = useState([]);
-  const [stats, setStats] = useState(null);
   const [history, setHistory] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -38,7 +37,6 @@ function AchievementsPage() {
     Promise.all([getAchievements(), getActivityHistory()])
       .then(([achievementData, historyData]) => {
         setAchievements(achievementData.achievements || []);
-        setStats(achievementData.stats || null);
         setHistory(Array.isArray(historyData) ? historyData : []);
       })
       .catch((err) => setError(err.message || "Failed to load achievements"))

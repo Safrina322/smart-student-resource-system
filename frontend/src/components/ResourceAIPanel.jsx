@@ -297,6 +297,7 @@ function ResourceAIPanel({ resourceId }) {
       ) : (
         <>
           <div className="ai-panel-tabs">
+            {/* eslint-disable-next-line no-unused-vars -- Icon is used as the JSX tag below; core no-unused-vars doesn't resolve destructured-and-renamed JSX component names */}
             {TABS.map(({ key, label, icon: Icon }) => (
               <button
                 key={key}
