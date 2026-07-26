@@ -2,16 +2,6 @@ import { queryAsync } from "../db.js";
 
 const LIMIT_PER_SOURCE = 8;
 
-export const searchResources = (like) =>
-  queryAsync(
-    `SELECT id, title, description, category AS subtitle, resource_link AS link
-     FROM resources
-     WHERE title LIKE ? OR description LIKE ? OR category LIKE ?
-     ORDER BY created_at DESC
-     LIMIT ${LIMIT_PER_SOURCE}`,
-    [like, like, like]
-  );
-
 export const searchCourses = (like) =>
   queryAsync(
     `SELECT id, title, description, subject AS subtitle

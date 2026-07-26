@@ -165,27 +165,32 @@ this is the analysis and plan only, per your request.
   schedule per admin).
 
 **Problems**
-- **Three overlapping "resource" concepts** grew organically and were never
-  consolidated:
-  1. `resources` — the original/simplest model: title, description,
-     category, a static link. Seeded once with 5 hardcoded external URLs
-     (MDN, freeCodeCamp, etc.), no owner, no moderation, no relationship to
-     courses.
-  2. `resource_requests` — a student "please add this content" request
-     pipeline, which over time grew `lesson_title`/`lesson_description`/
-     `resource_url`/`lesson_order` columns bolted on (see the migration
-     comment in `index.js`: "resource_requests were only ever created once
-     by hand").
-  3. `lecturer_resources` (+ `resource_comments`/`resource_ratings`/
-     `resource_bookmarks`/`ai_content_cache` built on top of it) — the
-     fully-featured, actually-moderated content model with a real
-     review/status pipeline.
-  An interviewer who reads the schema *will* ask "why three resource
-  tables?" There's a defensible answer (each serves a genuinely different
-  workflow: legacy static links, request-for-content, and
-  lecturer-published-content), but right now that reasoning lives only in
-  your head, not in the code or docs — it needs to be either written down
-  explicitly or consolidated.
+- ~~Three overlapping "resource" concepts~~ — **investigated and resolved
+  (Phase 2).** What looked at first read like three deliberately different
+  models turned out, on tracing every read/write path, to be two real ones
+  plus one dead one:
+  - `resource_requests` — a student "please add this content" request
+    pipeline, actively read and written by `requestRoutes`/
+    `adminRequestRoutes`. Real, distinct workflow.
+  - `lecturer_resources` (+ `resource_comments`/`resource_ratings`/
+    `resource_bookmarks`/`ai_content_cache` built on top of it) — the
+    fully-featured, actually-moderated content model with a real
+    review/status pipeline. Real, distinct workflow.
+  - `resources` — had **no write path anywhere in the app** except a
+    one-time boot seed. No admin UI, no form, no endpoint ever inserted a
+    row. Its one consumer (`ResourceListPage.jsx`) fetched it to render a
+    "Saved" stat and list, while that *same page* also hardcoded an
+    almost-identical array of the same 5 links directly in the component
+    (`onlineResources`) — the DB round-trip was pure overhead for data that
+    was also just sitting in the source file. It was also joined into
+    global search results. This wasn't a deliberate third workflow, it was
+    dead weight that kept returning data because it had been seeded once.
+    **Removed entirely**: the table, its repository/service/controller/
+    route, its search-index entry, and the redundant "Saved" section and
+    stat card in `ResourceListPage.jsx`. Verified via a live boot against
+    the real database (schema created cleanly with no `resources` table),
+    `/api/resources` now correctly 404s, and `/api/search` still returns
+    correct results from the two real sources.
 - **No formal migration tool.** Schema changes are tracked as JS functions
   with names like `ensureAuthColumns`, not as versioned, ordered migration
   files. There's no single place to see the full migration history in
@@ -487,11 +492,10 @@ interviewer reading the code cold. Later phases are progressively more
    existing `ensure*` functions into versioned migration files. This
    replaces "300 lines of imperative schema-checking in the app entrypoint"
    with an auditable, ordered history.
-4. **Write down (or execute) the resource-model consolidation plan.**
-   Either document explicitly why `resources`/`resource_requests`/
-   `lecturer_resources` are three deliberately different things, or begin
-   consolidating the legacy `resources` table into the `lecturer_resources`
-   model if it's genuinely redundant.
+4. ~~**Resource-model consolidation plan.**~~ **Done — the `resources` table
+   was confirmed dead (no write path anywhere) and removed entirely**,
+   rather than documented as a deliberate third model. See the Database
+   Design section above for what was actually found and removed.
 5. ~~**Add `npm audit` (or Dependabot) to CI.**~~ **Done.** Scoped to
    production dependencies at high/critical severity so it's a real gate,
    not a performative one — see the Security section above for the two

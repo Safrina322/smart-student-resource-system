@@ -9,7 +9,6 @@ import bcrypt from "bcryptjs";
 import db, { queryAsync } from "./db.js";
 import { setIo } from "./utils/socket.js";
 import authRoutes from "./routes/authRoutes.js";
-import resourceRoutes from "./routes/resourceRoute.js";
 import courseRoutes from "./routes/courseRoutes.js";
 import adminCourseRoutes from "./routes/adminCourseRoutes.js";
 import adminAuthRoutes from "./routes/adminAuthRoutes.js";
@@ -297,21 +296,6 @@ const ensureExtendedLearningSchema = async () => {
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4`
   );
 
-  await runMigration(
-    "✅ resources table ready",
-    `CREATE TABLE IF NOT EXISTS resources (
-      id INT AUTO_INCREMENT PRIMARY KEY,
-      title VARCHAR(255) NOT NULL,
-      description TEXT,
-      category VARCHAR(100),
-      image_url VARCHAR(500),
-      resource_link VARCHAR(500) NOT NULL,
-      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-      INDEX idx_resources_category (category),
-      INDEX idx_resources_created_at (created_at)
-    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4`
-  );
-
   // report_generation_history FKs to report_schedules, so this one must be
   // created first - preserved by simply awaiting them in this order.
   await runMigration(
@@ -531,26 +515,6 @@ const ensureResourceHubSchema = async () => {
   );
 };
 
-const ensureResourcesColumns = async () => {
-  const columnsToAdd = [
-    { name: "description", definition: "description TEXT" },
-    { name: "category", definition: "category VARCHAR(100)" },
-    { name: "image_url", definition: "image_url VARCHAR(500)" },
-    { name: "resource_link", definition: "resource_link VARCHAR(500)" },
-  ];
-
-  for (const { name, definition } of columnsToAdd) {
-    try {
-      const added = await ensureColumn("resources", name, definition);
-      console.log(
-        added ? `✅ Added column '${name}' to resources table` : `✅ Column '${name}' already exists`
-      );
-    } catch (err) {
-      console.error(`❌ Failed to add column '${name}':`, err.message);
-    }
-  }
-};
-
 const ensureSearchAndAiSchema = async () => {
   await runMigration(
     "✅ search_logs table ready",
@@ -577,66 +541,6 @@ const ensureSearchAndAiSchema = async () => {
       UNIQUE KEY uniq_resource_content_type (resource_id, content_type)
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4`
   );
-};
-
-const seedResources = async () => {
-  try {
-    const countRows = await queryAsync("SELECT COUNT(*) AS count FROM resources");
-    const resourceCount = countRows[0]?.count || 0;
-    console.log(`📊 Current resources in DB: ${resourceCount}`);
-
-    if (resourceCount > 0) {
-      console.log("✅ Resources already exist, skipping seed");
-      return;
-    }
-
-    console.log("🌱 Seeding sample resources...");
-    const sampleResources = [
-      [
-        "MDN Web Docs - HTML",
-        "Official HTML guide and reference from Mozilla.",
-        "Web Development",
-        "https://upload.wikimedia.org/wikipedia/commons/6/61/HTML5_logo_and_wordmark.svg",
-        "https://developer.mozilla.org/en-US/docs/Learn/HTML/Introduction_to_HTML",
-      ],
-      [
-        "freeCodeCamp - JavaScript Basics",
-        "Free interactive lessons to learn JavaScript fundamentals.",
-        "Programming",
-        "https://design-style-guide.freecodecamp.org/downloads/fcc_secondary_large.png",
-        "https://www.freecodecamp.org/learn/javascript-algorithms-and-data-structures-v8/",
-      ],
-      [
-        "Khan Academy - Algebra 1",
-        "Step-by-step algebra lessons, practice, and quizzes.",
-        "Mathematics",
-        "https://upload.wikimedia.org/wikipedia/commons/4/43/Khan_Academy_logo.svg",
-        "https://www.khanacademy.org/math/algebra",
-      ],
-      [
-        "Google Digital Garage",
-        "Free courses in digital skills, career growth, and productivity tools.",
-        "Career Skills",
-        "https://upload.wikimedia.org/wikipedia/commons/2/2f/Google_2015_logo.svg",
-        "https://grow.google/intl/en_in/",
-      ],
-      [
-        "Coursera - AI for Everyone",
-        "Beginner-friendly introduction to artificial intelligence concepts.",
-        "Artificial Intelligence",
-        "https://upload.wikimedia.org/wikipedia/commons/e/e5/Coursera_logo.svg",
-        "https://www.coursera.org/learn/ai-for-everyone",
-      ],
-    ];
-
-    await queryAsync(
-      `INSERT INTO resources (title, description, category, image_url, resource_link) VALUES ?`,
-      [sampleResources]
-    );
-    console.log("✅ Sample resources seeded successfully");
-  } catch (err) {
-    console.error("❌ Resource seed error:", err.message);
-  }
 };
 
 // Self-registration only creates students, so lecturer/moderator accounts
@@ -723,12 +627,10 @@ await ensureExtendedLearningSchema();
 await ensureRoleModel();
 await ensureAuthColumns();
 await ensureResourceHubSchema();
-await ensureResourcesColumns();
 await ensureSearchAndAiSchema();
 
 startReportScheduler();
 
-await seedResources();
 await seedDemoRoleAccounts();
 await seedDefaultAdmin();
 
@@ -770,7 +672,6 @@ app.use("/lesson-files", express.static("lesson-files"));
 
 // ROUTES (ALWAYS BEFORE listen)
 app.use("/api/auth", authRoutes);
-app.use("/api/resources", resourceRoutes);
 app.use("/api/courses", courseRoutes);
 
 // Keep API errors JSON-only so frontend does not receive HTML error pages.

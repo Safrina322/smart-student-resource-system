@@ -32,10 +32,8 @@ const FALLBACK_IMAGE =
 function ResourceListPage() {
   const navigate = useNavigate();
   const [courses, setCourses] = useState([]);
-  const [resources, setResources] = useState([]);
   const [loading, setLoading] = useState(true);
   const [courseError, setCourseError] = useState("");
-  const [resourceError, setResourceError] = useState("");
   const [searchTerm, setSearchTerm] = useState("");
   const [subjectFilter, setSubjectFilter] = useState("");
   const [levelFilter, setLevelFilter] = useState("");
@@ -152,53 +150,21 @@ function ResourceListPage() {
   const fetchAllData = async () => {
     setLoading(true);
     setCourseError("");
-    setResourceError("");
     const session = getSessionContext();
     try {
-      const [coursesResult, resourcesResult] = await Promise.allSettled([
-        apiCall("/api/courses", {
-          headers: getAuthHeader(session.tokenType),
-        }),
-        apiCall("/api/resources", {
-          headers: getAuthHeader(session.tokenType),
-        }),
-      ]);
-
-      if (coursesResult.status === "fulfilled") {
-        setCourses(coursesResult.value || []);
-      } else {
-        const message = getErrorMessage(coursesResult.reason, "Failed to load courses");
-        if (isAuthError(message)) {
-          session.clearSession();
-          navigate(session.loginPath);
-          return;
-        }
-
-        setCourses([]);
-        setCourseError(message);
-      }
-
-      if (resourcesResult.status === "fulfilled") {
-        setResources(Array.isArray(resourcesResult.value) ? resourcesResult.value : []);
-      } else {
-        const message = getErrorMessage(resourcesResult.reason, "Failed to load saved resources");
-        if (isAuthError(message)) {
-          session.clearSession();
-          navigate(session.loginPath);
-          return;
-        }
-
-        setResources([]);
-        setResourceError(message);
-      }
+      const data = await apiCall("/api/courses", {
+        headers: getAuthHeader(session.tokenType),
+      });
+      setCourses(data || []);
     } catch (err) {
-      const message = getErrorMessage(err, "Failed to load resources");
+      const message = getErrorMessage(err, "Failed to load courses");
       if (isAuthError(message)) {
         session.clearSession();
         navigate(session.loginPath);
         return;
       }
 
+      setCourses([]);
       setCourseError(message);
     }
     setLoading(false);
@@ -259,29 +225,6 @@ function ResourceListPage() {
     });
   }, [courses, levelFilter, searchTerm, subjectFilter]);
 
-  const filteredResources = useMemo(() => {
-    const keyword = searchTerm.trim().toLowerCase();
-
-    return resources.filter((resource) => {
-      const title = (resource.title || "").toLowerCase();
-      const category = (resource.category || "").toLowerCase();
-      const description = (resource.description || "").toLowerCase();
-      const link = (resource.resource_link || "").toLowerCase();
-
-      const matchesKeyword =
-        !keyword ||
-        title.includes(keyword) ||
-        category.includes(keyword) ||
-        description.includes(keyword) ||
-        link.includes(keyword);
-
-      const matchesSubject = !subjectFilter || resource.category === subjectFilter;
-      const matchesLevel = !levelFilter || true;
-
-      return matchesKeyword && matchesSubject && matchesLevel;
-    });
-  }, [levelFilter, resources, searchTerm, subjectFilter]);
-
   const filteredOnlineResources = useMemo(() => {
     const keyword = searchTerm.trim().toLowerCase();
 
@@ -325,8 +268,8 @@ function ResourceListPage() {
     });
   }, [hubResources, searchTerm, subjectFilter]);
 
-  const statusMessages = [courseError, resourceError].filter(Boolean);
-  const totalVisibleResources = filteredOnlineResources.length + filteredResources.length;
+  const statusMessages = [courseError].filter(Boolean);
+  const totalVisibleResources = filteredOnlineResources.length;
 
   return (
     <div className="resources-page">
@@ -344,10 +287,6 @@ function ResourceListPage() {
           <div className="stat-card">
             <span className="stat-label">Courses</span>
             <strong>{courses.length}</strong>
-          </div>
-          <div className="stat-card">
-            <span className="stat-label">Saved</span>
-            <strong>{resources.length}</strong>
           </div>
           <div className="stat-card">
             <span className="stat-label">Visible now</span>
@@ -468,51 +407,6 @@ function ResourceListPage() {
                   <span>by {resource.uploader_name}</span>
                 </div>
               </Link>
-            ))}
-          </div>
-        )}
-      </section>
-
-      <section className="saved-resources-section">
-        <div className="section-heading">
-          <div>
-            <p className="section-kicker">Saved</p>
-            <h2>Stored Resources from the Database</h2>
-          </div>
-          <p className="section-note">
-            These are the actual link resources saved in your backend table and protected by login.
-          </p>
-        </div>
-
-        {filteredResources.length === 0 ? (
-          <p className="empty-saved-resources">No saved resources matched your search yet.</p>
-        ) : (
-          <div className="saved-resources-grid">
-            {filteredResources.map((resource) => (
-              <article key={resource.id} className="saved-resource-card">
-                <div className="saved-resource-image-wrap">
-                  <img
-                    src={resource.image_url || resource.image || resource.imagePath || FALLBACK_IMAGE}
-                    alt={resource.title}
-                    onError={(e) => {
-                      e.target.src = FALLBACK_IMAGE;
-                    }}
-                  />
-                </div>
-                <div className="saved-resource-content">
-                  <span className="meta-pill">{resource.category || "General"}</span>
-                  <h3>{resource.title}</h3>
-                  <p>{resource.description}</p>
-                  <a
-                    href={resource.resource_link}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="resource-link-btn"
-                  >
-                    Open Resource
-                  </a>
-                </div>
-              </article>
             ))}
           </div>
         )}

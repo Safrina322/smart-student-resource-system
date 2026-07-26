@@ -5,8 +5,7 @@ const escapeLikeWildcards = (value) => value.replace(/[%_]/g, (match) => `\\${ma
 export const search = async (query) => {
   const like = `%${escapeLikeWildcards(query)}%`;
 
-  const [resources, courses, lecturerResources] = await Promise.all([
-    searchRepository.searchResources(like),
+  const [courses, lecturerResources] = await Promise.all([
     searchRepository.searchCourses(like),
     searchRepository.searchLecturerResources(like),
   ]);
@@ -18,7 +17,6 @@ export const search = async (query) => {
   });
 
   return {
-    resources: resources.map((row) => ({ ...row, type: "resource" })),
     courses: courses.map((row) => ({ ...row, type: "course" })),
     lecturerResources: lecturerResources.map((row) => ({ ...row, type: "lecturer_resource" })),
   };

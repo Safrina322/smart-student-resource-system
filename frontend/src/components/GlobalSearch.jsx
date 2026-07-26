@@ -8,7 +8,6 @@ import "../styles/GlobalSearch.css";
 
 const SECTION_LABELS = {
   courses: "Courses",
-  resources: "Resources",
   lecturerResources: "Lecturer Resources",
 };
 
@@ -75,9 +74,7 @@ function GlobalSearch() {
 
   const showSuggestions = open && !query.trim();
   const showResults = open && query.trim().length > 0;
-  const hasAnyResults =
-    results &&
-    (results.courses?.length || results.resources?.length || results.lecturerResources?.length);
+  const hasAnyResults = results && (results.courses?.length || results.lecturerResources?.length);
 
   return (
     <div className="global-search" ref={containerRef}>
