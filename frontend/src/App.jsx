@@ -3,6 +3,7 @@ import { AuthProvider } from "./context/AuthContext.jsx";
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
 import ScrollToTop from "./components/ScrollToTop.jsx";
+import ErrorBoundary from "./components/ErrorBoundary.jsx";
 import "./styles/App.css";
 import ProtectedRoute from "./components/ProtectRoute.jsx";
 import ProtectedAdminRoute from "./components/ProtectedAdminRoute.jsx";
@@ -44,6 +45,7 @@ function App() {
       
       <div className="app-container">
         <div className="main-content" >
+        <ErrorBoundary>
         <Routes>
           <Route path="/" element={<HomePage />} />
           <Route path="/login" element={<LoginChoice />} />
@@ -81,6 +83,7 @@ function App() {
           <Route path="/study-planner" element={<ProtectedRoute><StudyPlannerPage /></ProtectedRoute>} />
           <Route path="*" element={<NotFoundPage />} />
         </Routes>
+        </ErrorBoundary>
       </div>
 
       <Footer />
