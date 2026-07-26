@@ -34,8 +34,9 @@ function ForgotPasswordPage() {
         {message && <p className="password-error" style={{ color: "#7dd3fc" }}>{message}</p>}
 
         <div className="mb-3">
-          <label className="form-label">Email</label>
+          <label className="form-label" htmlFor="forgot-password-email">Email</label>
           <input
+            id="forgot-password-email"
             type="email"
             className="form-control"
             {...register("email", { required: "Email is required" })}

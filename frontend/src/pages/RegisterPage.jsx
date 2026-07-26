@@ -47,8 +47,9 @@ function RegisterPage() {
         {error && <p className="password-error">{error}</p>}
 
         <div className="mb-3">
-          <label className="form-label">Username</label>
+          <label className="form-label" htmlFor="register-username">Username</label>
           <input
+            id="register-username"
             type="text"
             className="form-control"
             value={username}
@@ -58,8 +59,9 @@ function RegisterPage() {
         </div>
 
         <div className="mb-3">
-          <label className="form-label">Email address</label>
+          <label className="form-label" htmlFor="register-email">Email address</label>
           <input
+            id="register-email"
             type="email"
             className="form-control"
             value={email}
@@ -69,8 +71,9 @@ function RegisterPage() {
         </div>
 
         <div className="mb-3">
-          <label className="form-label">Password</label>
+          <label className="form-label" htmlFor="register-password">Password</label>
           <input
+            id="register-password"
             type="password"
             className="form-control"
             value={password}
@@ -80,8 +83,9 @@ function RegisterPage() {
         </div>
 
         <div className="mb-3">
-          <label className="form-label">Re-enter Password</label>
+          <label className="form-label" htmlFor="register-confirm-password">Re-enter Password</label>
           <input
+            id="register-confirm-password"
             type="password"
             className="form-control"
             value={confirmPassword}

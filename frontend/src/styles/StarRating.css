@@ -1,14 +1,28 @@
 .star-rating {
   display: inline-flex;
+  align-items: center;
   gap: 2px;
   color: var(--color-warning);
 }
 
-.star-rating.interactive svg {
+.star-rating-star {
+  display: inline-flex;
+  background: none;
+  border: none;
+  padding: 0;
+  margin: 0;
+  color: inherit;
   cursor: pointer;
   transition: transform 0.15s ease;
 }
 
-.star-rating.interactive svg:hover {
+.star-rating-star:hover,
+.star-rating-star:focus-visible {
   transform: scale(1.15);
+}
+
+.star-rating-star:focus-visible {
+  outline: 2px solid var(--color-accent-cyan);
+  outline-offset: 2px;
+  border-radius: 4px;
 }

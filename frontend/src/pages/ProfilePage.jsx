@@ -82,24 +82,24 @@ function ProfilePage() {
 
           <div className="profile-grid">
             <div className="profile-field">
-              <label>First Name</label>
-              <input type="text" {...profileForm.register("firstName")} />
+              <label htmlFor="profile-first-name">First Name</label>
+              <input id="profile-first-name" type="text" {...profileForm.register("firstName")} />
             </div>
             <div className="profile-field">
-              <label>Last Name</label>
-              <input type="text" {...profileForm.register("lastName")} />
+              <label htmlFor="profile-last-name">Last Name</label>
+              <input id="profile-last-name" type="text" {...profileForm.register("lastName")} />
             </div>
             <div className="profile-field">
-              <label>Phone</label>
-              <input type="text" {...profileForm.register("phone")} />
+              <label htmlFor="profile-phone">Phone</label>
+              <input id="profile-phone" type="text" {...profileForm.register("phone")} />
             </div>
             <div className="profile-field">
-              <label>Semester</label>
-              <input type="number" min="1" max="12" {...profileForm.register("semester")} />
+              <label htmlFor="profile-semester">Semester</label>
+              <input id="profile-semester" type="number" min="1" max="12" {...profileForm.register("semester")} />
             </div>
             <div className="profile-field profile-field-wide">
-              <label>Course / Branch</label>
-              <input type="text" {...profileForm.register("courseBranch")} />
+              <label htmlFor="profile-course-branch">Course / Branch</label>
+              <input id="profile-course-branch" type="text" {...profileForm.register("courseBranch")} />
             </div>
           </div>
 
@@ -116,8 +116,9 @@ function ProfilePage() {
 
           <div className="profile-grid">
             <div className="profile-field profile-field-wide">
-              <label>Current Password</label>
+              <label htmlFor="profile-current-password">Current Password</label>
               <input
+                id="profile-current-password"
                 type="password"
                 {...passwordForm.register("currentPassword", { required: "Current password is required" })}
               />
@@ -128,8 +129,9 @@ function ProfilePage() {
               )}
             </div>
             <div className="profile-field">
-              <label>New Password</label>
+              <label htmlFor="profile-new-password">New Password</label>
               <input
+                id="profile-new-password"
                 type="password"
                 {...passwordForm.register("newPassword", {
                   required: "New password is required",
@@ -141,8 +143,9 @@ function ProfilePage() {
               )}
             </div>
             <div className="profile-field">
-              <label>Confirm New Password</label>
+              <label htmlFor="profile-confirm-password">Confirm New Password</label>
               <input
+                id="profile-confirm-password"
                 type="password"
                 {...passwordForm.register("confirmPassword", {
                   required: "Please confirm your new password",

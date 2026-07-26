@@ -41,8 +41,9 @@ function LoginPage() {
         {error && <p className="password-error">{error}</p>}
 
         <div className="mb-3">
-          <label className="form-label">Username</label>
+          <label className="form-label" htmlFor="login-username">Username</label>
           <input
+            id="login-username"
             type="text"
             className="form-control"
             value={username}
@@ -52,8 +53,9 @@ function LoginPage() {
         </div>
 
         <div className="mb-3">
-          <label className="form-label">Password</label>
+          <label className="form-label" htmlFor="login-password">Password</label>
           <input
+            id="login-password"
             type="password"
             className="form-control"
             value={password}

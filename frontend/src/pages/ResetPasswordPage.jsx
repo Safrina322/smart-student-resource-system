@@ -36,8 +36,9 @@ function ResetPasswordPage() {
         {message && <p className="password-error">{message}</p>}
 
         <div className="mb-3">
-          <label className="form-label">New Password</label>
+          <label className="form-label" htmlFor="reset-new-password">New Password</label>
           <input
+            id="reset-new-password"
             type="password"
             className="form-control"
             {...register("newPassword", {
@@ -49,8 +50,9 @@ function ResetPasswordPage() {
         </div>
 
         <div className="mb-3">
-          <label className="form-label">Confirm New Password</label>
+          <label className="form-label" htmlFor="reset-confirm-password">Confirm New Password</label>
           <input
+            id="reset-confirm-password"
             type="password"
             className="form-control"
             {...register("confirmPassword", {

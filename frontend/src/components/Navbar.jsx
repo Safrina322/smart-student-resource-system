@@ -55,11 +55,17 @@ function Navbar() {
         <GlobalSearch />
 
         {/* Hamburger Menu Icon */}
-        <div className="hamburger" onClick={toggleMobileMenu}>
+        <button
+          type="button"
+          className="hamburger"
+          onClick={toggleMobileMenu}
+          aria-label={mobileMenuOpen ? "Close menu" : "Open menu"}
+          aria-expanded={mobileMenuOpen}
+        >
           <span className={mobileMenuOpen ? "active" : ""}></span>
           <span className={mobileMenuOpen ? "active" : ""}></span>
           <span className={mobileMenuOpen ? "active" : ""}></span>
-        </div>
+        </button>
 
         {/* Navigation Links */}
         <div className={`nav-menu ${mobileMenuOpen ? "active" : ""}`}>

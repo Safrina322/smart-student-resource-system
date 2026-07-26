@@ -152,24 +152,27 @@ function RequestResource() {
         <h2>Request a Resource</h2>
 
         <form onSubmit={handleSubmit}>
-          <label>Title</label>
+          <label htmlFor="request-title">Title</label>
           <input
+            id="request-title"
             name="title"
             value={formData.title}
             onChange={handleChange}
             required
           />
 
-          <label>Subject</label>
+          <label htmlFor="request-subject">Subject</label>
           <input
+            id="request-subject"
             name="subject"
             value={formData.subject}
             onChange={handleChange}
             required
           />
 
-          <label>Course Description</label>
+          <label htmlFor="request-description">Course Description</label>
           <input
+            id="request-description"
             name="description"
             value={formData.description}
             onChange={handleChange}
@@ -177,8 +180,9 @@ function RequestResource() {
             required
           />
 
-          <label>Semester</label>
+          <label htmlFor="request-semester">Semester</label>
           <input
+            id="request-semester"
             type="number"
             min="1"
             max="12"
@@ -189,8 +193,9 @@ function RequestResource() {
             required
           />
 
-          <label>Level</label>
+          <label htmlFor="request-level">Level</label>
           <select
+            id="request-level"
             name="level"
             value={formData.level}
             onChange={handleChange}
@@ -200,8 +205,9 @@ function RequestResource() {
             <option>Advanced</option>
           </select>
 
-          <label>Duration</label>
+          <label htmlFor="request-duration">Duration</label>
           <input
+            id="request-duration"
             name="duration"
             value={formData.duration}
             onChange={handleChange}
@@ -209,16 +215,18 @@ function RequestResource() {
             required
           />
 
-          <label>Course Image</label>
+          <label htmlFor="request-image">Course Image</label>
           <input
+            id="request-image"
             type="file"
             accept="image/*"
             onChange={(e) => setImageFile(e.target.files?.[0] || null)}
             required
           />
 
-          <label>Lesson Title</label>
+          <label htmlFor="request-lesson-title">Lesson Title</label>
           <input
+            id="request-lesson-title"
             name="lesson_title"
             value={formData.lesson_title}
             onChange={handleChange}
@@ -226,8 +234,9 @@ function RequestResource() {
             required
           />
 
-          <label>Lesson Description</label>
+          <label htmlFor="request-lesson-description">Lesson Description</label>
           <input
+            id="request-lesson-description"
             name="lesson_description"
             value={formData.lesson_description}
             onChange={handleChange}
@@ -235,8 +244,9 @@ function RequestResource() {
             required
           />
 
-          <label>Resource Type</label>
+          <label htmlFor="request-type">Resource Type</label>
           <select
+            id="request-type"
             name="type"
             value={formData.type}
             onChange={handleChange}
@@ -246,8 +256,9 @@ function RequestResource() {
             <option>Link</option>
           </select>
 
-          <label>Resource URL (PDF / Video / Link)</label>
+          <label htmlFor="request-resource-url">Resource URL (PDF / Video / Link)</label>
           <input
+            id="request-resource-url"
             name="resource_url"
             value={formData.resource_url}
             placeholder="https://..."
@@ -255,8 +266,9 @@ function RequestResource() {
             required
           />
 
-          <label>Lesson Order</label>
+          <label htmlFor="request-lesson-order">Lesson Order</label>
           <input
+            id="request-lesson-order"
             type="number"
             min="1"
             name="lesson_order"
@@ -265,8 +277,9 @@ function RequestResource() {
             required
           />
 
-          <label>Message to Admin</label>
+          <label htmlFor="request-message">Message to Admin</label>
           <input
+            id="request-message"
             name="message"
             value={formData.message}
             placeholder="Why should this be added?"

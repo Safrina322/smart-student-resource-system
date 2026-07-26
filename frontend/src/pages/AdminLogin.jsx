@@ -40,8 +40,9 @@ function AdminLogin() {
         {error && <p className="password-error">{error}</p>}
 
         <div className="mb-3">
-          <label className="form-label">Admin Email</label>
+          <label className="form-label" htmlFor="admin-login-email">Admin Email</label>
           <input
+            id="admin-login-email"
             type="email"
             className="form-control"
             value={email}
@@ -51,8 +52,9 @@ function AdminLogin() {
         </div>
 
         <div className="mb-3">
-          <label className="form-label">Password</label>
+          <label className="form-label" htmlFor="admin-login-password">Password</label>
           <input
+            id="admin-login-password"
             type="password"
             className="form-control"
             value={password}

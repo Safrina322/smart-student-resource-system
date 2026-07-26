@@ -205,6 +205,15 @@
   cursor: pointer;
   gap: 6px;
   margin-left: 20px;
+  background: none;
+  border: none;
+  padding: 4px;
+}
+
+.hamburger:focus-visible {
+  outline: 2px solid var(--color-accent-cyan);
+  outline-offset: 2px;
+  border-radius: 4px;
 }
 
 .hamburger span {
