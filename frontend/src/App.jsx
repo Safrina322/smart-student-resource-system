@@ -20,7 +20,6 @@ const AdminDashboard = lazy(() => import("./pages/AdminDashboard.jsx"));
 const UploadResourcePage = lazy(() => import("./pages/UserRequestResource.jsx"));
 const ResourceListPage = lazy(() => import("./pages/ResourceListPage"));
 const CourseLearningPage = lazy(() => import("./pages/CourseLearningPage"));
-const AdminPanelPage = lazy(() => import("./pages/Adminpanelpage"));
 const AboutPage = lazy(() => import("./pages/Aboutpage"));
 const ContactPage = lazy(() => import("./pages/ContactPage.jsx"));
 const AdminAddCourse = lazy(() => import("./pages/AdminAddCourse.jsx"));
