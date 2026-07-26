@@ -174,6 +174,10 @@ frontend/src/
 - **Grounded, not hallucinated, AI.** Recommendations and search assist are constrained to only reference resources that actually exist in the candidate set passed to the model — the prompt explicitly forbids inventing IDs, and the response is filtered against the real candidate list regardless.
 - **Response caching for AI generation.** Summaries/quizzes/flashcards are cached per resource so a second request is instant and doesn't re-spend API quota.
 
+For the detailed war stories behind these decisions (the bugs that led to
+each one, and how they were diagnosed), see
+[docs/interview-talking-points.md](docs/interview-talking-points.md).
+
 ---
 
 ## License
