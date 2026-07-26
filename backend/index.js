@@ -28,6 +28,7 @@ import adminUserRoutes from "./routes/adminUserRoutes.js";
 import resourceHubRoutes from "./routes/resourceHubRoutes.js";
 import achievementRoutes from "./routes/achievementRoutes.js";
 import aiRoutes from "./routes/aiRoutes.js";
+import healthRoutes from "./routes/healthRoutes.js";
 import { startReportScheduler } from "./utils/reportScheduler.js";
 dotenv.config();
 
@@ -850,6 +851,7 @@ setInterval(() => {
 }, 4 * 60 * 1000);
 
 app.use(express.json());
+app.use("/api/health", healthRoutes);
 app.use("/api/admin", adminAuthRoutes);
 app.use("/api/requests", requestRoutes);
 app.use("/api/admin/requests", adminRequestRoutes);
