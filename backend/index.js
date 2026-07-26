@@ -839,6 +839,16 @@ setTimeout(() => {
   seedDefaultAdmin();
 }, 1000);
 
+// Hosted free-tier MySQL (e.g. Aiven) auto-powers-off after a period of no
+// activity, which then 404s every request until someone manually resumes it
+// in the provider dashboard. A cheap periodic query keeps the connection
+// active so the database never looks idle. No-op cost on local dev.
+setInterval(() => {
+  db.query("SELECT 1", (err) => {
+    if (err) console.error("⚠️ Keep-alive ping failed:", err.message);
+  });
+}, 4 * 60 * 1000);
+
 app.use(express.json());
 app.use("/api/admin", adminAuthRoutes);
 app.use("/api/requests", requestRoutes);
