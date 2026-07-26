@@ -148,7 +148,31 @@ const ensureFoundationalSchema = async () => {
 
 await ensureFoundationalSchema();
 
-const ensureExtendedLearningSchema = () => {
+// Shared by every "add this column if it's missing" migration below - was
+// duplicated inline four times (once per table) as a SHOW COLUMNS + ALTER
+// TABLE callback pair. Returns whether it actually added the column, so
+// callers can gate one-time follow-up work (e.g. a backfill) on that.
+const ensureColumn = async (table, name, definition) => {
+  const existing = await queryAsync(`SHOW COLUMNS FROM ${table} LIKE ?`, [name]);
+  if (existing.length > 0) return false;
+  await queryAsync(`ALTER TABLE ${table} ADD COLUMN ${definition}`);
+  return true;
+};
+
+// Runs one CREATE TABLE IF NOT EXISTS, logging success/failure the same way
+// every migration below needs to - a failure here is logged and swallowed
+// rather than thrown, matching this file's existing "best effort, don't
+// block boot over an optional table" tolerance.
+const runMigration = async (successMessage, sql) => {
+  try {
+    await queryAsync(sql);
+    console.log(successMessage);
+  } catch (err) {
+    console.error("⚠️ Schema migration warning:", err.message);
+  }
+};
+
+const ensureExtendedLearningSchema = async () => {
   const columnMigrations = [
     { name: "description", definition: "description TEXT" },
     { name: "level", definition: "level VARCHAR(50)" },
@@ -160,26 +184,16 @@ const ensureExtendedLearningSchema = () => {
     { name: "lesson_order", definition: "lesson_order INT DEFAULT 1" },
   ];
 
-  columnMigrations.forEach(({ name, definition }) => {
-    db.query("SHOW COLUMNS FROM resource_requests LIKE ?", [name], (checkErr, result) => {
-      if (checkErr) {
-        console.error("⚠️ Schema check warning:", checkErr.message);
-        return;
-      }
+  for (const { name, definition } of columnMigrations) {
+    try {
+      await ensureColumn("resource_requests", name, definition);
+    } catch (err) {
+      console.error("⚠️ Schema migration warning:", err.message);
+    }
+  }
 
-      if (result.length > 0) {
-        return;
-      }
-
-      db.query(`ALTER TABLE resource_requests ADD COLUMN ${definition}`, (alterErr) => {
-        if (alterErr) {
-          console.error("⚠️ Schema migration warning:", alterErr.message);
-        }
-      });
-    });
-  });
-
-  db.query(
+  await runMigration(
+    "✅ course_lessons table ready",
     `CREATE TABLE IF NOT EXISTS course_lessons (
       id INT AUTO_INCREMENT PRIMARY KEY,
       course_id INT NOT NULL,
@@ -192,15 +206,11 @@ const ensureExtendedLearningSchema = () => {
       FOREIGN KEY (course_id) REFERENCES courses(id) ON DELETE CASCADE,
       INDEX idx_course_lessons_course_id (course_id),
       INDEX idx_course_lessons_order (lesson_order)
-    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4`,
-    (tableErr) => {
-      if (tableErr) {
-        console.error("⚠️ Schema migration warning:", tableErr.message);
-      }
-    }
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4`
   );
 
-  db.query(
+  await runMigration(
+    "✅ analytics_events table ready",
     `CREATE TABLE IF NOT EXISTS analytics_events (
       id INT AUTO_INCREMENT PRIMARY KEY,
       user_id INT NULL,
@@ -214,15 +224,11 @@ const ensureExtendedLearningSchema = () => {
       INDEX idx_analytics_created_at (created_at),
       INDEX idx_analytics_course_id (course_id),
       INDEX idx_analytics_user_id (user_id)
-    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4`,
-    (tableErr) => {
-      if (tableErr) {
-        console.error("⚠️ Schema migration warning:", tableErr.message);
-      }
-    }
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4`
   );
 
-  db.query(
+  await runMigration(
+    "✅ user_learning_progress table ready",
     `CREATE TABLE IF NOT EXISTS user_learning_progress (
       id INT AUTO_INCREMENT PRIMARY KEY,
       user_id INT NOT NULL,
@@ -235,15 +241,11 @@ const ensureExtendedLearningSchema = () => {
       UNIQUE KEY user_course (user_id, course_id),
       INDEX idx_user_course_accessed (user_id, last_accessed_at),
       INDEX idx_course_accessed (course_id, last_accessed_at)
-    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4`,
-    (tableErr) => {
-      if (tableErr) {
-        console.error("⚠️ Schema migration warning:", tableErr.message);
-      }
-    }
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4`
   );
 
-  db.query(
+  await runMigration(
+    "✅ request_status_history table ready",
     `CREATE TABLE IF NOT EXISTS request_status_history (
       id INT AUTO_INCREMENT PRIMARY KEY,
       request_id INT NOT NULL,
@@ -255,15 +257,11 @@ const ensureExtendedLearningSchema = () => {
       INDEX idx_request_status_history_request_id (request_id),
       INDEX idx_request_status_history_status (status),
       INDEX idx_request_status_history_changed_at (changed_at)
-    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4`,
-    (tableErr) => {
-      if (tableErr) {
-        console.error("⚠️ Schema migration warning:", tableErr.message);
-      }
-    }
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4`
   );
 
-  db.query(
+  await runMigration(
+    "✅ user_notifications table ready",
     `CREATE TABLE IF NOT EXISTS user_notifications (
       id INT AUTO_INCREMENT PRIMARY KEY,
       user_id INT NOT NULL,
@@ -278,15 +276,11 @@ const ensureExtendedLearningSchema = () => {
       INDEX idx_user_notifications_user_id (user_id),
       INDEX idx_user_notifications_read (is_read),
       INDEX idx_user_notifications_created_at (created_at)
-    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4`,
-    (tableErr) => {
-      if (tableErr) {
-        console.error("⚠️ Schema migration warning:", tableErr.message);
-      }
-    }
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4`
   );
 
-  db.query(
+  await runMigration(
+    "✅ admin_audit_logs table ready",
     `CREATE TABLE IF NOT EXISTS admin_audit_logs (
       id INT AUTO_INCREMENT PRIMARY KEY,
       admin_id INT NULL,
@@ -300,15 +294,11 @@ const ensureExtendedLearningSchema = () => {
       INDEX idx_admin_audit_action (action_type),
       INDEX idx_admin_audit_target (target_type),
       INDEX idx_admin_audit_created_at (created_at)
-    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4`,
-    (tableErr) => {
-      if (tableErr) {
-        console.error("⚠️ Schema migration warning:", tableErr.message);
-      }
-    }
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4`
   );
 
-  db.query(
+  await runMigration(
+    "✅ resources table ready",
     `CREATE TABLE IF NOT EXISTS resources (
       id INT AUTO_INCREMENT PRIMARY KEY,
       title VARCHAR(255) NOT NULL,
@@ -319,15 +309,13 @@ const ensureExtendedLearningSchema = () => {
       created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
       INDEX idx_resources_category (category),
       INDEX idx_resources_created_at (created_at)
-    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4`,
-    (tableErr) => {
-      if (tableErr) {
-        console.error("⚠️ Schema migration warning:", tableErr.message);
-      }
-    }
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4`
   );
 
-  db.query(
+  // report_generation_history FKs to report_schedules, so this one must be
+  // created first - preserved by simply awaiting them in this order.
+  await runMigration(
+    "✅ report_schedules table ready",
     `CREATE TABLE IF NOT EXISTS report_schedules (
       id INT AUTO_INCREMENT PRIMARY KEY,
       admin_id INT NOT NULL,
@@ -345,15 +333,11 @@ const ensureExtendedLearningSchema = () => {
       UNIQUE KEY uniq_report_schedule_admin (admin_id),
       INDEX idx_report_schedules_next_run (next_run_at),
       INDEX idx_report_schedules_active (is_active)
-    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4`,
-    (tableErr) => {
-      if (tableErr) {
-        console.error("⚠️ Schema migration warning:", tableErr.message);
-      }
-    }
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4`
   );
 
-  db.query(
+  await runMigration(
+    "✅ report_generation_history table ready",
     `CREATE TABLE IF NOT EXISTS report_generation_history (
       id INT AUTO_INCREMENT PRIMARY KEY,
       admin_id INT NULL,
@@ -371,78 +355,51 @@ const ensureExtendedLearningSchema = () => {
       INDEX idx_report_history_created_at (created_at),
       INDEX idx_report_history_admin_id (admin_id),
       INDEX idx_report_history_status (status)
-    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4`,
-    (tableErr) => {
-      if (tableErr) {
-        console.error("⚠️ Schema migration warning:", tableErr.message);
-      }
-    }
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4`
   );
 };
-
-ensureExtendedLearningSchema();
 
 // Expands the role model from 2 roles (student/admin) to 5: users gets
 // lecturer/moderator alongside student; admin gets a dept_admin/sysadmin
 // tier via a new column. No existing FK relationships change.
-const ensureRoleModel = () => {
-  db.query("SHOW COLUMNS FROM users LIKE 'role'", (checkErr, result) => {
-    if (checkErr) {
-      console.error("⚠️ Role schema check warning:", checkErr.message);
-      return;
-    }
-
-    const currentType = result[0]?.Type || "";
+const ensureRoleModel = async () => {
+  try {
+    const userRoleColumn = await queryAsync("SHOW COLUMNS FROM users LIKE 'role'");
+    const currentType = userRoleColumn[0]?.Type || "";
     if (currentType.includes("lecturer") && currentType.includes("moderator")) {
       console.log("✅ users.role already includes lecturer/moderator");
-      return;
+    } else {
+      await queryAsync(
+        "ALTER TABLE users MODIFY COLUMN role ENUM('student','lecturer','moderator') DEFAULT 'student'"
+      );
+      console.log("✅ Expanded users.role to student/lecturer/moderator");
     }
+  } catch (err) {
+    console.error("⚠️ Role schema migration warning:", err.message);
+  }
 
-    db.query(
-      "ALTER TABLE users MODIFY COLUMN role ENUM('student','lecturer','moderator') DEFAULT 'student'",
-      (alterErr) => {
-        if (alterErr) {
-          console.error("⚠️ Role schema migration warning:", alterErr.message);
-        } else {
-          console.log("✅ Expanded users.role to student/lecturer/moderator");
-        }
-      }
-    );
-  });
-
-  db.query("SHOW COLUMNS FROM admin LIKE 'role'", (checkErr, result) => {
-    if (checkErr) {
-      console.error("⚠️ Admin role schema check warning:", checkErr.message);
-      return;
-    }
-
-    if (result.length > 0) {
+  try {
+    const adminRoleColumn = await queryAsync("SHOW COLUMNS FROM admin LIKE 'role'");
+    if (adminRoleColumn.length > 0) {
       console.log("✅ Column 'role' already exists on admin");
-      return;
+    } else {
+      // Existing admin rows predate the dept_admin/sysadmin split; they were
+      // the platform's only administrators, so they become sysadmin here.
+      await queryAsync(
+        "ALTER TABLE admin ADD COLUMN role ENUM('dept_admin','sysadmin') DEFAULT 'sysadmin'"
+      );
+      console.log("✅ Added role column to admin table (existing admins -> sysadmin)");
     }
-
-    // Existing admin rows predate the dept_admin/sysadmin split; they were
-    // the platform's only administrators, so they become sysadmin here.
-    db.query(
-      "ALTER TABLE admin ADD COLUMN role ENUM('dept_admin','sysadmin') DEFAULT 'sysadmin'",
-      (alterErr) => {
-        if (alterErr) {
-          console.error("⚠️ Admin role migration warning:", alterErr.message);
-        } else {
-          console.log("✅ Added role column to admin table (existing admins -> sysadmin)");
-        }
-      }
-    );
-  });
+  } catch (err) {
+    console.error("⚠️ Admin role migration warning:", err.message);
+  }
 };
-
-ensureRoleModel();
 
 // Adds email verification + password reset support to users, and password
 // reset support to admin. Self-registered users start unverified; existing
 // rows (created before this column existed) are marked verified so nobody
 // already using the app gets locked out.
-const ensureAuthColumns = () => {
+const ensureAuthColumns = async () => {
   const userColumns = [
     { name: "email_verified", definition: "email_verified TINYINT(1) DEFAULT 0" },
     { name: "email_verification_token", definition: "email_verification_token VARCHAR(255) NULL" },
@@ -450,162 +407,131 @@ const ensureAuthColumns = () => {
     { name: "password_reset_expires", definition: "password_reset_expires DATETIME NULL" },
   ];
 
-  userColumns.forEach(({ name, definition }) => {
-    db.query("SHOW COLUMNS FROM users LIKE ?", [name], (checkErr, result) => {
-      if (checkErr) {
-        console.error(`⚠️ Auth column check error for users.${name}:`, checkErr.message);
-        return;
+  for (const { name, definition } of userColumns) {
+    let added = false;
+    try {
+      added = await ensureColumn("users", name, definition);
+      if (added) console.log(`✅ Added column 'users.${name}'`);
+    } catch (err) {
+      console.error(`❌ Failed to add users.${name}:`, err.message);
+      continue;
+    }
+
+    if (added && name === "email_verified") {
+      try {
+        await queryAsync("UPDATE users SET email_verified = 1 WHERE email_verified = 0");
+        console.log("✅ Backfilled existing users as email_verified");
+      } catch (err) {
+        console.error("⚠️ email_verified backfill warning:", err.message);
       }
-      if (result.length > 0) return;
-
-      db.query(`ALTER TABLE users ADD COLUMN ${definition}`, (alterErr) => {
-        if (alterErr) {
-          console.error(`❌ Failed to add users.${name}:`, alterErr.message);
-          return;
-        }
-        console.log(`✅ Added column 'users.${name}'`);
-
-        if (name === "email_verified") {
-          db.query("UPDATE users SET email_verified = 1 WHERE email_verified = 0", (backfillErr) => {
-            if (backfillErr) {
-              console.error("⚠️ email_verified backfill warning:", backfillErr.message);
-            } else {
-              console.log("✅ Backfilled existing users as email_verified");
-            }
-          });
-        }
-      });
-    });
-  });
+    }
+  }
 
   const adminColumns = [
     { name: "password_reset_token", definition: "password_reset_token VARCHAR(255) NULL" },
     { name: "password_reset_expires", definition: "password_reset_expires DATETIME NULL" },
   ];
 
-  adminColumns.forEach(({ name, definition }) => {
-    db.query("SHOW COLUMNS FROM admin LIKE ?", [name], (checkErr, result) => {
-      if (checkErr) {
-        console.error(`⚠️ Auth column check error for admin.${name}:`, checkErr.message);
-        return;
-      }
-      if (result.length > 0) return;
-
-      db.query(`ALTER TABLE admin ADD COLUMN ${definition}`, (alterErr) => {
-        if (alterErr) {
-          console.error(`❌ Failed to add admin.${name}:`, alterErr.message);
-        } else {
-          console.log(`✅ Added column 'admin.${name}'`);
-        }
-      });
-    });
-  });
+  for (const { name, definition } of adminColumns) {
+    try {
+      const added = await ensureColumn("admin", name, definition);
+      if (added) console.log(`✅ Added column 'admin.${name}'`);
+    } catch (err) {
+      console.error(`❌ Failed to add admin.${name}:`, err.message);
+    }
+  }
 };
-
-ensureAuthColumns();
 
 // Lecturer-uploaded resources, moderated separately from the existing
 // student resource_requests pipeline (which is a request-for-content flow
 // with lesson fields) since lecturer uploads are direct, trusted content
 // contributions with a different shape and review path.
-db.query(
-  `CREATE TABLE IF NOT EXISTS lecturer_resources (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    uploader_id INT NOT NULL,
-    title VARCHAR(255) NOT NULL,
-    description TEXT,
-    subject VARCHAR(100),
-    department VARCHAR(100),
-    semester INT,
-    course_id INT NULL,
-    resource_type ENUM('PDF','Video','Link','Image','ZIP','Document') DEFAULT 'PDF',
-    resource_link VARCHAR(500) NOT NULL,
-    tags VARCHAR(255),
-    status ENUM('pending','approved','rejected','flagged') DEFAULT 'pending',
-    reviewed_by INT NULL,
-    review_comment TEXT,
-    views INT DEFAULT 0,
-    downloads INT DEFAULT 0,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    reviewed_at TIMESTAMP NULL,
-    FOREIGN KEY (uploader_id) REFERENCES users(id) ON DELETE CASCADE,
-    FOREIGN KEY (course_id) REFERENCES courses(id) ON DELETE SET NULL,
-    FOREIGN KEY (reviewed_by) REFERENCES users(id) ON DELETE SET NULL,
-    INDEX idx_lecturer_resources_status (status),
-    INDEX idx_lecturer_resources_uploader (uploader_id),
-    INDEX idx_lecturer_resources_created_at (created_at)
-  ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4`,
-  (tableErr) => {
-    if (tableErr) {
-      console.error("⚠️ lecturer_resources migration warning:", tableErr.message);
-    } else {
-      console.log("✅ lecturer_resources table ready");
-    }
-  }
-);
+const ensureResourceHubSchema = async () => {
+  await runMigration(
+    "✅ lecturer_resources table ready",
+    `CREATE TABLE IF NOT EXISTS lecturer_resources (
+      id INT AUTO_INCREMENT PRIMARY KEY,
+      uploader_id INT NOT NULL,
+      title VARCHAR(255) NOT NULL,
+      description TEXT,
+      subject VARCHAR(100),
+      department VARCHAR(100),
+      semester INT,
+      course_id INT NULL,
+      resource_type ENUM('PDF','Video','Link','Image','ZIP','Document') DEFAULT 'PDF',
+      resource_link VARCHAR(500) NOT NULL,
+      tags VARCHAR(255),
+      status ENUM('pending','approved','rejected','flagged') DEFAULT 'pending',
+      reviewed_by INT NULL,
+      review_comment TEXT,
+      views INT DEFAULT 0,
+      downloads INT DEFAULT 0,
+      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+      updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+      reviewed_at TIMESTAMP NULL,
+      FOREIGN KEY (uploader_id) REFERENCES users(id) ON DELETE CASCADE,
+      FOREIGN KEY (course_id) REFERENCES courses(id) ON DELETE SET NULL,
+      FOREIGN KEY (reviewed_by) REFERENCES users(id) ON DELETE SET NULL,
+      INDEX idx_lecturer_resources_status (status),
+      INDEX idx_lecturer_resources_uploader (uploader_id),
+      INDEX idx_lecturer_resources_created_at (created_at)
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4`
+  );
 
-// Comments (with one-level-or-deeper replies via parent_comment_id),
-// ratings (one per user per resource, upserted), and bookmarks for the
-// student-facing resource hub built on top of lecturer_resources.
-db.query(
-  `CREATE TABLE IF NOT EXISTS resource_comments (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    resource_id INT NOT NULL,
-    user_id INT NOT NULL,
-    parent_comment_id INT NULL,
-    comment_text TEXT NOT NULL,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (resource_id) REFERENCES lecturer_resources(id) ON DELETE CASCADE,
-    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
-    FOREIGN KEY (parent_comment_id) REFERENCES resource_comments(id) ON DELETE CASCADE,
-    INDEX idx_resource_comments_resource (resource_id),
-    INDEX idx_resource_comments_parent (parent_comment_id)
-  ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4`,
-  (err) => {
-    if (err) console.error("⚠️ resource_comments migration warning:", err.message);
-    else console.log("✅ resource_comments table ready");
-  }
-);
+  // Comments (with one-level-or-deeper replies via parent_comment_id),
+  // ratings (one per user per resource, upserted), and bookmarks for the
+  // student-facing resource hub built on top of lecturer_resources - all FK
+  // to it, so this function must run after the table above is created,
+  // preserved here by simply awaiting them in order.
+  await runMigration(
+    "✅ resource_comments table ready",
+    `CREATE TABLE IF NOT EXISTS resource_comments (
+      id INT AUTO_INCREMENT PRIMARY KEY,
+      resource_id INT NOT NULL,
+      user_id INT NOT NULL,
+      parent_comment_id INT NULL,
+      comment_text TEXT NOT NULL,
+      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+      FOREIGN KEY (resource_id) REFERENCES lecturer_resources(id) ON DELETE CASCADE,
+      FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+      FOREIGN KEY (parent_comment_id) REFERENCES resource_comments(id) ON DELETE CASCADE,
+      INDEX idx_resource_comments_resource (resource_id),
+      INDEX idx_resource_comments_parent (parent_comment_id)
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4`
+  );
 
-db.query(
-  `CREATE TABLE IF NOT EXISTS resource_ratings (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    resource_id INT NOT NULL,
-    user_id INT NOT NULL,
-    rating TINYINT NOT NULL,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    FOREIGN KEY (resource_id) REFERENCES lecturer_resources(id) ON DELETE CASCADE,
-    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
-    UNIQUE KEY uniq_resource_user_rating (resource_id, user_id),
-    INDEX idx_resource_ratings_resource (resource_id)
-  ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4`,
-  (err) => {
-    if (err) console.error("⚠️ resource_ratings migration warning:", err.message);
-    else console.log("✅ resource_ratings table ready");
-  }
-);
+  await runMigration(
+    "✅ resource_ratings table ready",
+    `CREATE TABLE IF NOT EXISTS resource_ratings (
+      id INT AUTO_INCREMENT PRIMARY KEY,
+      resource_id INT NOT NULL,
+      user_id INT NOT NULL,
+      rating TINYINT NOT NULL,
+      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+      updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+      FOREIGN KEY (resource_id) REFERENCES lecturer_resources(id) ON DELETE CASCADE,
+      FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+      UNIQUE KEY uniq_resource_user_rating (resource_id, user_id),
+      INDEX idx_resource_ratings_resource (resource_id)
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4`
+  );
 
-db.query(
-  `CREATE TABLE IF NOT EXISTS resource_bookmarks (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    resource_id INT NOT NULL,
-    user_id INT NOT NULL,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (resource_id) REFERENCES lecturer_resources(id) ON DELETE CASCADE,
-    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
-    UNIQUE KEY uniq_resource_user_bookmark (resource_id, user_id),
-    INDEX idx_resource_bookmarks_user (user_id)
-  ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4`,
-  (err) => {
-    if (err) console.error("⚠️ resource_bookmarks migration warning:", err.message);
-    else console.log("✅ resource_bookmarks table ready");
-  }
-);
+  await runMigration(
+    "✅ resource_bookmarks table ready",
+    `CREATE TABLE IF NOT EXISTS resource_bookmarks (
+      id INT AUTO_INCREMENT PRIMARY KEY,
+      resource_id INT NOT NULL,
+      user_id INT NOT NULL,
+      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+      FOREIGN KEY (resource_id) REFERENCES lecturer_resources(id) ON DELETE CASCADE,
+      FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+      UNIQUE KEY uniq_resource_user_bookmark (resource_id, user_id),
+      INDEX idx_resource_bookmarks_user (user_id)
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4`
+  );
+};
 
-// ✅ ADD MISSING COLUMNS TO RESOURCES TABLE
-const ensureResourcesColumns = () => {
+const ensureResourcesColumns = async () => {
   const columnsToAdd = [
     { name: "description", definition: "description TEXT" },
     { name: "category", definition: "category VARCHAR(100)" },
@@ -613,42 +539,52 @@ const ensureResourcesColumns = () => {
     { name: "resource_link", definition: "resource_link VARCHAR(500)" },
   ];
 
-  columnsToAdd.forEach(({ name, definition }) => {
-    db.query(`SHOW COLUMNS FROM resources LIKE ?`, [name], (checkErr, result) => {
-      if (checkErr) {
-        console.error(`⚠️ Column check error for ${name}:`, checkErr.message);
-        return;
-      }
-
-      if (result.length > 0) {
-        console.log(`✅ Column '${name}' already exists`);
-        return;
-      }
-
-      db.query(`ALTER TABLE resources ADD COLUMN ${definition}`, (alterErr) => {
-        if (alterErr) {
-          console.error(`❌ Failed to add column '${name}':`, alterErr.message);
-        } else {
-          console.log(`✅ Added column '${name}' to resources table`);
-        }
-      });
-    });
-  });
+  for (const { name, definition } of columnsToAdd) {
+    try {
+      const added = await ensureColumn("resources", name, definition);
+      console.log(
+        added ? `✅ Added column '${name}' to resources table` : `✅ Column '${name}' already exists`
+      );
+    } catch (err) {
+      console.error(`❌ Failed to add column '${name}':`, err.message);
+    }
+  }
 };
 
-ensureResourcesColumns();
-startReportScheduler();
+const ensureSearchAndAiSchema = async () => {
+  await runMigration(
+    "✅ search_logs table ready",
+    `CREATE TABLE IF NOT EXISTS search_logs (
+      id INT AUTO_INCREMENT PRIMARY KEY,
+      query VARCHAR(255) NOT NULL,
+      user_id INT NULL,
+      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+      INDEX idx_search_logs_query (query),
+      INDEX idx_search_logs_created_at (created_at)
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4`
+  );
 
-const seedResources = () => {
-  db.query("SELECT COUNT(*) AS count FROM resources", (countErr, countRows) => {
-    if (countErr) {
-      console.error("❌ Resource seed error:", countErr.message);
-      return;
-    }
+  // FKs to lecturer_resources, so this must run after ensureResourceHubSchema.
+  await runMigration(
+    "✅ ai_content_cache table ready",
+    `CREATE TABLE IF NOT EXISTS ai_content_cache (
+      id INT AUTO_INCREMENT PRIMARY KEY,
+      resource_id INT NOT NULL,
+      content_type VARCHAR(30) NOT NULL,
+      content_json LONGTEXT NOT NULL,
+      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+      FOREIGN KEY (resource_id) REFERENCES lecturer_resources(id) ON DELETE CASCADE,
+      UNIQUE KEY uniq_resource_content_type (resource_id, content_type)
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4`
+  );
+};
 
+const seedResources = async () => {
+  try {
+    const countRows = await queryAsync("SELECT COUNT(*) AS count FROM resources");
     const resourceCount = countRows[0]?.count || 0;
     console.log(`📊 Current resources in DB: ${resourceCount}`);
-    
+
     if (resourceCount > 0) {
       console.log("✅ Resources already exist, skipping seed");
       return;
@@ -693,116 +629,60 @@ const seedResources = () => {
       ],
     ];
 
-    db.query(
-      `INSERT INTO resources (title, description, category, image_url, resource_link)
-       VALUES ?`,
-      [sampleResources],
-      (insertErr) => {
-        if (insertErr) {
-          console.error("❌ Resource seed error:", insertErr.message);
-        } else {
-          console.log("✅ Sample resources seeded successfully");
-        }
-      }
+    await queryAsync(
+      `INSERT INTO resources (title, description, category, image_url, resource_link) VALUES ?`,
+      [sampleResources]
     );
-  });
+    console.log("✅ Sample resources seeded successfully");
+  } catch (err) {
+    console.error("❌ Resource seed error:", err.message);
+  }
 };
 
 // Self-registration only creates students, so lecturer/moderator accounts
 // have no signup path yet - seed one of each with known credentials so the
 // role-gated dashboards are demoable without a manual DB insert.
-const seedDemoRoleAccounts = () => {
+const seedDemoRoleAccounts = async () => {
   const demoAccounts = [
     { username: "demo.lecturer", email: "demo.lecturer@smartstudent.dev", role: "lecturer" },
     { username: "demo.moderator", email: "demo.moderator@smartstudent.dev", role: "moderator" },
   ];
 
-  demoAccounts.forEach(async ({ username, email, role }) => {
-    db.query("SELECT id FROM users WHERE username = ?", [username], async (checkErr, rows) => {
-      if (checkErr) {
-        console.error(`⚠️ Demo account check error for ${username}:`, checkErr.message);
-        return;
-      }
-      if (rows.length > 0) return;
+  for (const { username, email, role } of demoAccounts) {
+    try {
+      const rows = await queryAsync("SELECT id FROM users WHERE username = ?", [username]);
+      if (rows.length > 0) continue;
 
       const hashedPassword = await bcrypt.hash("Demo@12345", 10);
-      db.query(
+      await queryAsync(
         "INSERT INTO users (username, email, password, role, email_verified) VALUES (?, ?, ?, ?, 1)",
-        [username, email, hashedPassword, role],
-        (insertErr) => {
-          if (insertErr) {
-            console.error(`❌ Failed to seed demo ${role}:`, insertErr.message);
-          } else {
-            console.log(`✅ Seeded demo ${role} account: ${username} / Demo@12345`);
-          }
-        }
+        [username, email, hashedPassword, role]
       );
-    });
-  });
+      console.log(`✅ Seeded demo ${role} account: ${username} / Demo@12345`);
+    } catch (err) {
+      console.error(`❌ Failed to seed demo ${role}:`, err.message);
+    }
+  }
 };
 
 // The only sysadmin account previously came from a one-time manual run of
 // database_setup.sql, so a fresh database (e.g. a newly provisioned host)
 // had no way to log into the admin panel at all until this ran.
-const seedDefaultAdmin = () => {
-  db.query("SELECT id FROM admin LIMIT 1", async (checkErr, rows) => {
-    if (checkErr) {
-      console.error("⚠️ Admin seed check error:", checkErr.message);
-      return;
-    }
+const seedDefaultAdmin = async () => {
+  try {
+    const rows = await queryAsync("SELECT id FROM admin LIMIT 1");
     if (rows.length > 0) return;
 
     const hashedPassword = await bcrypt.hash("admin123", 10);
-    db.query(
+    await queryAsync(
       "INSERT INTO admin (name, email, password, department, role) VALUES (?, ?, ?, ?, ?)",
-      ["Admin User", "fathimasafrina57@gmail.com", hashedPassword, "Administration", "sysadmin"],
-      (insertErr) => {
-        if (insertErr) {
-          console.error("❌ Failed to seed default admin:", insertErr.message);
-        } else {
-          console.log("✅ Seeded default admin account: fathimasafrina57@gmail.com / admin123");
-        }
-      }
+      ["Admin User", "fathimasafrina57@gmail.com", hashedPassword, "Administration", "sysadmin"]
     );
-  });
+    console.log("✅ Seeded default admin account: fathimasafrina57@gmail.com / admin123");
+  } catch (err) {
+    console.error("❌ Failed to seed default admin:", err.message);
+  }
 };
-
-db.query(
-  `CREATE TABLE IF NOT EXISTS search_logs (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    query VARCHAR(255) NOT NULL,
-    user_id INT NULL,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    INDEX idx_search_logs_query (query),
-    INDEX idx_search_logs_created_at (created_at)
-  ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4`,
-  (tableErr) => {
-    if (tableErr) {
-      console.error("⚠️ search_logs migration warning:", tableErr.message);
-    } else {
-      console.log("✅ search_logs table ready");
-    }
-  }
-);
-
-db.query(
-  `CREATE TABLE IF NOT EXISTS ai_content_cache (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    resource_id INT NOT NULL,
-    content_type VARCHAR(30) NOT NULL,
-    content_json LONGTEXT NOT NULL,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (resource_id) REFERENCES lecturer_resources(id) ON DELETE CASCADE,
-    UNIQUE KEY uniq_resource_content_type (resource_id, content_type)
-  ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4`,
-  (tableErr) => {
-    if (tableErr) {
-      console.error("⚠️ ai_content_cache migration warning:", tableErr.message);
-    } else {
-      console.log("✅ ai_content_cache table ready");
-    }
-  }
-);
 
 // ✅ Configure CORS for the frontend app
 // Vite picks the next free port (5174, 5175, ...) whenever 5173 is already
@@ -833,12 +713,26 @@ app.use(
 );
 app.use(cors(corsOptions));
 
-// Seed resources/demo accounts after a short delay to ensure DB is ready
-setTimeout(() => {
-  seedResources();
-  seedDemoRoleAccounts();
-  seedDefaultAdmin();
-}, 1000);
+// Each of these previously ran fire-and-forget (a bare function call, not
+// awaited), so the server could start accepting requests - and the seed
+// functions below could run - before a table/column they depend on had
+// actually finished being created. Awaiting them in order (each function
+// internally awaits its own steps in the order they must happen, e.g.
+// report_generation_history after report_schedules) closes that race.
+await ensureExtendedLearningSchema();
+await ensureRoleModel();
+await ensureAuthColumns();
+await ensureResourceHubSchema();
+await ensureResourcesColumns();
+await ensureSearchAndAiSchema();
+
+startReportScheduler();
+
+await seedResources();
+await seedDemoRoleAccounts();
+await seedDefaultAdmin();
+
+console.log("✅ Database schema and seed data ready");
 
 // Hosted free-tier MySQL (e.g. Aiven) auto-powers-off after a period of no
 // activity, which then 404s every request until someone manually resumes it
