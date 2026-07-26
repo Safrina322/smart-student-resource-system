@@ -7,10 +7,16 @@ import * as adminRepository from "../repositories/adminRepository.js";
 // with adminAuth.js and anything else already checking for it;
 // `adminRole` carries the granular dept_admin/sysadmin distinction for
 // the new requireRole middleware.
+// A dedicated secret for admin tokens so a bug or leak in the student-facing
+// signing path can't be used to forge an admin token. Falls back to
+// JWT_SECRET if ADMIN_JWT_SECRET isn't configured in a given environment,
+// so this can roll out without breaking a deployment that hasn't set it yet.
+const ADMIN_JWT_SECRET = process.env.ADMIN_JWT_SECRET || process.env.JWT_SECRET;
+
 const signToken = (admin) =>
   jwt.sign(
     { adminId: admin.id, role: "admin", adminRole: admin.role || "sysadmin" },
-    process.env.JWT_SECRET,
+    ADMIN_JWT_SECRET,
     { expiresIn: "1d" }
   );
 

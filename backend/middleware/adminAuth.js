@@ -1,5 +1,8 @@
 import jwt from "jsonwebtoken";
 
+// Must match the secret adminAuthService.js signs with.
+const ADMIN_JWT_SECRET = process.env.ADMIN_JWT_SECRET || process.env.JWT_SECRET;
+
 const adminAuth = (req, res, next) => {
   const authHeader = req.headers.authorization;
 
@@ -10,7 +13,7 @@ const adminAuth = (req, res, next) => {
   const token = authHeader.split(" ")[1];
 
   try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    const decoded = jwt.verify(token, ADMIN_JWT_SECRET);
 
     if (decoded.role !== "admin") {
       return res.status(403).json({ message: "Admin access only" });
