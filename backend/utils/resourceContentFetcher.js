@@ -17,7 +17,7 @@ const FALLBACK_MIME_BY_RESOURCE_TYPE = {
 // resource_link is attacker-influenced (any approved lecturer upload) and
 // this fetch runs server-side, so without this check a malicious link could
 // make the server reach internal services or cloud metadata endpoints (SSRF).
-const isPrivateOrReservedIp = (ip) => {
+export const isPrivateOrReservedIp = (ip) => {
   const version = net.isIP(ip);
   if (version === 4) {
     const [a, b] = ip.split(".").map(Number);
@@ -43,7 +43,7 @@ const isPrivateOrReservedIp = (ip) => {
   return true; // not a parseable IP - fail closed
 };
 
-const isSafeResourceUrl = async (urlString) => {
+export const isSafeResourceUrl = async (urlString) => {
   let parsed;
   try {
     parsed = new URL(urlString);
