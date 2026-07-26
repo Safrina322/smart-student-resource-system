@@ -11,14 +11,23 @@ import {
 import validate from "../middleware/validate.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
 import authMiddleware from "../middleware/authMiddleware.js";
+import { aiLimiter, aiPublicLimiter } from "../middleware/rateLimiter.js";
 
 const router = express.Router();
 
 // Search assist rides on the same public search data as /api/search - no
-// auth required, matching that route's access model.
-router.post("/search-assist", validate(searchAssistSchema), asyncHandler(aiController.searchAssist));
+// auth required, matching that route's access model. It still spends
+// uncached Gemini quota per call though, so it gets its own, tighter,
+// IP-based limiter rather than being left completely unrestricted.
+router.post(
+  "/search-assist",
+  aiPublicLimiter,
+  validate(searchAssistSchema),
+  asyncHandler(aiController.searchAssist)
+);
 
 router.use(authMiddleware);
+router.use(aiLimiter);
 
 router.get(
   "/resources/:id/summary",
