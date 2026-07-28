@@ -112,7 +112,7 @@ cd smart-student-resource-system
 cd backend
 npm install
 cp .env.example .env   # fill in your DB credentials, JWT secret, etc.
-node index.js           # auto-creates all tables and seeds demo accounts on first boot
+node index.js           # runs pending migrations and seeds demo accounts on first boot
 
 # Frontend (new terminal)
 cd frontend
@@ -120,7 +120,12 @@ npm install
 npm run dev
 ```
 
-The backend self-bootstraps its entire schema on first run — no separate migration step needed. See `.env.example` for every environment variable it reads and what each one is for.
+The backend runs any pending database migrations automatically on boot — no
+separate step needed for local dev. Schema changes live as versioned files in
+`backend/migrations/` (see that folder's README for how to add one); `npm run
+migrate` runs them standalone without starting the server, useful as an
+explicit pre-deploy step. See `.env.example` for every environment variable
+the app reads and what each one is for.
 
 ---
 
@@ -172,7 +177,7 @@ frontend/src/
 
 ## Notable engineering decisions
 
-- **Self-bootstrapping schema.** The database layer creates every table (including the foundational ones) on first boot with idempotent `CREATE TABLE IF NOT EXISTS` statements — a fresh MySQL instance works with zero manual setup.
+- **Versioned migrations, applied automatically on boot.** Schema changes live as numbered SQL files in `backend/migrations/`, tracked in a `schema_migrations` table so each one runs exactly once — a fresh MySQL instance works with zero manual setup, and there's a single ordered place to see the full schema history.
 - **SSRF-safe resource fetching.** The AI summary/chat features fetch a lecturer-supplied resource URL server-side to ground generation in it. That URL is attacker-influenced, so it's validated against private/reserved IP ranges (including cloud metadata endpoints) before any request goes out.
 - **Grounded, not hallucinated, AI.** Recommendations and search assist are constrained to only reference resources that actually exist in the candidate set passed to the model — the prompt explicitly forbids inventing IDs, and the response is filtered against the real candidate list regardless.
 - **Response caching for AI generation.** Summaries/quizzes/flashcards are cached per resource so a second request is instant and doesn't re-spend API quota.

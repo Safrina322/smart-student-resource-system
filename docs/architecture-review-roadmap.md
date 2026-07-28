@@ -487,11 +487,33 @@ interviewer reading the code cold. Later phases are progressively more
    caching and request deduplication for free (fixing the duplicate
    unread-count fetch between `NotificationBell` and `NotificationsPanel`),
    and makes the data-fetching pages meaningfully easier to test.
-3. **Introduce a real migration tool** (e.g. `node-pg-migrate`-style
-   numbered SQL files, or a lightweight MySQL migration runner) and port the
-   existing `ensure*` functions into versioned migration files. This
-   replaces "300 lines of imperative schema-checking in the app entrypoint"
-   with an auditable, ordered history.
+3. ~~**Introduce a real migration tool.**~~ **Done.** A lightweight custom
+   runner (`backend/migrations/runner.js`, ~50 lines, no new framework
+   dependency) applies numbered `.sql` files in order, tracked in a
+   `schema_migrations` table so each runs exactly once. `index.js` dropped
+   from ~940 lines to 234 - the ~300 lines of imperative "check if a column
+   exists, ALTER if not" functions this replaced turned out to be entirely
+   supersedable: the foundational `CREATE TABLE` statements already included
+   every column those functions used to ALTER in, so a single baseline
+   migration with the final-state schema was sufficient rather than needing
+   to replay history. A genuine behavior improvement, not just a refactor: a
+   failed migration now throws and stops boot instead of logging a warning
+   and continuing with a silently-incomplete schema. Verified against both
+   the existing (already-migrated) dev database and a completely fresh one
+   created for the purpose - full register/login/admin-login/list-courses
+   flow tested end to end against the fresh database before this was
+   considered done.
+
+   Side finding while inspecting the live database for this: the local dev
+   MySQL instance has several tables (`admin_backup`, `courses_backup`,
+   `users_backup`, `resource_requests_backup`, `active_courses_view`,
+   `pending_requests_view`, `approved_requests_with_courses`,
+   `student_dashboard`) that no code anywhere in this repo creates or
+   queries - leftovers from the original manual `database_setup.sql` setup
+   predating this app entirely. Harmless (nothing reads or writes them), but
+   worth a manual `DROP TABLE` cleanup pass on whichever database instances
+   still have them; not done here since it's unrelated to the migration
+   system and touches infrastructure outside what any code change can fix.
 4. ~~**Resource-model consolidation plan.**~~ **Done — the `resources` table
    was confirmed dead (no write path anywhere) and removed entirely**,
    rather than documented as a deliberate third model. See the Database

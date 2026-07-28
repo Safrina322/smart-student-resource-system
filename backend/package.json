@@ -6,7 +6,8 @@
   "scripts": {
     "start": "node index.js",
     "test": "vitest run",
-    "openapi": "node scripts/generateOpenApi.js"
+    "openapi": "node scripts/generateOpenApi.js",
+    "migrate": "node scripts/migrate.js"
   },
   "dependencies": {
     "@asteasolutions/zod-to-openapi": "^9.1.0",
