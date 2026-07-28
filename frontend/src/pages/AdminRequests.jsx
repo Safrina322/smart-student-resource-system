@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { apiCall, getAuthHeader } from "../utils/api.js";
+import { listRequests, approveRequest, rejectRequest } from "../services/adminRequestService.js";
 import "../styles/AdminRequests.css";
 
 function AdminRequests() {
@@ -13,9 +13,7 @@ function AdminRequests() {
     setLoading(true);
     setError("");
     try {
-      const data = await apiCall(`/api/admin/requests?page=${page}`, {
-        headers: getAuthHeader("adminToken"),
-      });
+      const data = await listRequests(page);
       setRequests(data.items || []);
       setPagination(data.pagination);
     } catch (err) {
@@ -31,11 +29,7 @@ function AdminRequests() {
   const handleApprove = async (id) => {
     setActionError("");
     try {
-      await apiCall(`/api/admin/requests/${id}/approve`, {
-        method: "PUT",
-        headers: getAuthHeader("adminToken"),
-      });
-
+      await approveRequest(id);
       fetchRequests(pagination.page);
     } catch (err) {
       setActionError(`Failed to approve: ${err.message}`);
@@ -45,11 +39,7 @@ function AdminRequests() {
   const handleReject = async (id) => {
     setActionError("");
     try {
-      await apiCall(`/api/admin/requests/${id}/reject`, {
-        method: "PUT",
-        headers: getAuthHeader("adminToken"),
-      });
-
+      await rejectRequest(id);
       fetchRequests(pagination.page);
     } catch (err) {
       setActionError(`Failed to reject: ${err.message}`);

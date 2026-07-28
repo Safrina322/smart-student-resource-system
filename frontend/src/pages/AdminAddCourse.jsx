@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { getApiUrl } from "../utils/api";
+import { addCourse } from "../services/adminLessonService.js";
 import "../styles/UploadResource.css";
 
 function AdminAddCourse() {
@@ -19,8 +19,6 @@ function AdminAddCourse() {
   const [image, setImage] = useState(null);
   const [resourceFile, setResourceFile] = useState(null);
   const [message, setMessage] = useState("");
-
-  const token = localStorage.getItem("adminToken");
 
   const handleChange = (e) => {
     setFormData({
@@ -43,23 +41,7 @@ function AdminAddCourse() {
     }
 
     try {
-      const res = await fetch(
-        `${getApiUrl()}/api/admin/courses/add`,
-        {
-          method: "POST",
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-          body: data,
-        }
-      );
-
-      const result = await res.json();
-
-      if (!res.ok) {
-        setMessage(result.message || "❌ Failed to add course");
-        return;
-      }
+      await addCourse(data);
 
       setMessage("✅ Course added successfully");
 
@@ -79,8 +61,7 @@ function AdminAddCourse() {
       setImage(null);
       setResourceFile(null);
     } catch (err) {
-      console.error(err);
-      setMessage("❌ Server error");
+      setMessage(err.message || "❌ Failed to add course");
     }
   };
 

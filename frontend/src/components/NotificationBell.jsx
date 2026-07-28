@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { HiOutlineBell } from "react-icons/hi2";
-import { apiCall, getAuthHeader } from "../utils/api.js";
+import { listNotifications } from "../services/notificationService.js";
 import { getSocket } from "../services/socketClient.js";
 import "../styles/NotificationBell.css";
 
@@ -10,7 +10,7 @@ function NotificationBell() {
   const [unreadCount, setUnreadCount] = useState(0);
 
   useEffect(() => {
-    apiCall("/api/notifications", { headers: getAuthHeader("token") })
+    listNotifications()
       .then((data) => setUnreadCount(Number(data.unreadCount) || 0))
       .catch(() => {});
 

@@ -1,6 +1,11 @@
 import { useEffect, useState } from "react";
-import { apiCall, getAuthHeader } from "../utils/api";
 import { listCourses } from "../services/courseService.js";
+import {
+  getCourseLessons,
+  addLesson as addLessonRequest,
+  updateLesson,
+  deleteLesson,
+} from "../services/adminLessonService.js";
 import "../styles/AdminManageLessons.css";
 
 function AdminManageLessons() {
@@ -43,9 +48,7 @@ function AdminManageLessons() {
 
     const fetchLessons = async () => {
       try {
-        const data = await apiCall(`/api/admin/courses/${selectedCourseId}/lessons`, {
-          headers: getAuthHeader("adminToken"),
-        });
+        const data = await getCourseLessons(selectedCourseId);
         setLessons(data || []);
       } catch (err) {
         setStatus(`Failed to load lessons: ${err.message}`);
@@ -64,16 +67,12 @@ function AdminManageLessons() {
   const handleSave = async (lesson) => {
     setStatus("");
     try {
-      await apiCall(`/api/admin/courses/lessons/${lesson.id}`, {
-        method: "PUT",
-        headers: getAuthHeader("adminToken"),
-        body: JSON.stringify({
-          lesson_title: lesson.lesson_title,
-          lesson_description: lesson.lesson_description,
-          resource_type: lesson.resource_type,
-          resource_url: lesson.resource_url,
-          lesson_order: lesson.lesson_order,
-        }),
+      await updateLesson(lesson.id, {
+        lesson_title: lesson.lesson_title,
+        lesson_description: lesson.lesson_description,
+        resource_type: lesson.resource_type,
+        resource_url: lesson.resource_url,
+        lesson_order: lesson.lesson_order,
       });
       setStatus("Lesson updated successfully");
     } catch (err) {
@@ -84,10 +83,7 @@ function AdminManageLessons() {
   const handleDelete = async (lessonId) => {
     setStatus("");
     try {
-      await apiCall(`/api/admin/courses/lessons/${lessonId}`, {
-        method: "DELETE",
-        headers: getAuthHeader("adminToken"),
-      });
+      await deleteLesson(lessonId);
       setLessons((prev) => prev.filter((lesson) => lesson.id !== lessonId));
       setStatus("Lesson deleted");
     } catch (err) {
@@ -110,15 +106,9 @@ function AdminManageLessons() {
         payload.append("resource_file", newLessonFile);
       }
 
-      await apiCall(`/api/admin/courses/${selectedCourseId}/lessons`, {
-        method: "POST",
-        headers: getAuthHeader("adminToken"),
-        body: payload,
-      });
+      await addLessonRequest(selectedCourseId, payload);
 
-      const refreshed = await apiCall(`/api/admin/courses/${selectedCourseId}/lessons`, {
-        headers: getAuthHeader("adminToken"),
-      });
+      const refreshed = await getCourseLessons(selectedCourseId);
 
       setLessons(refreshed || []);
       setNewLesson({

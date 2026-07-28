@@ -9,3 +9,13 @@ export const listCourses = async () => {
   const { data } = await apiClient.get("/api/courses", { params: { pageSize: 100 } });
   return data.items;
 };
+
+export const getCourse = async (id) => {
+  const { data } = await apiClient.get(`/api/courses/${id}`);
+  return data;
+};
+
+export const getCourseLessons = async (id) => {
+  const { data } = await apiClient.get(`/api/courses/${id}/lessons`);
+  return Array.isArray(data) ? data : [];
+};

@@ -1,6 +1,9 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link, useParams } from "react-router-dom";
-import { apiCall, getApiUrl, getAuthHeader } from "../utils/api";
+import { getApiUrl } from "../utils/api";
+import { getCourse, getCourseLessons } from "../services/courseService.js";
+import { trackAccess } from "../services/learningProgressService.js";
+import { trackEvent } from "../services/analyticsService.js";
 import "../styles/Resources.css";
 
 function buildLearningPlan(course) {
@@ -48,8 +51,8 @@ function CourseLearningPage() {
       setError("");
       try {
         const [courseData, lessonData] = await Promise.all([
-          apiCall(`/api/courses/${id}`),
-          apiCall(`/api/courses/${id}/lessons`),
+          getCourse(id),
+          getCourseLessons(id),
         ]);
         setCourse(courseData);
         setLessons(Array.isArray(lessonData) ? lessonData : []);
@@ -58,23 +61,15 @@ function CourseLearningPage() {
         const token = localStorage.getItem("token");
         if (token) {
           // Track in user learning progress
-          apiCall("/api/user/track-access", {
-            method: "POST",
-            headers: getAuthHeader("token"),
-            body: JSON.stringify({ courseId: Number(id) }),
-          }).catch(() => {
+          trackAccess(Number(id)).catch(() => {
             // Silently ignore tracking errors
           });
 
           // Track as analytics event for popularity ranking
-          apiCall("/api/analytics/events", {
-            method: "POST",
-            headers: getAuthHeader("token"),
-            body: JSON.stringify({
-              eventType: "course_access",
-              courseId: Number(id),
-              metadata: { courseTitle: courseData?.title },
-            }),
+          trackEvent({
+            eventType: "course_access",
+            courseId: Number(id),
+            metadata: { courseTitle: courseData?.title },
           }).catch(() => {
             // Silently ignore tracking errors
           });
@@ -114,18 +109,14 @@ function CourseLearningPage() {
     const token = localStorage.getItem("token");
     if (!token) return;
 
-    apiCall("/api/analytics/events", {
-      method: "POST",
-      headers: getAuthHeader("token"),
-      body: JSON.stringify({
-        eventType: "resource_open",
-        courseId: Number(id),
-        lessonId: lesson.id,
-        resourceType: lesson.resource_type,
-        metadata: {
-          lessonTitle: lesson.lesson_title,
-        },
-      }),
+    trackEvent({
+      eventType: "resource_open",
+      courseId: Number(id),
+      lessonId: lesson.id,
+      resourceType: lesson.resource_type,
+      metadata: {
+        lessonTitle: lesson.lesson_title,
+      },
     }).catch(() => {
       // Do not block resource opening if analytics fails.
     });

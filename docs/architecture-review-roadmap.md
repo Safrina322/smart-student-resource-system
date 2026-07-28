@@ -475,12 +475,31 @@ interviewer reading the code cold. Later phases are progressively more
 
 ## Phase 2 — Important
 
-1. **Unify frontend API access behind one pattern.** Migrate every page
-   still using `utils/api.js` directly onto the `apiClient`-based service
-   layer, adding the missing service modules (a `courseService.js`,
-   `dashboardService.js`, `adminRequestService.js`, etc.) so no page talks
-   to `fetch`/`apiCall` directly. Delete `utils/api.js` once nothing
-   references it.
+1. ~~**Unify frontend API access behind one pattern.**~~ **Done.** All 12
+   pages/components still calling `fetch`/`apiCall` directly (one of them,
+   `AdminAddCourse.jsx`, was calling raw `fetch()` even more directly than
+   `utils/api.js`) now go through the `apiClient`-based service layer, via 9
+   new service modules (`adminAuditService`, `adminAnalyticsService`,
+   `adminLessonService`, `adminRequestService`, `analyticsService`,
+   `learningProgressService`, `notificationService`, `popularResourceService`,
+   `requestService`) plus extensions to the existing `courseService.js`.
+   `utils/api.js` is down to a single re-exported `getApiUrl()` helper (still
+   used for building plain image/file URLs, not API calls) rather than
+   deleted outright, since that one function has legitimate non-HTTP callers;
+   the CSV report download (previously a hand-rolled `fetch` + manual
+   `response.ok` check) now goes through `apiClient` with `responseType:
+   "blob"`. Every response shape the new services assume was cross-checked
+   directly against the backend controller/service source (not just inferred
+   from the frontend code being replaced) before considering this done, and
+   every touched endpoint was smoke-tested live afterward.
+
+   Deliberately **not** done in this pass: converting each page's `useState`/
+   `useEffect` fetch pattern to `useQuery`/`useMutation`. That's a separate,
+   larger, behavior-adjacent change - see the TanStack Query item below,
+   which covers a smaller, thoroughly-tested subset rather than all 20+ pages
+   at once precisely because it changes state-management behavior in ways
+   that are hard to verify without a real browser (unavailable in this
+   session's sandbox - see that item for the full reasoning).
 2. **Introduce a server-state library (TanStack Query).** This is the
    single highest-leverage frontend change available: it replaces the
    duplicated fetch/loading/error boilerplate across every page, adds

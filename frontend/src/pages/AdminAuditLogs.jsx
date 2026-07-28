@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { apiCall, getAuthHeader } from "../utils/api";
+import { listAuditLogs } from "../services/adminAuditService.js";
 import "../styles/AdminAuditLogs.css";
 
 function AdminAuditLogs() {
@@ -22,10 +22,8 @@ function AdminAuditLogs() {
     setLoading(true);
     setError("");
     try {
-      const data = await apiCall("/api/admin/audit/logs", {
-        headers: getAuthHeader("adminToken"),
-      });
-      setLogs(Array.isArray(data.logs) ? data.logs : []);
+      const data = await listAuditLogs();
+      setLogs(Array.isArray(data) ? data : []);
     } catch (err) {
       setError(err.message || "Failed to load logs");
     } finally {

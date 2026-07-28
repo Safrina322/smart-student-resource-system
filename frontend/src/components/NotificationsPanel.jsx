@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { apiCall, getAuthHeader } from "../utils/api";
+import { listNotifications, markRead as markReadRequest, markAllRead as markAllReadRequest } from "../services/notificationService.js";
 import { getSocket } from "../services/socketClient.js";
 import "../styles/NotificationsPanel.css";
 
@@ -26,9 +26,7 @@ function NotificationsPanel() {
   const fetchNotifications = async () => {
     setLoading(true);
     try {
-      const data = await apiCall("/api/notifications", {
-        headers: getAuthHeader("token"),
-      });
+      const data = await listNotifications();
       setNotifications(Array.isArray(data.notifications) ? data.notifications : []);
       setUnreadCount(Number(data.unreadCount) || 0);
     } catch (err) {
@@ -40,10 +38,7 @@ function NotificationsPanel() {
 
   const markAsRead = async (id) => {
     try {
-      await apiCall(`/api/notifications/${id}/read`, {
-        method: "PATCH",
-        headers: getAuthHeader("token"),
-      });
+      await markReadRequest(id);
       setNotifications((prev) =>
         prev.map((item) =>
           item.id === id ? { ...item, is_read: 1, read_at: new Date().toISOString() } : item
@@ -57,10 +52,7 @@ function NotificationsPanel() {
 
   const markAllRead = async () => {
     try {
-      await apiCall("/api/notifications/read-all", {
-        method: "PATCH",
-        headers: getAuthHeader("token"),
-      });
+      await markAllReadRequest();
       setNotifications((prev) => prev.map((item) => ({ ...item, is_read: 1, read_at: item.read_at || new Date().toISOString() })));
       setUnreadCount(0);
     } catch (err) {

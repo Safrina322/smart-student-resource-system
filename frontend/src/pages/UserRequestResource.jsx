@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
-import { apiCall, getAuthHeader } from "../utils/api.js";
 import { useNavigate } from "react-router-dom";
+import { listMyRequests, submitRequest } from "../services/requestService.js";
 import "../styles/UploadResource.css";
 
 function RequestResource() {
@@ -53,10 +53,8 @@ function RequestResource() {
   const fetchMyRequests = async () => {
     setTimelineLoading(true);
     try {
-      const data = await apiCall("/api/requests/mine", {
-        headers: getAuthHeader("token"),
-      });
-      setMyRequests(Array.isArray(data.requests) ? data.requests : []);
+      const data = await listMyRequests();
+      setMyRequests(Array.isArray(data) ? data : []);
     } catch (err) {
       if (handleAuthFailure(err.message)) {
         setTimelineLoading(false);
@@ -110,11 +108,7 @@ function RequestResource() {
         payload.append("image", imageFile);
       }
 
-      await apiCall("/api/requests", {
-        method: "POST",
-        headers: getAuthHeader("token"),
-        body: payload,
-      });
+      await submitRequest(payload);
 
       setStatus("✅ Request sent to admin successfully!");
 

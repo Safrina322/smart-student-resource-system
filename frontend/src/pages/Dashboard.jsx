@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { apiCall, getAuthHeader, getApiUrl } from "../utils/api.js";
+import { getApiUrl } from "../utils/api.js";
 import "../styles/Dashboard.css";
 import { Link, useNavigate } from "react-router-dom";
 import PopularResources from "../components/PopularResources.jsx";
@@ -8,6 +8,7 @@ import { SkeletonTableRows } from "../components/Skeleton.jsx";
 import { listMyBookmarks } from "../services/resourceHubService.js";
 import { listCourses } from "../services/courseService.js";
 import { getRecommendations } from "../services/aiService.js";
+import { getContinueLearning } from "../services/learningProgressService.js";
 
 function Dashboard() {
   const [courses, setCourses] = useState([]);
@@ -36,10 +37,7 @@ function Dashboard() {
 
   const fetchLearningProgress = async () => {
     try {
-      const data = await apiCall("/api/user/continue-learning", {
-        method: "GET",
-        headers: getAuthHeader("token"),
-      });
+      const data = await getContinueLearning();
       if (data.continueLearning) {
         setContinueLearning(data.continueLearning);
       }

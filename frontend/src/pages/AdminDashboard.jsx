@@ -1,9 +1,18 @@
 import { useEffect, useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
-import { apiCall, getApiUrl, getAuthHeader } from "../utils/api";
+import { getApiUrl } from "../utils/api.js";
 import "../styles/AdminDashboard.css";
 import ActivityTrendChart from "../components/charts/ActivityTrendChart.jsx";
 import TopSubjectsChart from "../components/charts/TopSubjectsChart.jsx";
+import {
+  getSummary,
+  getTrends,
+  getReportHistory,
+  getSchedule,
+  saveSchedule,
+  deleteSchedule,
+  downloadReport,
+} from "../services/adminAnalyticsService.js";
 
 function AdminDashboard() {
   const navigate = useNavigate();
@@ -62,9 +71,7 @@ function AdminDashboard() {
     } else {
       setAdminName(buildAdminDisplayName(name, adminEmail));
 
-      apiCall("/api/admin/analytics/summary", {
-        headers: getAuthHeader("adminToken"),
-      })
+      getSummary()
         .then((data) => {
           setSummary(data || {});
         })
@@ -72,9 +79,7 @@ function AdminDashboard() {
           // Keep fallback stats if summary fails.
         });
 
-      apiCall("/api/admin/analytics/trends", {
-        headers: getAuthHeader("adminToken"),
-      })
+      getTrends()
         .then((data) => {
           setTrends(data || {});
         })
@@ -90,9 +95,7 @@ function AdminDashboard() {
   const loadReportHistory = async () => {
     setHistoryLoading(true);
     try {
-      const data = await apiCall("/api/admin/analytics/report/history?limit=12", {
-        headers: getAuthHeader("adminToken"),
-      });
+      const data = await getReportHistory(12);
       setReportHistory(Array.isArray(data) ? data : []);
     } catch {
       setReportHistory([]);
@@ -104,9 +107,7 @@ function AdminDashboard() {
   const loadReportSchedule = async () => {
     setScheduleError("");
     try {
-      const data = await apiCall("/api/admin/analytics/report/schedules", {
-        headers: getAuthHeader("adminToken"),
-      });
+      const data = await getSchedule();
 
       if (Array.isArray(data) && data.length > 0) {
         const schedule = data[0];
@@ -145,21 +146,8 @@ function AdminDashboard() {
         return;
       }
 
-      const response = await fetch(
-        `${getApiUrl()}/api/admin/analytics/report?days=${encodeURIComponent(reportDays)}&format=csv`,
-        {
-          headers: {
-            ...getAuthHeader("adminToken"),
-          },
-        }
-      );
-
-      if (!response.ok) {
-        throw new Error("Failed to generate report");
-      }
-
-      const blob = await response.blob();
-      const downloadUrl = window.URL.createObjectURL(blob);
+      const response = await downloadReport(reportDays);
+      const downloadUrl = window.URL.createObjectURL(response.data);
       const link = document.createElement("a");
       link.href = downloadUrl;
       link.download = `admin-report-${reportDays}d.csv`;
@@ -180,16 +168,12 @@ function AdminDashboard() {
     setScheduleError("");
 
     try {
-      await apiCall("/api/admin/analytics/report/schedules", {
-        method: "POST",
-        headers: getAuthHeader("adminToken"),
-        body: JSON.stringify({
-          frequency: scheduleForm.frequency,
-          timeOfDay: scheduleForm.timeOfDay,
-          rangeDays: Number(scheduleForm.rangeDays),
-          recipientEmail: scheduleForm.recipientEmail,
-          isActive: Boolean(scheduleForm.isActive),
-        }),
+      await saveSchedule({
+        frequency: scheduleForm.frequency,
+        timeOfDay: scheduleForm.timeOfDay,
+        rangeDays: Number(scheduleForm.rangeDays),
+        recipientEmail: scheduleForm.recipientEmail,
+        isActive: Boolean(scheduleForm.isActive),
       });
 
       await loadReportSchedule();
@@ -207,10 +191,7 @@ function AdminDashboard() {
     setScheduleError("");
 
     try {
-      await apiCall(`/api/admin/analytics/report/schedules/${scheduleForm.scheduleId}`, {
-        method: "DELETE",
-        headers: getAuthHeader("adminToken"),
-      });
+      await deleteSchedule(scheduleForm.scheduleId);
 
       setScheduleForm({
         frequency: "daily",

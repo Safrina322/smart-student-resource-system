@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { apiCall, getApiUrl } from "../utils/api";
+import { getApiUrl } from "../utils/api";
+import { getPopularCourses, getTrending } from "../services/popularResourceService.js";
 import "../styles/PopularResources.css";
 import { SkeletonCard } from "./Skeleton.jsx";
 
@@ -35,11 +36,11 @@ function PopularResources() {
     setError("");
     try {
       const [popularData, trendingData] = await Promise.all([
-        apiCall("/api/popular/popular-courses"),
-        apiCall("/api/popular/trending"),
+        getPopularCourses(),
+        getTrending(),
       ]);
-      setPopular(popularData.popularCourses || []);
-      setTrending(trendingData.trendingCourses || []);
+      setPopular(popularData);
+      setTrending(trendingData);
     } catch (err) {
       setError(`Failed to load resources: ${err.message}`);
     } finally {
