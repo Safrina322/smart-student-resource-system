@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useQuery } from "@tanstack/react-query";
 import { Link } from "react-router-dom";
 import { getApiUrl } from "../utils/api";
 import { getPopularCourses, getTrending } from "../services/popularResourceService.js";
@@ -22,31 +22,21 @@ const FALLBACK_IMAGE =
   `);
 
 function PopularResources() {
-  const [popular, setPopular] = useState([]);
-  const [trending, setTrending] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
+  const {
+    data: popular = [],
+    isLoading: popularLoading,
+    error: popularError,
+  } = useQuery({ queryKey: ["popular-courses"], queryFn: getPopularCourses });
 
-  useEffect(() => {
-    fetchPopularAndTrending();
-  }, []);
+  const {
+    data: trending = [],
+    isLoading: trendingLoading,
+    error: trendingError,
+  } = useQuery({ queryKey: ["trending-courses"], queryFn: getTrending });
 
-  const fetchPopularAndTrending = async () => {
-    setLoading(true);
-    setError("");
-    try {
-      const [popularData, trendingData] = await Promise.all([
-        getPopularCourses(),
-        getTrending(),
-      ]);
-      setPopular(popularData);
-      setTrending(trendingData);
-    } catch (err) {
-      setError(`Failed to load resources: ${err.message}`);
-    } finally {
-      setLoading(false);
-    }
-  };
+  const loading = popularLoading || trendingLoading;
+  const queryError = popularError || trendingError;
+  const error = queryError ? `Failed to load resources: ${queryError.message}` : "";
 
   const resolveImageUrl = (image) => {
     if (!image) return FALLBACK_IMAGE;

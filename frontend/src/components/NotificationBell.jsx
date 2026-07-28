@@ -1,26 +1,31 @@
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { HiOutlineBell } from "react-icons/hi2";
 import { listNotifications } from "../services/notificationService.js";
 import { getSocket } from "../services/socketClient.js";
 import "../styles/NotificationBell.css";
 
+// Shares the ["notifications"] query cache with NotificationsPanel - both
+// mounted at once (bell in the navbar, panel on the dashboard) previously
+// fired two independent fetches for the same data on every page load.
 function NotificationBell() {
   const navigate = useNavigate();
-  const [unreadCount, setUnreadCount] = useState(0);
+  const queryClient = useQueryClient();
+  const { data } = useQuery({
+    queryKey: ["notifications"],
+    queryFn: listNotifications,
+  });
+  const unreadCount = Number(data?.unreadCount) || 0;
 
   useEffect(() => {
-    listNotifications()
-      .then((data) => setUnreadCount(Number(data.unreadCount) || 0))
-      .catch(() => {});
-
     const socket = getSocket();
     if (!socket) return;
 
-    const handleNew = () => setUnreadCount((prev) => prev + 1);
+    const handleNew = () => queryClient.invalidateQueries({ queryKey: ["notifications"] });
     socket.on("notification:new", handleNew);
     return () => socket.off("notification:new", handleNew);
-  }, []);
+  }, [queryClient]);
 
   return (
     <button

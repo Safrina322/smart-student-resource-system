@@ -1,5 +1,7 @@
 import { lazy, Suspense } from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { QueryClientProvider } from "@tanstack/react-query";
+import { queryClient } from "./queryClient.js";
 import { AuthProvider } from "./context/AuthContext.jsx";
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
@@ -40,6 +42,7 @@ const AchievementsPage = lazy(() => import("./pages/AchievementsPage.jsx"));
 const StudyPlannerPage = lazy(() => import("./pages/StudyPlannerPage.jsx"));
 function App() {
   return (
+    <QueryClientProvider client={queryClient}>
     <AuthProvider>
     <Router>
       <ScrollToTop />
@@ -97,6 +100,7 @@ function App() {
 
     </Router>
     </AuthProvider>
+    </QueryClientProvider>
   );
 }
 

@@ -1,64 +1,46 @@
-import { useEffect, useState } from "react";
-import { listNotifications, markRead as markReadRequest, markAllRead as markAllReadRequest } from "../services/notificationService.js";
+import { useEffect } from "react";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import {
+  listNotifications,
+  markRead as markReadRequest,
+  markAllRead as markAllReadRequest,
+} from "../services/notificationService.js";
 import { getSocket } from "../services/socketClient.js";
 import "../styles/NotificationsPanel.css";
 
+// Shares the ["notifications"] query cache with NotificationBell - see that
+// component for why. Mutations invalidate the shared cache instead of
+// hand-patching local state, so both components always agree with the
+// server (and each other) after any action from either.
 function NotificationsPanel() {
-  const [notifications, setNotifications] = useState([]);
-  const [unreadCount, setUnreadCount] = useState(0);
-  const [loading, setLoading] = useState(true);
+  const queryClient = useQueryClient();
+  const { data, isLoading } = useQuery({
+    queryKey: ["notifications"],
+    queryFn: listNotifications,
+  });
+  const notifications = Array.isArray(data?.notifications) ? data.notifications : [];
+  const unreadCount = Number(data?.unreadCount) || 0;
 
   useEffect(() => {
-    fetchNotifications();
-
     const socket = getSocket();
     if (!socket) return;
 
-    const handleNew = (notification) => {
-      setNotifications((prev) => [notification, ...prev].slice(0, 30));
-      setUnreadCount((prev) => prev + 1);
-    };
-
+    const handleNew = () => queryClient.invalidateQueries({ queryKey: ["notifications"] });
     socket.on("notification:new", handleNew);
     return () => socket.off("notification:new", handleNew);
-  }, []);
+  }, [queryClient]);
 
-  const fetchNotifications = async () => {
-    setLoading(true);
-    try {
-      const data = await listNotifications();
-      setNotifications(Array.isArray(data.notifications) ? data.notifications : []);
-      setUnreadCount(Number(data.unreadCount) || 0);
-    } catch (err) {
-      console.error("Failed to fetch notifications", err.message);
-    } finally {
-      setLoading(false);
-    }
-  };
+  const invalidate = () => queryClient.invalidateQueries({ queryKey: ["notifications"] });
 
-  const markAsRead = async (id) => {
-    try {
-      await markReadRequest(id);
-      setNotifications((prev) =>
-        prev.map((item) =>
-          item.id === id ? { ...item, is_read: 1, read_at: new Date().toISOString() } : item
-        )
-      );
-      setUnreadCount((prev) => Math.max(0, prev - 1));
-    } catch (err) {
-      console.error("Failed to mark notification", err.message);
-    }
-  };
+  const markReadMutation = useMutation({
+    mutationFn: markReadRequest,
+    onSuccess: invalidate,
+  });
 
-  const markAllRead = async () => {
-    try {
-      await markAllReadRequest();
-      setNotifications((prev) => prev.map((item) => ({ ...item, is_read: 1, read_at: item.read_at || new Date().toISOString() })));
-      setUnreadCount(0);
-    } catch (err) {
-      console.error("Failed to mark all notifications", err.message);
-    }
-  };
+  const markAllReadMutation = useMutation({
+    mutationFn: markAllReadRequest,
+    onSuccess: invalidate,
+  });
 
   const formatDate = (value) => {
     if (!value) return "";
@@ -72,14 +54,19 @@ function NotificationsPanel() {
         <div className="notifications-actions">
           <span className="notifications-count">{unreadCount} unread</span>
           {unreadCount > 0 && (
-            <button type="button" onClick={markAllRead} className="mark-all-btn">
+            <button
+              type="button"
+              onClick={() => markAllReadMutation.mutate()}
+              disabled={markAllReadMutation.isPending}
+              className="mark-all-btn"
+            >
               Mark all read
             </button>
           )}
         </div>
       </div>
 
-      {loading ? (
+      {isLoading ? (
         <p className="notifications-empty">Loading notifications...</p>
       ) : notifications.length === 0 ? (
         <p className="notifications-empty">No notifications yet.</p>
@@ -98,7 +85,8 @@ function NotificationsPanel() {
               {!item.is_read && (
                 <button
                   type="button"
-                  onClick={() => markAsRead(item.id)}
+                  onClick={() => markReadMutation.mutate(item.id)}
+                  disabled={markReadMutation.isPending}
                   className="mark-read-btn"
                 >
                   Mark read

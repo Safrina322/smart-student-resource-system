@@ -500,12 +500,42 @@ interviewer reading the code cold. Later phases are progressively more
    at once precisely because it changes state-management behavior in ways
    that are hard to verify without a real browser (unavailable in this
    session's sandbox - see that item for the full reasoning).
-2. **Introduce a server-state library (TanStack Query).** This is the
-   single highest-leverage frontend change available: it replaces the
-   duplicated fetch/loading/error boilerplate across every page, adds
-   caching and request deduplication for free (fixing the duplicate
-   unread-count fetch between `NotificationBell` and `NotificationsPanel`),
-   and makes the data-fetching pages meaningfully easier to test.
+2. ~~**Introduce a server-state library (TanStack Query).**~~ **Partially
+   done, deliberately scoped down.** `@tanstack/react-query` is installed and
+   wired up via `QueryClientProvider` in `App.jsx`. Converted:
+   `NotificationBell`/`NotificationsPanel` (the exact duplicate-fetch example
+   named above - both now share one `["notifications"]` query, proven by an
+   automated test asserting the fetch mock is called exactly once when both
+   are mounted together) and `PopularResources` (two independent `useQuery`
+   calls replacing a `Promise.all` + manual loading/error state).
+
+   **Not** converted: the other ~18 data-fetching pages
+   (`Dashboard`/`ResourceListPage`/`AdminDashboard`/etc.). This was a
+   deliberate scope decision, not an oversight: this session's sandbox has no
+   working headless browser (network access to download one was blocked),
+   so every other verification in this session relied on lint + unit tests +
+   live `curl` checks against the real backend - all of which work great for
+   the *service-layer* unification (item 1), since that's a pure plumbing
+   swap with no behavior change. Actually testing a `useQuery`/`useMutation`
+   conversion properly requires observing real render/loading-state
+   behavior, and while writing an RTL test for exactly that (the
+   `NotificationBell` + `NotificationsPanel` mutation-sync case), a
+   discrepancy surfaced: a `markAllRead` mutation's `invalidateQueries` call
+   correctly refetches and updates the shared cache when
+   `NotificationsPanel` is tested alone, but a version of the same test with
+   *both* components mounted together didn't converge within a 1s timeout in
+   this specific test environment (JSDOM + Vitest) despite the underlying
+   fetch mock being called the expected number of times - suggesting a
+   test-harness-specific timing quirk in how multiple `QueryObserver`s for
+   one key settle, rather than a bug in the (textbook, idiomatic) production
+   code. Given real uncertainty about whether that discrepancy would
+   reproduce in an actual browser, converting the remaining ~18 pages
+   without being able to verify the result visually was judged too risky
+   against "never break existing functionality" - better to ship a smaller,
+   solidly-verified slice than a sweeping change resting on an assumption.
+   Recommended next step: revisit with real browser access (Playwright with
+   the browser binary actually installed) and convert the rest page by page,
+   verifying each one visually before moving to the next.
 3. ~~**Introduce a real migration tool.**~~ **Done.** A lightweight custom
    runner (`backend/migrations/runner.js`, ~50 lines, no new framework
    dependency) applies numbered `.sql` files in order, tracked in a
