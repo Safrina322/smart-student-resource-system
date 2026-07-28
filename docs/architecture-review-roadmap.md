@@ -500,8 +500,19 @@ interviewer reading the code cold. Later phases are progressively more
    production dependencies at high/critical severity so it's a real gate,
    not a performative one — see the Security section above for the two
    known findings it deliberately doesn't block on yet.
-6. **Add response caching / pagination to list-heavy endpoints** — course
-   catalog, resource hub listing, admin request lists.
+6. ~~**Add pagination to list-heavy endpoints.**~~ **Done** for the three
+   named (course catalog, resource hub listing, admin request list) - real
+   `page`/`pageSize` query params (validated, capped at 100/page), a
+   `COUNT(*)` alongside the `LIMIT/OFFSET` query, and a consistent
+   `{ items, pagination: { page, pageSize, total, totalPages } }` envelope.
+   The course catalog and resource hub pages request the max page size to
+   preserve their current "browse everything, filter client-side" UX rather
+   than needing a client-side filtering rework in the same change; the admin
+   request list (no competing client-side filter logic, and the one most
+   likely to actually accumulate rows an admin needs to page through) got
+   real Previous/Next controls. Response caching (e.g. `Cache-Control`
+   headers) is still open - pagination was the higher-value half of this
+   item and caching is a separable concern.
 7. ~~**Generate an OpenAPI spec from the existing Zod schemas.**~~ **Done.**
    `@asteasolutions/zod-to-openapi` extracts request schemas (body/params/
    query) directly from the existing `validation/*.js` files - all 74

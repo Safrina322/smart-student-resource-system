@@ -1,10 +1,12 @@
 import { z } from "zod";
+import { paginationParams } from "./paginationValidation.js";
 
 export const listResourcesQuerySchema = z.object({
   query: z.object({
     search: z.string().trim().max(200).optional(),
     subject: z.string().trim().max(100).optional(),
     department: z.string().trim().max(100).optional(),
+    ...paginationParams,
   }),
 });
 

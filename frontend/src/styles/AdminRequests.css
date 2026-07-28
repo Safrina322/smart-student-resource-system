@@ -81,3 +81,33 @@
   text-align: center;
   color: #777;
 }
+
+/* Pagination */
+.admin-requests-pagination {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  margin-top: 10px;
+  color: #ccc;
+  font-size: 0.9rem;
+}
+
+.admin-requests-pagination button {
+  padding: 8px 14px;
+  border-radius: 8px;
+  border: 1px solid #333;
+  background: #161b22;
+  color: #fff;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+.admin-requests-pagination button:hover:not(:disabled) {
+  border-color: #4caf50;
+}
+
+.admin-requests-pagination button:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}

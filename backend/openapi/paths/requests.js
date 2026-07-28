@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { registerRoute } from "../registry.js";
+import { listRequestsQuerySchema } from "../../validation/adminRequestValidation.js";
 
 const tags = ["Resource Requests"];
 
@@ -28,8 +29,9 @@ registerRoute({
   method: "get",
   path: "/api/admin/requests",
   tags,
-  summary: "List all resource requests (admin)",
+  summary: "List pending resource requests (admin, paginated)",
   security: [{ adminAuth: [] }],
+  schema: listRequestsQuerySchema,
 });
 
 const requestIdParams = z.object({ params: z.object({ id: z.coerce.number().int().positive() }) });

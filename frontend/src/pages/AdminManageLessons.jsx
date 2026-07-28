@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { apiCall, getAuthHeader } from "../utils/api";
+import { listCourses } from "../services/courseService.js";
 import "../styles/AdminManageLessons.css";
 
 function AdminManageLessons() {
@@ -21,7 +22,7 @@ function AdminManageLessons() {
     const fetchCourses = async () => {
       setLoading(true);
       try {
-        const data = await apiCall("/api/courses");
+        const data = await listCourses();
         setCourses(data || []);
         if (data?.length) {
           setSelectedCourseId(String(data[0].id));

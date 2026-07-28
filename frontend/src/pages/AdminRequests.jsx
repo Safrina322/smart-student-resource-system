@@ -4,18 +4,20 @@ import "../styles/AdminRequests.css";
 
 function AdminRequests() {
   const [requests, setRequests] = useState([]);
+  const [pagination, setPagination] = useState({ page: 1, pageSize: 20, total: 0, totalPages: 1 });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [actionError, setActionError] = useState("");
 
-  const fetchRequests = async () => {
+  const fetchRequests = async (page = 1) => {
     setLoading(true);
     setError("");
     try {
-      const data = await apiCall("/api/admin/requests", {
+      const data = await apiCall(`/api/admin/requests?page=${page}`, {
         headers: getAuthHeader("adminToken"),
       });
-      setRequests(data || []);
+      setRequests(data.items || []);
+      setPagination(data.pagination);
     } catch (err) {
       setError(`❌ Failed to load requests: ${err.message}`);
     }
@@ -23,7 +25,7 @@ function AdminRequests() {
   };
 
   useEffect(() => {
-    fetchRequests();
+    fetchRequests(1);
   }, []);
 
   const handleApprove = async (id) => {
@@ -34,7 +36,7 @@ function AdminRequests() {
         headers: getAuthHeader("adminToken"),
       });
 
-      setRequests(requests.filter(req => req.id !== id));
+      fetchRequests(pagination.page);
     } catch (err) {
       setActionError(`Failed to approve: ${err.message}`);
     }
@@ -48,7 +50,7 @@ function AdminRequests() {
         headers: getAuthHeader("adminToken"),
       });
 
-      setRequests(requests.filter(req => req.id !== id));
+      fetchRequests(pagination.page);
     } catch (err) {
       setActionError(`Failed to reject: ${err.message}`);
     }
@@ -57,7 +59,7 @@ function AdminRequests() {
   return (
     <div className="upload-page">
       <div className="upload-card">
-        <h2>Pending Resource Requests</h2>
+        <h2>Pending Resource Requests{pagination.total > 0 ? ` (${pagination.total})` : ""}</h2>
 
         {error && <p style={{ color: "red", textAlign: "center" }}>{error}</p>}
         {actionError && <p style={{ color: "red", textAlign: "center" }}>{actionError}</p>}
@@ -87,6 +89,28 @@ function AdminRequests() {
               <button className="reject" onClick={() => handleReject(req.id)}>❌ Reject</button>
             </div>
           ))
+        )}
+
+        {!loading && pagination.totalPages > 1 && (
+          <div className="admin-requests-pagination">
+            <button
+              type="button"
+              disabled={pagination.page <= 1}
+              onClick={() => fetchRequests(pagination.page - 1)}
+            >
+              ← Previous
+            </button>
+            <span>
+              Page {pagination.page} of {pagination.totalPages}
+            </span>
+            <button
+              type="button"
+              disabled={pagination.page >= pagination.totalPages}
+              onClick={() => fetchRequests(pagination.page + 1)}
+            >
+              Next →
+            </button>
+          </div>
         )}
       </div>
     </div>

@@ -1,7 +1,16 @@
 import { queryAsync } from "../db.js";
 
-export const findPending = () =>
-  queryAsync("SELECT * FROM resource_requests WHERE status='pending'");
+export const findPending = async ({ page, pageSize }) => {
+  const offset = (page - 1) * pageSize;
+  const [rows, countRows] = await Promise.all([
+    queryAsync(
+      "SELECT * FROM resource_requests WHERE status='pending' ORDER BY created_at DESC LIMIT ? OFFSET ?",
+      [pageSize, offset]
+    ),
+    queryAsync("SELECT COUNT(*) AS count FROM resource_requests WHERE status='pending'"),
+  ]);
+  return { rows, total: countRows[0]?.count || 0 };
+};
 
 export const findWithUserById = async (id) => {
   const rows = await queryAsync(

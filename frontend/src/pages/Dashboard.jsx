@@ -6,6 +6,7 @@ import PopularResources from "../components/PopularResources.jsx";
 import NotificationsPanel from "../components/NotificationsPanel.jsx";
 import { SkeletonTableRows } from "../components/Skeleton.jsx";
 import { listMyBookmarks } from "../services/resourceHubService.js";
+import { listCourses } from "../services/courseService.js";
 import { getRecommendations } from "../services/aiService.js";
 
 function Dashboard() {
@@ -24,7 +25,7 @@ function Dashboard() {
     setLoading(true);
     setError("");
     try {
-      const data = await apiCall("/api/courses");
+      const data = await listCourses();
       setCourses(data || []);
     } catch (err) {
       setError(`Failed to load courses: ${err.message}`);

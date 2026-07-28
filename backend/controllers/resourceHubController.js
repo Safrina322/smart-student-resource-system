@@ -4,8 +4,8 @@ import * as ratingService from "../services/ratingService.js";
 import * as bookmarkService from "../services/bookmarkService.js";
 
 export const list = async (req, res) => {
-  const resources = await publicResourceService.listApproved(req.query);
-  res.json(resources);
+  const result = await publicResourceService.listApproved(req.query);
+  res.json(result);
 };
 
 export const detail = async (req, res) => {

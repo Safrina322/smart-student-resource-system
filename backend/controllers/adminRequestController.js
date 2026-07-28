@@ -1,8 +1,8 @@
 import * as adminRequestService from "../services/adminRequestService.js";
 
 export const list = async (req, res) => {
-  const requests = await adminRequestService.listPending();
-  res.json(requests);
+  const result = await adminRequestService.listPending(req.query);
+  res.json(result);
 };
 
 export const approve = async (req, res) => {

@@ -1,8 +1,8 @@
 import * as courseService from "../services/courseService.js";
 
 export const list = async (req, res) => {
-  const courses = await courseService.listAll();
-  res.json(courses);
+  const result = await courseService.listAll(req.query);
+  res.json(result);
 };
 
 export const getOne = async (req, res) => {

@@ -1,6 +1,6 @@
 import { z } from "zod";
 import { registerRoute } from "../registry.js";
-import { courseIdParamSchema } from "../../validation/courseValidation.js";
+import { courseIdParamSchema, courseListQuerySchema } from "../../validation/courseValidation.js";
 
 const tags = ["Courses"];
 
@@ -8,8 +8,9 @@ registerRoute({
   method: "get",
   path: "/api/courses",
   tags,
-  summary: "List all active courses",
+  summary: "List active courses (paginated)",
   security: [],
+  schema: courseListQuerySchema,
 });
 
 registerRoute({

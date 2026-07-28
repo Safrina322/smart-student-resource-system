@@ -1,10 +1,18 @@
 import apiClient from "./apiClient.js";
 
+// See courseService.js's listCourses for why pageSize is maxed out here
+// rather than surfacing pagination controls - same backend contract, same
+// "the current UI browses everything at once" behavior to preserve.
 export const listResources = async ({ search, subject, department } = {}) => {
   const { data } = await apiClient.get("/api/resource-hub", {
-    params: { search: search || undefined, subject: subject || undefined, department: department || undefined },
+    params: {
+      search: search || undefined,
+      subject: subject || undefined,
+      department: department || undefined,
+      pageSize: 100,
+    },
   });
-  return data;
+  return data.items;
 };
 
 export const getResource = async (id) => {

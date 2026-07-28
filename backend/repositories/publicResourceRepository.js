@@ -9,7 +9,7 @@ const LIST_COLUMNS = `
   COUNT(DISTINCT rr.id) AS rating_count
 `;
 
-export const findApproved = ({ search, subject, department }) => {
+export const findApproved = async ({ search, subject, department, page, pageSize }) => {
   const conditions = ["lr.status = 'approved'"];
   const params = [];
 
@@ -29,17 +29,27 @@ export const findApproved = ({ search, subject, department }) => {
     params.push(department);
   }
 
-  return queryAsync(
-    `SELECT ${LIST_COLUMNS}
-     FROM lecturer_resources lr
-     JOIN users u ON u.id = lr.uploader_id
-     LEFT JOIN resource_ratings rr ON rr.resource_id = lr.id
-     WHERE ${conditions.join(" AND ")}
-     GROUP BY lr.id
-     ORDER BY lr.created_at DESC
-     LIMIT 100`,
-    params
-  );
+  const whereClause = conditions.join(" AND ");
+  const offset = (page - 1) * pageSize;
+
+  const [rows, countRows] = await Promise.all([
+    queryAsync(
+      `SELECT ${LIST_COLUMNS}
+       FROM lecturer_resources lr
+       JOIN users u ON u.id = lr.uploader_id
+       LEFT JOIN resource_ratings rr ON rr.resource_id = lr.id
+       WHERE ${whereClause}
+       GROUP BY lr.id
+       ORDER BY lr.created_at DESC
+       LIMIT ? OFFSET ?`,
+      [...params, pageSize, offset]
+    ),
+    // No JOIN needed here - every filterable column (title/description/tags/
+    // subject/department) lives on lecturer_resources itself.
+    queryAsync(`SELECT COUNT(*) AS count FROM lecturer_resources lr WHERE ${whereClause}`, params),
+  ]);
+
+  return { rows, total: countRows[0]?.count || 0 };
 };
 
 export const findApprovedById = async (id) => {

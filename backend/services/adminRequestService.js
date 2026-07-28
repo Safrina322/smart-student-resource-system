@@ -3,8 +3,12 @@ import * as adminRequestRepository from "../repositories/adminRequestRepository.
 import { sendRequestStatusEmail } from "../utils/mailer.js";
 import { notifyUser } from "./notificationService.js";
 import { logAdminAction } from "../utils/auditLogger.js";
+import { buildPaginationMeta } from "../utils/pagination.js";
 
-export const listPending = () => adminRequestRepository.findPending();
+export const listPending = async ({ page, pageSize }) => {
+  const { rows, total } = await adminRequestRepository.findPending({ page, pageSize });
+  return { items: rows, pagination: buildPaginationMeta(page, pageSize, total) };
+};
 
 const resolveOrCreateCourse = async (request) => {
   const existing = await adminRequestRepository.findCourseByTitleAndSubject(

@@ -1,7 +1,17 @@
 import { AppError } from "../utils/AppError.js";
 import * as publicResourceRepository from "../repositories/publicResourceRepository.js";
+import { buildPaginationMeta } from "../utils/pagination.js";
 
-export const listApproved = (filters) => publicResourceRepository.findApproved(filters);
+export const listApproved = async ({ search, subject, department, page, pageSize }) => {
+  const { rows, total } = await publicResourceRepository.findApproved({
+    search,
+    subject,
+    department,
+    page,
+    pageSize,
+  });
+  return { items: rows, pagination: buildPaginationMeta(page, pageSize, total) };
+};
 
 export const getDetail = async (id) => {
   const resource = await publicResourceRepository.findApprovedById(id);

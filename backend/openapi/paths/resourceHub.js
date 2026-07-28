@@ -13,7 +13,7 @@ registerRoute({
   method: "get",
   path: "/api/resource-hub",
   tags,
-  summary: "Browse approved lecturer-published resources (public)",
+  summary: "Browse approved lecturer-published resources (public, paginated)",
   security: [],
   schema: listResourcesQuerySchema,
 });

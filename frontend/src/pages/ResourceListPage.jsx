@@ -1,11 +1,12 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { HiOutlineSparkles } from "react-icons/hi2";
-import { apiCall, getApiUrl, getAuthHeader } from "../utils/api.js";
+import { getApiUrl } from "../utils/api.js";
 import SearchBar from "../components/Searchbar.jsx";
 import Filter from "../components/Filter.jsx";
 import StarRating from "../components/StarRating.jsx";
 import { listResources as listHubResources } from "../services/resourceHubService.js";
+import { listCourses } from "../services/courseService.js";
 import { searchAssist } from "../services/aiService.js";
 import "../styles/Resources.css";
 import "../styles/ResourceAIPanel.css";
@@ -152,9 +153,7 @@ function ResourceListPage() {
     setCourseError("");
     const session = getSessionContext();
     try {
-      const data = await apiCall("/api/courses", {
-        headers: getAuthHeader(session.tokenType),
-      });
+      const data = await listCourses();
       setCourses(data || []);
     } catch (err) {
       const message = getErrorMessage(err, "Failed to load courses");
