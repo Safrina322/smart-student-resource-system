@@ -126,6 +126,9 @@ The backend self-bootstraps its entire schema on first run — no separate migra
 
 ## API Overview
 
+Interactive docs (Swagger UI, generated from the actual Zod validation
+schemas): `/api/docs`. Raw OpenAPI JSON: `/api/openapi.json`.
+
 All endpoints live under `/api`. Grouped by resource:
 
 | Prefix | Covers |

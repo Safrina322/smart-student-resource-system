@@ -502,8 +502,15 @@ interviewer reading the code cold. Later phases are progressively more
    known findings it deliberately doesn't block on yet.
 6. **Add response caching / pagination to list-heavy endpoints** — course
    catalog, resource hub listing, admin request lists.
-7. **Generate an OpenAPI spec from the existing Zod schemas** rather than
-   hand-maintaining the README's route table separately.
+7. ~~**Generate an OpenAPI spec from the existing Zod schemas.**~~ **Done.**
+   `@asteasolutions/zod-to-openapi` extracts request schemas (body/params/
+   query) directly from the existing `validation/*.js` files - all 74
+   endpoints across every route file are registered, served live at
+   `/api/docs` (Swagger UI) and `/api/openapi.json`, plus `npm run openapi`
+   for a static export. Response bodies are deliberately left undocumented
+   beyond status codes, since this codebase's Zod schemas validate requests
+   only - documenting a response contract the API doesn't actually enforce
+   would be inventing, not generating.
 
 ## Phase 3 — Advanced
 

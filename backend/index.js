@@ -6,6 +6,8 @@ import cors from "cors";
 import helmet from "helmet";
 import dotenv from "dotenv";
 import bcrypt from "bcryptjs";
+import swaggerUi from "swagger-ui-express";
+import { generateOpenApiDocument } from "./openapi/document.js";
 import db, { queryAsync } from "./db.js";
 import { setIo } from "./utils/socket.js";
 import authRoutes from "./routes/authRoutes.js";
@@ -673,6 +675,13 @@ app.use("/lesson-files", express.static("lesson-files"));
 // ROUTES (ALWAYS BEFORE listen)
 app.use("/api/auth", authRoutes);
 app.use("/api/courses", courseRoutes);
+
+// Generated once at boot from the same Zod schemas the `validate` middleware
+// enforces at runtime - see openapi/document.js for why response bodies
+// aren't part of it.
+const openApiDocument = generateOpenApiDocument();
+app.get("/api/openapi.json", (req, res) => res.json(openApiDocument));
+app.use("/api/docs", swaggerUi.serve, swaggerUi.setup(openApiDocument));
 
 // Keep API errors JSON-only so frontend does not receive HTML error pages.
 app.use("/api", (req, res) => {
