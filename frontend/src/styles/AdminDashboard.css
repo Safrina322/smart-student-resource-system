@@ -2,10 +2,10 @@
   min-height: 100vh;
   padding: 96px 32px 40px;
   background:
-    radial-gradient(1200px 500px at 20% -10%, rgba(34, 211, 238, 0.14), transparent 60%),
-    radial-gradient(1000px 550px at 90% 0%, rgba(59, 130, 246, 0.14), transparent 58%),
-    #030712;
-  color: #e5e7eb;
+    radial-gradient(1200px 500px at 20% -10%, rgba(34, 238, 217, 0.14), transparent 60%),
+    radial-gradient(1000px 550px at 90% 0%, rgba(59, 246, 204, 0.14), transparent 58%),
+    #03120e;
+  color: #e5ebea;
 }
 
 .admin-hero {
@@ -14,8 +14,8 @@
   position: relative;
   border-radius: 20px;
   overflow: hidden;
-  border: 1px solid rgba(148, 163, 184, 0.2);
-  box-shadow: 0 24px 80px rgba(2, 6, 23, 0.6);
+  border: 1px solid rgba(148, 184, 176, 0.2);
+  box-shadow: 0 24px 80px rgba(2, 23, 17, 0.6);
   min-height: 320px;
 }
 
@@ -30,7 +30,7 @@
 .admin-hero-overlay {
   position: absolute;
   inset: 0;
-  background: linear-gradient(120deg, rgba(2, 6, 23, 0.92) 35%, rgba(15, 23, 42, 0.75) 100%);
+  background: linear-gradient(120deg, rgba(2, 23, 17, 0.92) 35%, rgba(15, 42, 35, 0.75) 100%);
 }
 
 .admin-hero-content {
@@ -41,7 +41,7 @@
 
 .admin-eyebrow {
   margin: 0;
-  color: #67e8f9;
+  color: #67f9eb;
   font-weight: 700;
   letter-spacing: 0.08em;
   text-transform: uppercase;
@@ -51,14 +51,14 @@
 .admin-title {
   margin: 8px 0 10px;
   font-size: 2.2rem;
-  color: #f8fafc;
+  color: #f8fcfb;
   font-weight: 800;
 }
 
 .admin-subtitle {
   margin: 0;
   max-width: 680px;
-  color: #cbd5e1;
+  color: #cbe1dc;
   line-height: 1.6;
 }
 
@@ -71,8 +71,8 @@
 }
 
 .admin-stat-card {
-  background: rgba(15, 23, 42, 0.52);
-  border: 1px solid rgba(125, 211, 252, 0.2);
+  background: rgba(15, 42, 35, 0.52);
+  border: 1px solid rgba(125, 252, 233, 0.2);
   border-radius: 12px;
   padding: 12px 14px;
   backdrop-filter: blur(2px);
@@ -80,7 +80,7 @@
 
 .admin-stat-card span {
   display: block;
-  color: #a5f3fc;
+  color: #a5fcf4;
   font-size: 0.78rem;
   text-transform: uppercase;
   letter-spacing: 0.06em;
@@ -89,7 +89,7 @@
 .admin-stat-card strong {
   display: block;
   margin-top: 4px;
-  color: #e2e8f0;
+  color: #e2f0ed;
 }
 
 .admin-actions-grid {
@@ -110,35 +110,35 @@
 
 .admin-chart-card {
   border-radius: 16px;
-  border: 1px solid rgba(148, 163, 184, 0.2);
-  background: linear-gradient(160deg, rgba(15, 23, 42, 0.95), rgba(17, 24, 39, 0.95));
+  border: 1px solid rgba(148, 184, 176, 0.2);
+  background: linear-gradient(160deg, rgba(15, 42, 35, 0.95), rgba(17, 39, 34, 0.95));
   padding: 18px;
 }
 
 .admin-chart-card h3 {
   margin: 0;
-  color: #f8fafc;
+  color: #f8fcfb;
 }
 
 .admin-chart-card > p {
   margin: 8px 0 14px;
-  color: #cbd5e1;
+  color: #cbe1dc;
   font-size: 0.95rem;
 }
 
 .chart-empty {
-  color: #94a3b8;
+  color: #94b8b0;
   margin: 2px 0 0;
 }
 
 .admin-action-card {
   text-align: left;
   border-radius: 16px;
-  border: 1px solid rgba(148, 163, 184, 0.2);
-  background: linear-gradient(160deg, rgba(15, 23, 42, 0.95), rgba(17, 24, 39, 0.95));
+  border: 1px solid rgba(148, 184, 176, 0.2);
+  background: linear-gradient(160deg, rgba(15, 42, 35, 0.95), rgba(17, 39, 34, 0.95));
   padding: 18px 18px 20px;
   text-decoration: none;
-  color: #e5e7eb;
+  color: #e5ebea;
   transition: transform 0.22s ease, border-color 0.22s ease, box-shadow 0.22s ease;
   cursor: pointer;
 }
@@ -146,20 +146,20 @@
 .admin-action-card h3 {
   margin: 0 0 8px;
   font-size: 1.1rem;
-  color: #f8fafc;
+  color: #f8fcfb;
 }
 
 .admin-action-card p {
   margin: 0;
-  color: #cbd5e1;
+  color: #cbe1dc;
   line-height: 1.5;
   font-size: 0.95rem;
 }
 
 .admin-action-card:hover {
   transform: translateY(-3px);
-  border-color: rgba(34, 211, 238, 0.6);
-  box-shadow: 0 16px 30px rgba(2, 6, 23, 0.45);
+  border-color: rgba(34, 238, 217, 0.6);
+  box-shadow: 0 16px 30px rgba(2, 23, 17, 0.45);
 }
 
 .admin-report-card {
@@ -176,16 +176,16 @@
 }
 
 .admin-report-controls label {
-  color: #a5f3fc;
+  color: #a5fcf4;
   font-size: 0.82rem;
   text-transform: uppercase;
   letter-spacing: 0.05em;
 }
 
 .admin-report-controls select {
-  border: 1px solid rgba(148, 163, 184, 0.4);
-  background: rgba(2, 6, 23, 0.5);
-  color: #e5e7eb;
+  border: 1px solid rgba(148, 184, 176, 0.4);
+  background: rgba(2, 23, 17, 0.5);
+  color: #e5ebea;
   border-radius: 10px;
   padding: 10px 12px;
   font-size: 0.92rem;
@@ -193,9 +193,9 @@
 
 .admin-report-controls input[type="time"],
 .admin-report-controls input[type="email"] {
-  border: 1px solid rgba(148, 163, 184, 0.4);
-  background: rgba(2, 6, 23, 0.5);
-  color: #e5e7eb;
+  border: 1px solid rgba(148, 184, 176, 0.4);
+  background: rgba(2, 23, 17, 0.5);
+  color: #e5ebea;
   border-radius: 10px;
   padding: 10px 12px;
   font-size: 0.92rem;
@@ -205,7 +205,7 @@
   display: inline-flex;
   gap: 8px;
   align-items: center;
-  color: #cbd5e1;
+  color: #cbe1dc;
   font-size: 0.9rem;
 }
 
@@ -216,9 +216,9 @@
 }
 
 .report-download-btn {
-  border: 1px solid rgba(34, 211, 238, 0.5);
-  background: linear-gradient(160deg, rgba(8, 145, 178, 0.9), rgba(14, 116, 144, 0.9));
-  color: #ecfeff;
+  border: 1px solid rgba(34, 238, 217, 0.5);
+  background: linear-gradient(160deg, rgba(8, 178, 158, 0.9), rgba(14, 144, 128, 0.9));
+  color: #ecfffd;
   border-radius: 10px;
   padding: 10px 12px;
   font-weight: 700;
@@ -237,9 +237,9 @@
 }
 
 .report-secondary-btn {
-  border: 1px solid rgba(148, 163, 184, 0.4);
-  background: rgba(15, 23, 42, 0.9);
-  color: #e2e8f0;
+  border: 1px solid rgba(148, 184, 176, 0.4);
+  background: rgba(15, 42, 35, 0.9);
+  color: #e2f0ed;
   border-radius: 10px;
   padding: 10px 12px;
   font-weight: 700;
@@ -267,7 +267,7 @@
 }
 
 .history-row {
-  border: 1px solid rgba(148, 163, 184, 0.22);
+  border: 1px solid rgba(148, 184, 176, 0.22);
   border-radius: 10px;
   padding: 10px;
   display: flex;
@@ -281,12 +281,12 @@
 }
 
 .history-row span {
-  color: #94a3b8;
+  color: #94b8b0;
   font-size: 0.84rem;
 }
 
 .history-row small {
-  color: #94a3b8;
+  color: #94b8b0;
 }
 
 .history-status {
@@ -296,7 +296,7 @@
 }
 
 .history-status.success {
-  color: #67e8f9;
+  color: #67f9eb;
 }
 
 .history-status.failed {

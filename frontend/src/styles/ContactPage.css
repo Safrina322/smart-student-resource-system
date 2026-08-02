@@ -2,10 +2,10 @@
   min-height: 100vh;
   padding: 110px 8% 50px;
   background:
-    radial-gradient(900px 420px at 90% -10%, rgba(56, 189, 248, 0.16), transparent 58%),
-    radial-gradient(700px 300px at -5% 20%, rgba(14, 165, 233, 0.13), transparent 55%),
-    #04070b;
-  color: #e8f0fb;
+    radial-gradient(900px 420px at 90% -10%, rgba(56, 248, 220, 0.16), transparent 58%),
+    radial-gradient(700px 300px at -5% 20%, rgba(14, 233, 201, 0.13), transparent 55%),
+    #040b0a;
+  color: #e8fbf7;
 }
 
 .contact-hero {
@@ -15,7 +15,7 @@
 
 .contact-kicker {
   margin: 0 0 8px;
-  color: #7dd3fc;
+  color: #7dfce9;
   text-transform: uppercase;
   letter-spacing: 0.08em;
   font-weight: 700;
@@ -29,7 +29,7 @@
 
 .contact-hero p {
   margin: 0;
-  color: #b5c7de;
+  color: #b5ded5;
   line-height: 1.65;
 }
 
@@ -40,8 +40,8 @@
 }
 
 .contact-card {
-  background: linear-gradient(145deg, #0e1726, #09111c);
-  border: 1px solid #23344b;
+  background: linear-gradient(145deg, #0e2621, #091c18);
+  border: 1px solid #234b42;
   border-radius: 14px;
   padding: 18px;
   box-shadow: 0 10px 26px rgba(0, 0, 0, 0.3);
@@ -54,7 +54,7 @@
 .contact-link {
   display: inline-block;
   margin-bottom: 8px;
-  color: #8dd8ff;
+  color: #8dffed;
   text-decoration: none;
   font-weight: 600;
 }
@@ -65,7 +65,7 @@
 
 .contact-card p {
   margin: 0;
-  color: #b6c9e2;
+  color: #b6e2d9;
   line-height: 1.55;
 }
 
@@ -75,6 +75,6 @@
 
 .contact-footnote {
   margin-top: 16px;
-  color: #93a8c2;
+  color: #93c2b8;
   font-size: 0.88rem;
 }

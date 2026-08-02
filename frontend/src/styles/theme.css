@@ -1,27 +1,27 @@
 :root {
-  /* Surfaces */
-  --color-bg: #030712;
-  --color-surface: rgba(15, 23, 42, 0.6);
-  --color-surface-strong: rgba(15, 23, 42, 0.92);
-  --color-border: rgba(148, 163, 184, 0.2);
+  /* Surfaces - neutral slate, deliberately not blue-tinted */
+  --color-bg: #0b0f0e;
+  --color-surface: rgba(19, 26, 24, 0.6);
+  --color-surface-strong: rgba(19, 26, 24, 0.92);
+  --color-border: rgba(160, 175, 170, 0.18);
 
   /* Text */
-  --color-text: #f8fafc;
-  --color-text-secondary: #cbd5e1;
-  --color-text-muted: #94a3b8;
+  --color-text: #f1f5f4;
+  --color-text-secondary: #cbd2cf;
+  --color-text-muted: #8a9a95;
 
-  /* Accents */
-  --color-accent-cyan: #22d3ee;
-  --color-accent: #6366f1;
-  --color-accent-strong: #4f46e5;
+  /* Accents - emerald/teal, replacing the old cyan/indigo */
+  --color-accent-cyan: #14b8a6;
+  --color-accent: #10b981;
+  --color-accent-strong: #059669;
   --color-accent-violet: #8b5cf6;
   --color-accent-pink: #f472b6;
-  --gradient-accent: linear-gradient(90deg, #22d3ee, #6366f1);
+  --gradient-accent: linear-gradient(90deg, #10b981, #14b8a6);
   --gradient-accent-alt: linear-gradient(160deg, #a78bfa, #6d28d9);
 
   /* RGB triplets for rgba(var(--x-rgb), alpha) glow/tint effects */
-  --color-accent-cyan-rgb: 34, 211, 238;
-  --color-accent-rgb: 99, 102, 241;
+  --color-accent-cyan-rgb: 20, 184, 166;
+  --color-accent-rgb: 16, 185, 129;
   --color-accent-violet-rgb: 139, 92, 246;
   --color-accent-pink-rgb: 244, 114, 182;
 
@@ -31,7 +31,7 @@
   --color-success: #34d399;
   --color-warning: #fbbf24;
 
-  /* Reserved for admin-tier UI accents (distinct from the regular blue accent) */
+  /* Reserved for admin-tier UI accents (distinct from the regular emerald accent) */
   --color-gold: #ffd700;
   --color-gold-light: #ffed4e;
   --color-gold-rgb: 255, 215, 0;
@@ -41,8 +41,8 @@
   --radius-sm: 8px;
   --radius-md: 14px;
   --radius-lg: 20px;
-  --shadow-md: 0 20px 40px rgba(2, 6, 23, 0.45);
-  --shadow-glow: 0 0 30px rgba(99, 102, 241, 0.25);
+  --shadow-md: 0 20px 40px rgba(2, 8, 6, 0.45);
+  --shadow-glow: 0 0 30px rgba(16, 185, 129, 0.25);
 
   /* Typography */
   --font-sans: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial,

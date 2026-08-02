@@ -91,7 +91,7 @@
 }
 
 .tag-chip {
-  background: rgba(148, 163, 184, 0.12);
+  background: rgba(148, 184, 176, 0.12);
   border-radius: 999px;
   padding: 3px 10px;
   font-size: 0.78rem;
@@ -141,7 +141,7 @@
   align-items: center;
   gap: 8px;
   background: var(--gradient-accent);
-  color: #04101f;
+  color: #041f19;
   border: none;
   border-radius: var(--radius-sm);
   padding: 12px 22px;
@@ -255,7 +255,7 @@
 
 .comment-reply-form input {
   flex: 1;
-  background: rgba(2, 6, 23, 0.5);
+  background: rgba(2, 23, 17, 0.5);
   border: 1px solid var(--color-border);
   border-radius: var(--radius-sm);
   padding: 8px 12px;
@@ -265,7 +265,7 @@
 
 .comment-reply-form button {
   background: var(--color-accent-cyan);
-  color: #04101f;
+  color: #041f19;
   border: none;
   border-radius: var(--radius-sm);
   padding: 8px 14px;

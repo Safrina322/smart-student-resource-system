@@ -3,9 +3,9 @@
   border-radius: var(--radius-sm);
   background: linear-gradient(
     90deg,
-    rgba(148, 163, 184, 0.12) 25%,
-    rgba(148, 163, 184, 0.26) 37%,
-    rgba(148, 163, 184, 0.12) 63%
+    rgba(148, 184, 176, 0.12) 25%,
+    rgba(148, 184, 176, 0.26) 37%,
+    rgba(148, 184, 176, 0.12) 63%
   );
   background-size: 400% 100%;
   animation: skeleton-shimmer 1.4s ease infinite;

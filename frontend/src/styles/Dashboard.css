@@ -2,17 +2,17 @@
   display: flex;
   min-height: 100vh;
   background:
-    radial-gradient(1200px 500px at 85% -10%, rgba(14, 165, 233, 0.12), transparent 55%),
-    radial-gradient(900px 400px at -10% 30%, rgba(99, 102, 241, 0.14), transparent 55%),
-    #04070b;
-  color: #e5ecf6;
+    radial-gradient(1200px 500px at 85% -10%, rgba(14, 233, 201, 0.12), transparent 55%),
+    radial-gradient(900px 400px at -10% 30%, rgba(99, 241, 196, 0.14), transparent 55%),
+    #040b0a;
+  color: #e5f6f2;
   font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
 }
 
 .dashboard-sidebar {
   width: 250px;
-  background: linear-gradient(180deg, rgba(8, 13, 23, 0.95), rgba(7, 10, 17, 0.95));
-  border-right: 1px solid #1b2838;
+  background: linear-gradient(180deg, rgba(8, 23, 19, 0.95), rgba(7, 17, 15, 0.95));
+  border-right: 1px solid #1b3832;
   padding: 28px 24px;
 }
 
@@ -20,7 +20,7 @@
   margin: 0 0 24px;
   font-size: 1.45rem;
   letter-spacing: 0.3px;
-  color: #f8fbff;
+  color: #f8fffe;
 }
 
 .dashboard-sidebar ul {
@@ -36,7 +36,7 @@
 .dashboard-sidebar a {
   display: block;
   text-decoration: none;
-  color: #9db0c7;
+  color: #9dc7be;
   padding: 10px 12px;
   border-radius: 10px;
   border: 1px solid transparent;
@@ -44,9 +44,9 @@
 }
 
 .dashboard-sidebar a:hover {
-  color: #dff3ff;
-  background: #0e1726;
-  border-color: #233753;
+  color: #dffffa;
+  background: #0e2621;
+  border-color: #235349;
 }
 
 .dashboard-main {
@@ -57,7 +57,7 @@
 .dashboard-main h1 {
   margin: 0 0 18px;
   font-size: clamp(1.8rem, 3.2vw, 2.2rem);
-  color: #f3f8ff;
+  color: #f3fffc;
 }
 
 .stats-cards {
@@ -70,8 +70,8 @@
 .card {
   position: relative;
   overflow: hidden;
-  background: linear-gradient(145deg, #0f1827, #0a111e);
-  border: 1px solid #1e2d43;
+  background: linear-gradient(145deg, #0f2722, #0a1e19);
+  border: 1px solid #1e433b;
   border-radius: 14px;
   padding: 20px;
   box-shadow: 0 10px 24px rgba(0, 0, 0, 0.32);
@@ -82,7 +82,7 @@
   content: "";
   position: absolute;
   inset: 0;
-  background: linear-gradient(125deg, rgba(56, 189, 248, 0.08), transparent 45%);
+  background: linear-gradient(125deg, rgba(56, 248, 220, 0.08), transparent 45%);
   pointer-events: none;
 }
 
@@ -94,7 +94,7 @@
 .card h3 {
   margin: 0;
   font-size: 0.95rem;
-  color: #a8bed8;
+  color: #a8d8ce;
   font-weight: 600;
 }
 
@@ -102,7 +102,7 @@
   margin: 8px 0 0;
   font-size: 2rem;
   line-height: 1;
-  color: #f5fbff;
+  color: #f5fffd;
   font-weight: 700;
 }
 
@@ -118,10 +118,10 @@
 .continue-learning-card {
   display: flex;
   gap: 20px;
-  background: linear-gradient(130deg, #0d1626 0%, #08101b 100%);
+  background: linear-gradient(130deg, #0d2620 0%, #081b17 100%);
   border-radius: 14px;
   overflow: hidden;
-  border: 1px solid #23334a;
+  border: 1px solid #234a41;
   box-shadow: 0 12px 30px rgba(0, 0, 0, 0.32);
   transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
@@ -154,13 +154,13 @@
 
 .continue-subject {
   margin: 0;
-  color: #92b8de;
+  color: #92decf;
   font-size: 0.9rem;
 }
 
 .continue-lesson {
   margin: 2px 0;
-  color: #d3e1f1;
+  color: #d3f1eb;
   font-size: 0.92rem;
   font-style: italic;
 }
@@ -168,7 +168,7 @@
 .continue-time {
   margin: 2px 0 8px;
   font-size: 0.82rem;
-  color: #8ea2bc;
+  color: #8ebcb2;
 }
 
 .continue-btn {
@@ -176,7 +176,7 @@
   width: fit-content;
   margin-top: 4px;
   padding: 10px 16px;
-  background: linear-gradient(135deg, #0ea5e9, #2563eb);
+  background: linear-gradient(135deg, #0ee9c9, #25ebbb);
   color: #ffffff;
   text-decoration: none;
   border-radius: 8px;
@@ -187,7 +187,7 @@
 
 .continue-btn:hover {
   transform: translateY(-2px);
-  box-shadow: 0 8px 18px rgba(37, 99, 235, 0.35);
+  box-shadow: 0 8px 18px rgba(37, 235, 187, 0.35);
 }
 
 .recent-activity-section {
@@ -208,16 +208,16 @@
   display: flex;
   gap: 12px;
   padding: 14px;
-  background: #0d1523;
+  background: #0d231e;
   border-radius: 10px;
-  border: 1px solid #223248;
-  border-left: 4px solid #38bdf8;
+  border: 1px solid #224840;
+  border-left: 4px solid #38f8dc;
   transition: transform 0.2s ease, border-color 0.2s ease;
 }
 
 .activity-item:hover {
   transform: translateX(3px);
-  border-color: #3c5b81;
+  border-color: #3c8173;
 }
 
 .activity-icon {
@@ -237,15 +237,15 @@
 
 .activity-lesson {
   font-size: 0.88rem;
-  color: #9cb0c7;
+  color: #9cc7be;
   margin: 2px 0;
 }
 
 .activity-type {
   display: inline-block;
   font-size: 0.75rem;
-  background: #1b2738;
-  color: #bdd3ea;
+  background: #1b3832;
+  color: #bdeae1;
   padding: 3px 9px;
   border-radius: 4px;
   margin-right: 8px;
@@ -253,7 +253,7 @@
 
 .activity-time {
   font-size: 0.8rem;
-  color: #8ca0b8;
+  color: #8cb8af;
   margin-left: 8px;
 }
 
@@ -267,15 +267,15 @@
 }
 
 .recent-section p {
-  color: #9fb1c6;
+  color: #9fc6be;
   margin-top: 10px;
 }
 
 .resources-table {
   width: 100%;
   border-collapse: collapse;
-  background: #0b121e;
-  border: 1px solid #1f2d40;
+  background: #0b1e1a;
+  border: 1px solid #1f4039;
   border-radius: 12px;
   overflow: hidden;
 }
@@ -288,35 +288,35 @@
 }
 
 .resources-table th {
-  background: #101a2a;
-  color: #aac2dc;
+  background: #102a24;
+  color: #aadcd2;
   font-weight: 600;
 }
 
 .resources-table tr {
-  border-bottom: 1px solid #1b2a3f;
+  border-bottom: 1px solid #1b3f37;
 }
 
 .resources-table tr:hover {
-  background: #101a29;
+  background: #102923;
 }
 
 .view-course-link {
   display: inline-block;
   padding: 7px 12px;
-  background: #1d4ed8;
+  background: #1dd8a8;
   color: #fff;
   text-decoration: none;
   border-radius: 6px;
   font-size: 0.84rem;
   font-weight: 600;
-  border: 1px solid #2f69f0;
+  border: 1px solid #2ff0c0;
   transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
 .view-course-link:hover {
   transform: translateY(-1px);
-  box-shadow: 0 6px 16px rgba(37, 99, 235, 0.3);
+  box-shadow: 0 6px 16px rgba(37, 235, 187, 0.3);
 }
 
 @media (max-width: 768px) {
@@ -327,7 +327,7 @@
   .dashboard-sidebar {
     width: 100%;
     padding: 20px;
-    border-bottom: 1px solid #1a1f28;
+    border-bottom: 1px solid #1a2825;
   }
 
   .dashboard-main {

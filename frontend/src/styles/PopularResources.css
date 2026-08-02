@@ -1,7 +1,7 @@
 /* POPULAR RESOURCES CONTAINER */
 .popular-resources-container {
   padding: 26px 0;
-  color: #e5ecf6;
+  color: #e5f6f2;
 }
 
 /* POPULAR SECTION */
@@ -19,7 +19,7 @@
 }
 
 .section-subtitle {
-  color: #9db0c8;
+  color: #9dc8bf;
   margin-bottom: 18px;
   font-size: 0.95rem;
 }
@@ -33,12 +33,12 @@
 
 .popular-card {
   position: relative;
-  background: linear-gradient(135deg, #0e1726 0%, #08101b 100%);
+  background: linear-gradient(135deg, #0e2621 0%, #081b17 100%);
   border-radius: 14px;
   overflow: hidden;
   box-shadow: 0 10px 24px rgba(0, 0, 0, 0.35);
   transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
-  border: 1px solid #1f2f45;
+  border: 1px solid #1f453d;
 }
 
 .popular-card:hover {
@@ -84,20 +84,20 @@
 }
 
 .course-subject {
-  color: #9cb0c8;
+  color: #9cc8bf;
   font-size: 0.88rem;
   margin-bottom: 8px;
 }
 
 .course-level {
-  color: #aec1d7;
+  color: #aed7cf;
   font-size: 0.82rem;
   margin-bottom: 12px;
 }
 
 .popularity-bar {
   height: 6px;
-  background-color: #1a2a40;
+  background-color: #1a4038;
   border-radius: 3px;
   overflow: hidden;
   margin-bottom: 10px;
@@ -112,7 +112,7 @@
 
 .unique-users {
   font-size: 0.85rem;
-  color: #a9bdd5;
+  color: #a9d5cc;
   margin-bottom: 12px;
 }
 
@@ -120,7 +120,7 @@
   display: block;
   text-align: center;
   padding: 10px 14px;
-  background: linear-gradient(135deg, #0ea5e9, #2563eb);
+  background: linear-gradient(135deg, #0ee9c9, #25ebbb);
   color: white;
   text-decoration: none;
   border-radius: 8px;
@@ -132,7 +132,7 @@
 
 .view-course-btn:hover {
   transform: translateY(-2px);
-  box-shadow: 0 7px 18px rgba(37, 99, 235, 0.34);
+  box-shadow: 0 7px 18px rgba(37, 235, 187, 0.34);
 }
 
 /* TRENDING SECTION */
@@ -157,12 +157,12 @@
 }
 
 .trending-card {
-  background: linear-gradient(135deg, #141a26 0%, #0b111c 100%);
+  background: linear-gradient(135deg, #142622 0%, #0b1c18 100%);
   border-radius: 12px;
   overflow: hidden;
   box-shadow: 0 8px 18px rgba(0, 0, 0, 0.35);
   transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
-  border: 1px solid #223248;
+  border: 1px solid #224840;
   display: flex;
   flex-direction: column;
 }
@@ -217,7 +217,7 @@
 }
 
 .trending-subject {
-  color: #a6bbd3;
+  color: #a6d3ca;
   font-size: 0.85rem;
   margin-bottom: 10px;
 }
@@ -226,7 +226,7 @@
   display: flex;
   gap: 8px;
   font-size: 0.78rem;
-  color: #b2c4d8;
+  color: #b2d8d0;
   margin-bottom: 10px;
   flex-wrap: wrap;
 }
@@ -267,7 +267,7 @@
 .empty-state {
   text-align: center;
   padding: 40px 20px;
-  color: #90a4bb;
+  color: #90bbb2;
   font-size: 1.1rem;
 }
 

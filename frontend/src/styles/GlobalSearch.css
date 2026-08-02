@@ -10,7 +10,7 @@
   display: flex;
   align-items: center;
   gap: 8px;
-  background: rgba(2, 6, 23, 0.5);
+  background: rgba(2, 23, 17, 0.5);
   border: 1px solid var(--color-border);
   border-radius: 999px;
   padding: 7px 14px;
@@ -82,7 +82,7 @@
 
 .global-search-chip {
   display: inline-block;
-  background: rgba(148, 163, 184, 0.12);
+  background: rgba(148, 184, 176, 0.12);
   border: 1px solid var(--color-border);
   color: var(--color-text-secondary);
   border-radius: 999px;
@@ -110,7 +110,7 @@
 }
 
 .global-search-result:hover {
-  background: rgba(148, 163, 184, 0.1);
+  background: rgba(148, 184, 176, 0.1);
 }
 
 .global-search-result-title {
