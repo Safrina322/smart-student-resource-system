@@ -14,8 +14,14 @@ function AdminRequests() {
     setError("");
     try {
       const data = await listRequests(page);
-      setRequests(data.items || []);
-      setPagination(data.pagination);
+      // Tolerates a backend still on the old bare-array response shape (e.g.
+      // a rolling deploy where the frontend updates before the backend does)
+      // instead of crashing the whole page when `pagination` isn't there.
+      const items = Array.isArray(data?.items) ? data.items : Array.isArray(data) ? data : [];
+      setRequests(items);
+      setPagination(
+        data?.pagination || { page: 1, pageSize: items.length, total: items.length, totalPages: 1 }
+      );
     } catch (err) {
       setError(`❌ Failed to load requests: ${err.message}`);
     }
