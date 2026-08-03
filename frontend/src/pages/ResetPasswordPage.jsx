@@ -1,14 +1,13 @@
-import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import "../styles/LoginPage.css";
 import { useAuth } from "../hooks/useAuth.js";
+import { notify } from "../utils/notify.js";
 
 function ResetPasswordPage() {
   const { token } = useParams();
   const navigate = useNavigate();
   const { resetPassword } = useAuth();
-  const [message, setMessage] = useState("");
   const {
     register,
     handleSubmit,
@@ -19,12 +18,11 @@ function ResetPasswordPage() {
   const newPassword = watch("newPassword");
 
   const onSubmit = async ({ newPassword }) => {
-    setMessage("");
     try {
       await resetPassword({ token, newPassword });
       navigate("/user/login", { state: { justReset: true } });
     } catch (err) {
-      setMessage(err.message || "Could not reset password. The link may have expired.");
+      notify.error(err.message || "Could not reset password. The link may have expired.");
     }
   };
 
@@ -32,8 +30,6 @@ function ResetPasswordPage() {
     <div className="login-page">
       <form className="login-form" onSubmit={handleSubmit(onSubmit)}>
         <h2>Reset Password</h2>
-
-        {message && <p className="password-error">{message}</p>}
 
         <div className="mb-3">
           <label className="form-label" htmlFor="reset-new-password">New Password</label>

@@ -2,21 +2,20 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "../styles/LoginPage.css";
 import { useAuth } from "../hooks/useAuth.js";
+import { notify } from "../utils/notify.js";
 
 function AdminLogin() {
   const navigate = useNavigate();
   const { adminLogin } = useAuth();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
   const handleLogin = async (e) => {
     e.preventDefault();
-    setError("");
 
     if (!email || !password) {
-      setError("❌ Please enter email and password");
+      notify.error("Please enter email and password");
       return;
     }
 
@@ -26,7 +25,7 @@ function AdminLogin() {
       await adminLogin({ email, password });
       navigate("/admin/dashboard");
     } catch (err) {
-      setError(`❌ ${err.message || "Admin login failed. Check credentials."}`);
+      notify.error(err.message || "Admin login failed. Check credentials.");
     } finally {
       setLoading(false);
     }
@@ -36,8 +35,6 @@ function AdminLogin() {
     <div className="login-page">
       <form className="login-form" onSubmit={handleLogin}>
         <h2>Admin Login</h2>
-
-        {error && <p className="password-error">{error}</p>}
 
         <div className="mb-3">
           <label className="form-label" htmlFor="admin-login-email">Admin Email</label>

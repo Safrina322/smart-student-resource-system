@@ -1,12 +1,11 @@
-import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { Link } from "react-router-dom";
 import "../styles/LoginPage.css";
 import { useAuth } from "../hooks/useAuth.js";
+import { notify } from "../utils/notify.js";
 
 function ForgotPasswordPage() {
   const { requestPasswordReset } = useAuth();
-  const [message, setMessage] = useState("");
   const {
     register,
     handleSubmit,
@@ -14,12 +13,11 @@ function ForgotPasswordPage() {
   } = useForm({ defaultValues: { email: "" } });
 
   const onSubmit = async ({ email }) => {
-    setMessage("");
     try {
       const data = await requestPasswordReset(email);
-      setMessage(data.message);
+      notify.success(data.message);
     } catch (err) {
-      setMessage(err.message || "Something went wrong. Please try again.");
+      notify.error(err.message || "Something went wrong. Please try again.");
     }
   };
 
@@ -30,8 +28,6 @@ function ForgotPasswordPage() {
         <p style={{ color: "#aaa", marginBottom: 20, fontSize: "0.95rem" }}>
           Enter your account email and we'll send you a link to reset your password.
         </p>
-
-        {message && <p className="password-error" style={{ color: "#7dd3fc" }}>{message}</p>}
 
         <div className="mb-3">
           <label className="form-label" htmlFor="forgot-password-email">Email</label>

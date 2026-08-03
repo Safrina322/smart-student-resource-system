@@ -8,6 +8,7 @@ import StarRating from "../components/StarRating.jsx";
 import { listResources as listHubResources } from "../services/resourceHubService.js";
 import { listCourses } from "../services/courseService.js";
 import { searchAssist } from "../services/aiService.js";
+import { notify } from "../utils/notify.js";
 import "../styles/Resources.css";
 import "../styles/ResourceAIPanel.css";
 
@@ -40,7 +41,7 @@ function ResourceListPage() {
   const [levelFilter, setLevelFilter] = useState("");
   const [hubResources, setHubResources] = useState([]);
   const [hubLoading, setHubLoading] = useState(true);
-  const [aiAssist, setAiAssist] = useState({ loading: false, answer: null, error: "" });
+  const [aiAssist, setAiAssist] = useState({ loading: false, answer: null });
 
   const onlineResources = [
     {
@@ -92,19 +93,20 @@ function ResourceListPage() {
 
   // A previous AI answer no longer matches once the query changes.
   useEffect(() => {
-    setAiAssist({ loading: false, answer: null, error: "" });
+    setAiAssist({ loading: false, answer: null });
   }, [searchTerm]);
 
   const handleAskAI = async () => {
     const query = searchTerm.trim();
     if (!query || aiAssist.loading) return;
 
-    setAiAssist({ loading: true, answer: null, error: "" });
+    setAiAssist({ loading: true, answer: null });
     try {
       const data = await searchAssist(query);
-      setAiAssist({ loading: false, answer: data.answer, error: "" });
+      setAiAssist({ loading: false, answer: data.answer });
     } catch (err) {
-      setAiAssist({ loading: false, answer: null, error: err.message || "Could not get an AI answer" });
+      setAiAssist({ loading: false, answer: null });
+      notify.error(err.message || "Could not get an AI answer");
     }
   };
 
@@ -324,7 +326,6 @@ function ResourceListPage() {
           <button className="ai-action-btn secondary" onClick={handleAskAI} disabled={aiAssist.loading}>
             <HiOutlineSparkles /> {aiAssist.loading ? "Thinking..." : `Ask AI about "${searchTerm.trim()}"`}
           </button>
-          {aiAssist.error && <p className="ai-tab-error">{aiAssist.error}</p>}
           {aiAssist.answer && (
             <div className="ai-search-answer">
               <HiOutlineSparkles />

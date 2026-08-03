@@ -8,6 +8,7 @@ import {
   deleteResource,
   getLecturerAnalytics,
 } from "../services/lecturerResourceService.js";
+import { notify } from "../utils/notify.js";
 
 const RESOURCE_TYPES = ["PDF", "Video", "Link", "Image", "ZIP", "Document"];
 
@@ -31,7 +32,7 @@ function LecturerDashboard() {
   const [analytics, setAnalytics] = useState({ pending: 0, approved: 0, rejected: 0, flagged: 0 });
   const [loading, setLoading] = useState(true);
   const [editingId, setEditingId] = useState(null);
-  const [message, setMessage] = useState("");
+  const [loadError, setLoadError] = useState("");
 
   const {
     register,
@@ -42,12 +43,13 @@ function LecturerDashboard() {
 
   const loadData = async () => {
     setLoading(true);
+    setLoadError("");
     try {
       const [list, summary] = await Promise.all([listMyResources(), getLecturerAnalytics()]);
       setResources(list);
       setAnalytics(summary);
     } catch (err) {
-      setMessage(err.message || "Failed to load resources.");
+      setLoadError(err.message || "Failed to load resources.");
     } finally {
       setLoading(false);
     }
@@ -59,7 +61,6 @@ function LecturerDashboard() {
   }, []);
 
   const onSubmit = async (values) => {
-    setMessage("");
     const payload = {
       ...values,
       semester: values.semester === "" ? undefined : values.semester,
@@ -67,16 +68,16 @@ function LecturerDashboard() {
     try {
       if (editingId) {
         const data = await updateResource(editingId, payload);
-        setMessage(data.message);
+        notify.success(data.message);
       } else {
         const data = await uploadResource(payload);
-        setMessage(data.message);
+        notify.success(data.message);
       }
       reset(emptyForm);
       setEditingId(null);
       loadData();
     } catch (err) {
-      setMessage(err.message || "Could not save resource.");
+      notify.error(err.message || "Could not save resource.");
     }
   };
 
@@ -100,12 +101,12 @@ function LecturerDashboard() {
   };
 
   const handleDelete = async (id) => {
-    setMessage("");
     try {
       await deleteResource(id);
+      notify.success("Resource deleted");
       loadData();
     } catch (err) {
-      setMessage(err.message || "Could not delete resource.");
+      notify.error(err.message || "Could not delete resource.");
     }
   };
 
@@ -134,7 +135,7 @@ function LecturerDashboard() {
 
       <section className="role-card">
         <h2>{editingId ? "Edit Resource" : "Upload Resource"}</h2>
-        {message && <p className="role-message">{message}</p>}
+        {loadError && <p className="role-message">{loadError}</p>}
 
         <form onSubmit={handleSubmit(onSubmit)}>
           <div className="role-grid">

@@ -2,23 +2,22 @@ import { useState } from "react";
 import "../styles/LoginPage.css";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../hooks/useAuth.js";
+import { notify } from "../utils/notify.js";
 
 function RegisterPage() {
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
-  const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
   const { register, login } = useAuth();
 
   const handleRegister = async (e) => {
     e.preventDefault();
-    setError("");
 
     if (password !== confirmPassword) {
-      setError("Passwords do not match");
+      notify.error("Passwords do not match");
       return;
     }
 
@@ -33,7 +32,7 @@ function RegisterPage() {
       await login({ username, password });
       navigate("/dashboard");
     } catch (err) {
-      setError(err.message || "Registration failed");
+      notify.error(err.message || "Registration failed");
     } finally {
       setLoading(false);
     }
@@ -43,8 +42,6 @@ function RegisterPage() {
     <div className="login-page">
       <form className="login-form" onSubmit={handleRegister}>
         <h2>Create Account</h2>
-
-        {error && <p className="password-error">{error}</p>}
 
         <div className="mb-3">
           <label className="form-label" htmlFor="register-username">Username</label>

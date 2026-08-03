@@ -13,6 +13,7 @@ import {
   deleteSchedule,
   downloadReport,
 } from "../services/adminAnalyticsService.js";
+import { notify } from "../utils/notify.js";
 
 function AdminDashboard() {
   const navigate = useNavigate();
@@ -20,11 +21,9 @@ function AdminDashboard() {
   const [heroImageError, setHeroImageError] = useState(false);
   const [reportDays, setReportDays] = useState("30");
   const [reportLoading, setReportLoading] = useState(false);
-  const [reportError, setReportError] = useState("");
   const [historyLoading, setHistoryLoading] = useState(false);
   const [reportHistory, setReportHistory] = useState([]);
   const [scheduleLoading, setScheduleLoading] = useState(false);
-  const [scheduleError, setScheduleError] = useState("");
   const [scheduleForm, setScheduleForm] = useState({
     frequency: "daily",
     timeOfDay: "09:00",
@@ -105,7 +104,6 @@ function AdminDashboard() {
   };
 
   const loadReportSchedule = async () => {
-    setScheduleError("");
     try {
       const data = await getSchedule();
 
@@ -121,7 +119,7 @@ function AdminDashboard() {
         });
       }
     } catch {
-      setScheduleError("Could not load schedule.");
+      notify.error("Could not load report schedule.");
     }
   };
 
@@ -137,7 +135,6 @@ function AdminDashboard() {
 
   const handleGenerateReport = async () => {
     setReportLoading(true);
-    setReportError("");
 
     try {
       const token = localStorage.getItem("adminToken");
@@ -157,7 +154,7 @@ function AdminDashboard() {
       window.URL.revokeObjectURL(downloadUrl);
       loadReportHistory();
     } catch (err) {
-      setReportError(err.message || "Failed to generate report");
+      notify.error(err.message || "Failed to generate report");
     } finally {
       setReportLoading(false);
     }
@@ -165,7 +162,6 @@ function AdminDashboard() {
 
   const handleScheduleSave = async () => {
     setScheduleLoading(true);
-    setScheduleError("");
 
     try {
       await saveSchedule({
@@ -176,9 +172,10 @@ function AdminDashboard() {
         isActive: Boolean(scheduleForm.isActive),
       });
 
+      notify.success("Schedule saved");
       await loadReportSchedule();
     } catch (err) {
-      setScheduleError(err.message || "Failed to save schedule");
+      notify.error(err.message || "Failed to save schedule");
     } finally {
       setScheduleLoading(false);
     }
@@ -188,11 +185,11 @@ function AdminDashboard() {
     if (!scheduleForm.scheduleId) return;
 
     setScheduleLoading(true);
-    setScheduleError("");
 
     try {
       await deleteSchedule(scheduleForm.scheduleId);
 
+      notify.success("Schedule deleted");
       setScheduleForm({
         frequency: "daily",
         timeOfDay: "09:00",
@@ -202,7 +199,7 @@ function AdminDashboard() {
         scheduleId: null,
       });
     } catch (err) {
-      setScheduleError(err.message || "Failed to delete schedule");
+      notify.error(err.message || "Failed to delete schedule");
     } finally {
       setScheduleLoading(false);
     }
@@ -306,7 +303,6 @@ function AdminDashboard() {
               {reportLoading ? "Generating..." : "Download CSV"}
             </button>
           </div>
-          {reportError ? <p className="report-error">{reportError}</p> : null}
         </article>
 
         <article className="admin-action-card admin-report-card">
@@ -388,7 +384,6 @@ function AdminDashboard() {
             </div>
           </div>
 
-          {scheduleError ? <p className="report-error">{scheduleError}</p> : null}
         </article>
 
         <article className="admin-action-card admin-report-card admin-history-card">

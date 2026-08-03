@@ -9,46 +9,6 @@
   font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
 }
 
-.dashboard-sidebar {
-  width: 250px;
-  background: linear-gradient(180deg, rgba(8, 23, 19, 0.95), rgba(7, 17, 15, 0.95));
-  border-right: 1px solid #1b3832;
-  padding: 28px 24px;
-}
-
-.dashboard-sidebar h2 {
-  margin: 0 0 24px;
-  font-size: 1.45rem;
-  letter-spacing: 0.3px;
-  color: #f8fffe;
-}
-
-.dashboard-sidebar ul {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-}
-
-.dashboard-sidebar li {
-  margin: 6px 0;
-}
-
-.dashboard-sidebar a {
-  display: block;
-  text-decoration: none;
-  color: #9dc7be;
-  padding: 10px 12px;
-  border-radius: 10px;
-  border: 1px solid transparent;
-  transition: all 0.2s ease;
-}
-
-.dashboard-sidebar a:hover {
-  color: #dffffa;
-  background: #0e2621;
-  border-color: #235349;
-}
-
 .dashboard-main {
   flex: 1;
   padding: 34px;

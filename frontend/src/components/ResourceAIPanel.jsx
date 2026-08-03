@@ -14,6 +14,7 @@ import {
   getResourceFlashcards,
   chatWithResource,
 } from "../services/aiService.js";
+import { notify } from "../utils/notify.js";
 import "../styles/ResourceAIPanel.css";
 
 const TABS = [
@@ -24,19 +25,20 @@ const TABS = [
 ];
 
 function SummaryTab({ resourceId }) {
-  const [state, setState] = useState({ loading: false, error: "", summary: null });
+  const [state, setState] = useState({ loading: false, summary: null });
 
   const load = async () => {
-    setState({ loading: true, error: "", summary: null });
+    setState({ loading: true, summary: null });
     try {
       const data = await getResourceSummary(resourceId);
-      setState({ loading: false, error: "", summary: data.summary });
+      setState({ loading: false, summary: data.summary });
     } catch (err) {
-      setState({ loading: false, error: err.message || "Could not generate summary", summary: null });
+      setState({ loading: false, summary: null });
+      notify.error(err.message || "Could not generate summary");
     }
   };
 
-  if (!state.summary && !state.loading && !state.error) {
+  if (!state.summary && !state.loading) {
     return (
       <div className="ai-tab-empty">
         <p>Get a quick AI-generated summary of this resource's key concepts.</p>
@@ -48,7 +50,6 @@ function SummaryTab({ resourceId }) {
   }
 
   if (state.loading) return <p className="ai-tab-status">Reading the resource...</p>;
-  if (state.error) return <p className="ai-tab-status ai-tab-error">{state.error}</p>;
 
   return (
     <div className="ai-summary-content">
@@ -63,21 +64,22 @@ function SummaryTab({ resourceId }) {
 }
 
 function QuizTab({ resourceId }) {
-  const [state, setState] = useState({ loading: false, error: "", questions: null });
+  const [state, setState] = useState({ loading: false, questions: null });
   const [index, setIndex] = useState(0);
   const [selected, setSelected] = useState(null);
   const [score, setScore] = useState(0);
 
   const load = async () => {
-    setState({ loading: true, error: "", questions: null });
+    setState({ loading: true, questions: null });
     try {
       const data = await getResourceQuiz(resourceId, 5);
-      setState({ loading: false, error: "", questions: data.questions });
+      setState({ loading: false, questions: data.questions });
       setIndex(0);
       setSelected(null);
       setScore(0);
     } catch (err) {
-      setState({ loading: false, error: err.message || "Could not generate quiz", questions: null });
+      setState({ loading: false, questions: null });
+      notify.error(err.message || "Could not generate quiz");
     }
   };
 
@@ -94,7 +96,7 @@ function QuizTab({ resourceId }) {
     setIndex((i) => i + 1);
   };
 
-  if (!state.questions && !state.loading && !state.error) {
+  if (!state.questions && !state.loading) {
     return (
       <div className="ai-tab-empty">
         <p>Test your understanding with an AI-generated 5-question quiz.</p>
@@ -106,7 +108,6 @@ function QuizTab({ resourceId }) {
   }
 
   if (state.loading) return <p className="ai-tab-status">Writing quiz questions...</p>;
-  if (state.error) return <p className="ai-tab-status ai-tab-error">{state.error}</p>;
 
   if (index >= state.questions.length) {
     return (
@@ -156,23 +157,24 @@ function QuizTab({ resourceId }) {
 }
 
 function FlashcardsTab({ resourceId }) {
-  const [state, setState] = useState({ loading: false, error: "", flashcards: null });
+  const [state, setState] = useState({ loading: false, flashcards: null });
   const [index, setIndex] = useState(0);
   const [flipped, setFlipped] = useState(false);
 
   const load = async () => {
-    setState({ loading: true, error: "", flashcards: null });
+    setState({ loading: true, flashcards: null });
     try {
       const data = await getResourceFlashcards(resourceId, 8);
-      setState({ loading: false, error: "", flashcards: data.flashcards });
+      setState({ loading: false, flashcards: data.flashcards });
       setIndex(0);
       setFlipped(false);
     } catch (err) {
-      setState({ loading: false, error: err.message || "Could not generate flashcards", flashcards: null });
+      setState({ loading: false, flashcards: null });
+      notify.error(err.message || "Could not generate flashcards");
     }
   };
 
-  if (!state.flashcards && !state.loading && !state.error) {
+  if (!state.flashcards && !state.loading) {
     return (
       <div className="ai-tab-empty">
         <p>Generate a set of flashcards to help you memorize key terms.</p>
@@ -184,7 +186,6 @@ function FlashcardsTab({ resourceId }) {
   }
 
   if (state.loading) return <p className="ai-tab-status">Building flashcards...</p>;
-  if (state.error) return <p className="ai-tab-status ai-tab-error">{state.error}</p>;
 
   const card = state.flashcards[index];
 

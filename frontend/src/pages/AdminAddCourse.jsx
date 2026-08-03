@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { addCourse } from "../services/adminLessonService.js";
+import { notify } from "../utils/notify.js";
 import "../styles/UploadResource.css";
 
 function AdminAddCourse() {
@@ -18,7 +19,6 @@ function AdminAddCourse() {
 
   const [image, setImage] = useState(null);
   const [resourceFile, setResourceFile] = useState(null);
-  const [message, setMessage] = useState("");
 
   const handleChange = (e) => {
     setFormData({
@@ -29,7 +29,6 @@ function AdminAddCourse() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setMessage("");
 
     const data = new FormData();
     Object.keys(formData).forEach((key) =>
@@ -43,7 +42,7 @@ function AdminAddCourse() {
     try {
       await addCourse(data);
 
-      setMessage("✅ Course added successfully");
+      notify.success("Course added successfully");
 
       // Optional: reset form
       setFormData({
@@ -61,7 +60,7 @@ function AdminAddCourse() {
       setImage(null);
       setResourceFile(null);
     } catch (err) {
-      setMessage(err.message || "❌ Failed to add course");
+      notify.error(err.message || "Failed to add course");
     }
   };
 
@@ -69,8 +68,6 @@ function AdminAddCourse() {
     <div className="upload-page">
       <div className="upload-card">
         <h2>Add New Course</h2>
-
-        {message && <p style={{ textAlign: "center" }}>{message}</p>}
 
         <form onSubmit={handleSubmit}>
           <label>Course Title</label>

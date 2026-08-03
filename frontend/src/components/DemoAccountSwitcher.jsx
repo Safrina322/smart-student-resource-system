@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { HiOutlineAcademicCap, HiOutlinePresentationChartLine, HiOutlineShieldCheck, HiOutlineKey } from "react-icons/hi2";
 import { useAuth } from "../hooks/useAuth.js";
+import { notify } from "../utils/notify.js";
 import "../styles/DemoAccountSwitcher.css";
 
 const DEMO_ACCOUNTS = [
@@ -53,10 +54,8 @@ function DemoAccountSwitcher() {
   const navigate = useNavigate();
   const { login, adminLogin } = useAuth();
   const [loadingRole, setLoadingRole] = useState(null);
-  const [error, setError] = useState("");
 
   const handleDemoLogin = async (account) => {
-    setError("");
     setLoadingRole(account.role);
     try {
       if (account.kind === "admin") {
@@ -66,7 +65,7 @@ function DemoAccountSwitcher() {
       }
       navigate(account.landing);
     } catch (err) {
-      setError(err.message || `Could not sign in as ${account.label}`);
+      notify.error(err.message || `Could not sign in as ${account.label}`);
     } finally {
       setLoadingRole(null);
     }
@@ -78,8 +77,6 @@ function DemoAccountSwitcher() {
         <span>Just exploring?</span>
         <p>Jump into any role instantly — no credentials needed.</p>
       </div>
-
-      {error && <p className="demo-switcher-error">{error}</p>}
 
       <div className="demo-switcher-grid">
         {DEMO_ACCOUNTS.map((account) => {

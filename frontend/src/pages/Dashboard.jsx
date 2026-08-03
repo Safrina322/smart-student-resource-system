@@ -91,16 +91,6 @@ function Dashboard() {
 
   return (
     <div className="dashboard">
-      {/* Sidebar */}
-      <aside className="dashboard-sidebar">
-        <h2>Smart Student</h2>
-        <ul>
-          <li><Link to="/dashboard">Dashboard</Link></li>
-          <li><Link to="/resources">Resources</Link></li>
-          <li><Link to="/upload">Upload</Link></li>
-        </ul>
-      </aside>
-
       {/* Main content */}
       <main className="dashboard-main">
         <h1>Welcome 👋</h1>

@@ -6,6 +6,7 @@ import {
   updateLesson,
   deleteLesson,
 } from "../services/adminLessonService.js";
+import { notify } from "../utils/notify.js";
 import "../styles/AdminManageLessons.css";
 
 function AdminManageLessons() {
@@ -13,7 +14,7 @@ function AdminManageLessons() {
   const [selectedCourseId, setSelectedCourseId] = useState("");
   const [lessons, setLessons] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [status, setStatus] = useState("");
+  const [loadError, setLoadError] = useState("");
   const [newLessonFile, setNewLessonFile] = useState(null);
   const [newLesson, setNewLesson] = useState({
     lesson_title: "",
@@ -33,7 +34,7 @@ function AdminManageLessons() {
           setSelectedCourseId(String(data[0].id));
         }
       } catch (err) {
-        setStatus(`Failed to load courses: ${err.message}`);
+        setLoadError(`Failed to load courses: ${err.message}`);
       } finally {
         setLoading(false);
       }
@@ -44,14 +45,14 @@ function AdminManageLessons() {
 
   useEffect(() => {
     if (!selectedCourseId) return;
-    setStatus("");
+    setLoadError("");
 
     const fetchLessons = async () => {
       try {
         const data = await getCourseLessons(selectedCourseId);
         setLessons(data || []);
       } catch (err) {
-        setStatus(`Failed to load lessons: ${err.message}`);
+        setLoadError(`Failed to load lessons: ${err.message}`);
       }
     };
 
@@ -65,7 +66,6 @@ function AdminManageLessons() {
   };
 
   const handleSave = async (lesson) => {
-    setStatus("");
     try {
       await updateLesson(lesson.id, {
         lesson_title: lesson.lesson_title,
@@ -74,25 +74,23 @@ function AdminManageLessons() {
         resource_url: lesson.resource_url,
         lesson_order: lesson.lesson_order,
       });
-      setStatus("Lesson updated successfully");
+      notify.success("Lesson updated successfully");
     } catch (err) {
-      setStatus(`Update failed: ${err.message}`);
+      notify.error(`Update failed: ${err.message}`);
     }
   };
 
   const handleDelete = async (lessonId) => {
-    setStatus("");
     try {
       await deleteLesson(lessonId);
       setLessons((prev) => prev.filter((lesson) => lesson.id !== lessonId));
-      setStatus("Lesson deleted");
+      notify.success("Lesson deleted");
     } catch (err) {
-      setStatus(`Delete failed: ${err.message}`);
+      notify.error(`Delete failed: ${err.message}`);
     }
   };
 
   const handleAddLesson = async () => {
-    setStatus("");
     if (!selectedCourseId) return;
 
     try {
@@ -119,9 +117,9 @@ function AdminManageLessons() {
         lesson_order: 1,
       });
       setNewLessonFile(null);
-      setStatus("Lesson added successfully");
+      notify.success("Lesson added successfully");
     } catch (err) {
-      setStatus(`Add lesson failed: ${err.message}`);
+      notify.error(`Add lesson failed: ${err.message}`);
     }
   };
 
@@ -130,7 +128,7 @@ function AdminManageLessons() {
       <div className="admin-lessons-card">
         <h2>Manage Course Lessons</h2>
 
-        {status && <p className="admin-lessons-status">{status}</p>}
+        {loadError && <p className="admin-lessons-status">{loadError}</p>}
 
         {loading ? (
           <p>Loading...</p>

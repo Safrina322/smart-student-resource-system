@@ -1,6 +1,7 @@
 import { lazy, Suspense } from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { QueryClientProvider } from "@tanstack/react-query";
+import { Toaster } from "react-hot-toast";
 import { queryClient } from "./queryClient.js";
 import { AuthProvider } from "./context/AuthContext.jsx";
 import AppShell from "./components/AppShell.jsx";
@@ -45,6 +46,18 @@ function App() {
     <AuthProvider>
     <Router>
       <ScrollToTop />
+      <Toaster
+        position="top-right"
+        toastOptions={{
+          style: {
+            background: "var(--color-surface-strong)",
+            color: "var(--color-text)",
+            border: "1px solid var(--color-border)",
+          },
+          success: { iconTheme: { primary: "#10b981", secondary: "#0b0f0e" } },
+          error: { iconTheme: { primary: "#ef4444", secondary: "#0b0f0e" } },
+        }}
+      />
       <AppShell>
         <ErrorBoundary>
         <Suspense fallback={<PageLoader />}>

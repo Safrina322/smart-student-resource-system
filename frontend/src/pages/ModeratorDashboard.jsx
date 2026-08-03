@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import "../styles/RoleDashboard.css";
 import { getReviewQueue, approveResource, rejectResource, flagResource } from "../services/moderationService.js";
+import { notify } from "../utils/notify.js";
 
 const STATUSES = ["pending", "approved", "rejected", "flagged"];
 
@@ -8,16 +9,17 @@ function ModeratorDashboard() {
   const [status, setStatus] = useState("pending");
   const [queue, setQueue] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [message, setMessage] = useState("");
+  const [loadError, setLoadError] = useState("");
   const [commentDrafts, setCommentDrafts] = useState({});
 
   const loadQueue = async (targetStatus) => {
     setLoading(true);
+    setLoadError("");
     try {
       const data = await getReviewQueue(targetStatus);
       setQueue(data);
     } catch (err) {
-      setMessage(err.message || "Failed to load the review queue.");
+      setLoadError(err.message || "Failed to load the review queue.");
     } finally {
       setLoading(false);
     }
@@ -29,14 +31,13 @@ function ModeratorDashboard() {
   }, [status]);
 
   const handleAction = async (id, action) => {
-    setMessage("");
     const comment = commentDrafts[id] || "";
     try {
       const data = await action(id, comment);
-      setMessage(data.message);
+      notify.success(data.message);
       loadQueue(status);
     } catch (err) {
-      setMessage(err.message || "Action failed.");
+      notify.error(err.message || "Action failed.");
     }
   };
 
@@ -56,7 +57,7 @@ function ModeratorDashboard() {
         ))}
       </div>
 
-      {message && <p className="role-message">{message}</p>}
+      {loadError && <p className="role-message">{loadError}</p>}
 
       <section className="role-card">
         {loading ? (

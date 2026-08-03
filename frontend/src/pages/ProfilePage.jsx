@@ -2,12 +2,11 @@ import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import "../styles/ProfilePage.css";
 import { useAuth } from "../hooks/useAuth.js";
+import { notify } from "../utils/notify.js";
 
 function ProfilePage() {
   const { fetchProfile, updateProfile, changePassword } = useAuth();
   const [loading, setLoading] = useState(true);
-  const [profileMessage, setProfileMessage] = useState("");
-  const [passwordMessage, setPasswordMessage] = useState("");
 
   const profileForm = useForm({
     defaultValues: {
@@ -39,25 +38,23 @@ function ProfilePage() {
   }, []);
 
   const onSaveProfile = async (values) => {
-    setProfileMessage("");
     try {
       const data = await updateProfile(values);
-      setProfileMessage(data.message);
+      notify.success(data.message);
     } catch (err) {
-      setProfileMessage(err.message || "Could not update profile.");
+      notify.error(err.message || "Could not update profile.");
     }
   };
 
   const newPassword = passwordForm.watch("newPassword");
 
   const onChangePassword = async ({ currentPassword, newPassword }) => {
-    setPasswordMessage("");
     try {
       const data = await changePassword({ currentPassword, newPassword });
-      setPasswordMessage(data.message);
+      notify.success(data.message);
       passwordForm.reset();
     } catch (err) {
-      setPasswordMessage(err.message || "Could not change password.");
+      notify.error(err.message || "Could not change password.");
     }
   };
 
@@ -78,8 +75,6 @@ function ProfilePage() {
       <section className="profile-card">
         <h2>Profile Information</h2>
         <form onSubmit={profileForm.handleSubmit(onSaveProfile)}>
-          {profileMessage && <p className="profile-message">{profileMessage}</p>}
-
           <div className="profile-grid">
             <div className="profile-field">
               <label htmlFor="profile-first-name">First Name</label>
@@ -112,8 +107,6 @@ function ProfilePage() {
       <section className="profile-card">
         <h2>Change Password</h2>
         <form onSubmit={passwordForm.handleSubmit(onChangePassword)}>
-          {passwordMessage && <p className="profile-message">{passwordMessage}</p>}
-
           <div className="profile-grid">
             <div className="profile-field profile-field-wide">
               <label htmlFor="profile-current-password">Current Password</label>

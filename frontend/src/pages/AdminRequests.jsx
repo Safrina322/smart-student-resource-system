@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { listRequests, approveRequest, rejectRequest } from "../services/adminRequestService.js";
+import { notify } from "../utils/notify.js";
 import "../styles/AdminRequests.css";
 
 function AdminRequests() {
@@ -7,7 +8,6 @@ function AdminRequests() {
   const [pagination, setPagination] = useState({ page: 1, pageSize: 20, total: 0, totalPages: 1 });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
-  const [actionError, setActionError] = useState("");
 
   const fetchRequests = async (page = 1) => {
     setLoading(true);
@@ -33,22 +33,22 @@ function AdminRequests() {
   }, []);
 
   const handleApprove = async (id) => {
-    setActionError("");
     try {
       await approveRequest(id);
+      notify.success("Request approved");
       fetchRequests(pagination.page);
     } catch (err) {
-      setActionError(`Failed to approve: ${err.message}`);
+      notify.error(`Failed to approve: ${err.message}`);
     }
   };
 
   const handleReject = async (id) => {
-    setActionError("");
     try {
       await rejectRequest(id);
+      notify.success("Request rejected");
       fetchRequests(pagination.page);
     } catch (err) {
-      setActionError(`Failed to reject: ${err.message}`);
+      notify.error(`Failed to reject: ${err.message}`);
     }
   };
 
@@ -58,7 +58,6 @@ function AdminRequests() {
         <h2>Pending Resource Requests{pagination.total > 0 ? ` (${pagination.total})` : ""}</h2>
 
         {error && <p style={{ color: "red", textAlign: "center" }}>{error}</p>}
-        {actionError && <p style={{ color: "red", textAlign: "center" }}>{actionError}</p>}
 
         {loading ? (
           <p style={{ textAlign: "center" }}>Loading requests...</p>

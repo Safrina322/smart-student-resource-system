@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { listMyRequests, submitRequest } from "../services/requestService.js";
+import { notify } from "../utils/notify.js";
 import "../styles/UploadResource.css";
 
 function RequestResource() {
@@ -21,7 +22,6 @@ function RequestResource() {
     message: "",
   });
 
-  const [status, setStatus] = useState("");
   const [loading, setLoading] = useState(false);
   const [timelineLoading, setTimelineLoading] = useState(true);
   const [myRequests, setMyRequests] = useState([]);
@@ -42,7 +42,7 @@ function RequestResource() {
     if (isAuthError) {
       localStorage.removeItem("token");
       localStorage.removeItem("userName");
-      setStatus("❌ Session expired. Please login again.");
+      notify.error("Session expired. Please login again.");
       setTimeout(() => navigate("/user/login"), 700);
       return true;
     }
@@ -97,7 +97,6 @@ function RequestResource() {
     if (loading) return;
 
     setLoading(true);
-    setStatus("");
 
     try {
       const payload = new FormData();
@@ -110,7 +109,7 @@ function RequestResource() {
 
       await submitRequest(payload);
 
-      setStatus("✅ Request sent to admin successfully!");
+      notify.success("Request sent to admin successfully!");
 
       // 🔄 clear form after success
       setFormData({
@@ -134,7 +133,7 @@ function RequestResource() {
         setLoading(false);
         return;
       }
-      setStatus(`❌ ${err.message || "Failed to send request"}`);
+      notify.error(err.message || "Failed to send request");
     }
 
     setLoading(false);
@@ -283,12 +282,6 @@ function RequestResource() {
           <button disabled={loading}>
             {loading ? "Sending..." : "Send Request"}
           </button>
-
-          {status && (
-            <p className="upload-status-message" role="status">
-              {status}
-            </p>
-          )}
         </form>
 
         <section className="request-timeline-section">

@@ -22,6 +22,7 @@ import {
   toggleBookmark,
   listMyBookmarks,
 } from "../services/resourceHubService.js";
+import { notify } from "../utils/notify.js";
 import "../styles/ResourceDetail.css";
 
 function CommentThread({ comment, onReply, onDelete, canDelete, depth = 0 }) {
@@ -91,7 +92,6 @@ function ResourceDetailPage() {
   const [newComment, setNewComment] = useState("");
   const [rating, setRating] = useState({ average: 0, count: 0, myRating: null });
   const [bookmarked, setBookmarked] = useState(false);
-  const [feedback, setFeedback] = useState("");
 
   const currentUserId = (() => {
     const token = localStorage.getItem("token");
@@ -132,7 +132,7 @@ function ResourceDetailPage() {
       window.open(resourceLink, "_blank", "noreferrer");
       setResource((prev) => (prev ? { ...prev, downloads: (prev.downloads || 0) + 1 } : prev));
     } catch (err) {
-      setFeedback(err.message || "Could not open this resource");
+      notify.error(err.message || "Could not open this resource");
     }
   };
 
@@ -141,7 +141,7 @@ function ResourceDetailPage() {
       const { bookmarked: nowBookmarked } = await toggleBookmark(id);
       setBookmarked(nowBookmarked);
     } catch (err) {
-      setFeedback(err.message || "Could not update bookmark");
+      notify.error(err.message || "Could not update bookmark");
     }
   };
 
@@ -150,7 +150,7 @@ function ResourceDetailPage() {
       const summary = await rateResource(id, stars);
       setRating({ ...summary, myRating: stars });
     } catch (err) {
-      setFeedback(err.message || "Could not save rating");
+      notify.error(err.message || "Could not save rating");
     }
   };
 
@@ -163,7 +163,7 @@ function ResourceDetailPage() {
       const updated = await listComments(id);
       setComments(updated);
     } catch (err) {
-      setFeedback(err.message || "Could not post comment");
+      notify.error(err.message || "Could not post comment");
     }
   };
 
@@ -173,7 +173,7 @@ function ResourceDetailPage() {
       const updated = await listComments(id);
       setComments(updated);
     } catch (err) {
-      setFeedback(err.message || "Could not post reply");
+      notify.error(err.message || "Could not post reply");
     }
   };
 
@@ -183,7 +183,7 @@ function ResourceDetailPage() {
       const updated = await listComments(id);
       setComments(updated);
     } catch (err) {
-      setFeedback(err.message || "Could not delete comment");
+      notify.error(err.message || "Could not delete comment");
     }
   };
 
@@ -252,8 +252,6 @@ function ResourceDetailPage() {
             <StarRating value={rating.myRating || 0} onRate={handleRate} size="1.4rem" />
           </div>
         )}
-
-        {feedback && <p className="resource-detail-feedback">{feedback}</p>}
 
         <button className="resource-download-btn" onClick={handleDownload}>
           <HiOutlineArrowDownTray /> Open / Download Resource

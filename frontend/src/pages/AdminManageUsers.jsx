@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { HiOutlineArrowLeft, HiOutlineMagnifyingGlass } from "react-icons/hi2";
 import { listUsers, changeUserRole, changeUserStatus } from "../services/adminUserService.js";
 import { SkeletonTableRows } from "../components/Skeleton.jsx";
+import { notify } from "../utils/notify.js";
 import "../styles/AdminManageUsers.css";
 
 const ROLE_OPTIONS = ["student", "lecturer", "moderator"];
@@ -15,7 +16,6 @@ function AdminManageUsers() {
   const [roleFilter, setRoleFilter] = useState("");
   const [statusFilter, setStatusFilter] = useState("");
   const [pendingUserId, setPendingUserId] = useState(null);
-  const [feedback, setFeedback] = useState("");
 
   useEffect(() => {
     const timer = setTimeout(fetchUsers, 300); // debounce the search filter
@@ -39,13 +39,12 @@ function AdminManageUsers() {
   const handleRoleChange = async (user, newRole) => {
     if (newRole === user.role) return;
     setPendingUserId(user.id);
-    setFeedback("");
     try {
       const { user: updated } = await changeUserRole(user.id, newRole);
       setUsers((prev) => prev.map((u) => (u.id === user.id ? updated : u)));
-      setFeedback(`${user.username} is now ${newRole}.`);
+      notify.success(`${user.username} is now ${newRole}.`);
     } catch (err) {
-      setFeedback(err.message || "Failed to update role");
+      notify.error(err.message || "Failed to update role");
     } finally {
       setPendingUserId(null);
     }
@@ -53,14 +52,13 @@ function AdminManageUsers() {
 
   const handleStatusToggle = async (user) => {
     setPendingUserId(user.id);
-    setFeedback("");
     try {
       const nextActive = !user.is_active;
       const { user: updated } = await changeUserStatus(user.id, nextActive);
       setUsers((prev) => prev.map((u) => (u.id === user.id ? updated : u)));
-      setFeedback(`${user.username} ${nextActive ? "activated" : "deactivated"}.`);
+      notify.success(`${user.username} ${nextActive ? "activated" : "deactivated"}.`);
     } catch (err) {
-      setFeedback(err.message || "Failed to update status");
+      notify.error(err.message || "Failed to update status");
     } finally {
       setPendingUserId(null);
     }
@@ -108,7 +106,6 @@ function AdminManageUsers() {
       </div>
 
       {error && <p className="manage-users-error">{error}</p>}
-      {feedback && <p className="manage-users-feedback">{feedback}</p>}
 
       <div className="manage-users-table-wrap">
         <table className="manage-users-table">

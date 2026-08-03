@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { HiOutlineSparkles, HiOutlineCalendarDays } from "react-icons/hi2";
 import { generateStudyPlan } from "../services/aiService.js";
+import { notify } from "../utils/notify.js";
 import "../styles/StudyPlanner.css";
 
 function StudyPlannerPage() {
@@ -8,7 +9,6 @@ function StudyPlannerPage() {
   const [hoursPerWeek, setHoursPerWeek] = useState(6);
   const [targetWeeks, setTargetWeeks] = useState(4);
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
   const [plan, setPlan] = useState(null);
   const [completedTasks, setCompletedTasks] = useState({});
 
@@ -17,7 +17,6 @@ function StudyPlannerPage() {
     if (!goal.trim()) return;
 
     setLoading(true);
-    setError("");
     setPlan(null);
     setCompletedTasks({});
 
@@ -25,7 +24,7 @@ function StudyPlannerPage() {
       const data = await generateStudyPlan({ goal: goal.trim(), hoursPerWeek, targetWeeks });
       setPlan(data);
     } catch (err) {
-      setError(err.message || "Could not generate a study plan. Please try again.");
+      notify.error(err.message || "Could not generate a study plan. Please try again.");
     } finally {
       setLoading(false);
     }
@@ -87,8 +86,6 @@ function StudyPlannerPage() {
           <HiOutlineSparkles /> {loading ? "Building your plan..." : "Generate Study Plan"}
         </button>
       </form>
-
-      {error && <p className="study-planner-error">{error}</p>}
 
       {plan && (
         <div className="study-plan-result">

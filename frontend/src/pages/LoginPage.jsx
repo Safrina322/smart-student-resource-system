@@ -2,6 +2,7 @@ import { useState } from "react";
 import "../styles/LoginPage.css";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../hooks/useAuth.js";
+import { notify } from "../utils/notify.js";
 
 function LoginPage() {
   const navigate = useNavigate();
@@ -9,15 +10,13 @@ function LoginPage() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [rememberMe, setRememberMe] = useState(false);
-  const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
   const handleLogin = async (e) => {
     e.preventDefault();
-    setError("");
 
     if (!username || !password) {
-      setError("❌ Please enter username and password");
+      notify.error("Please enter username and password");
       return;
     }
 
@@ -27,7 +26,7 @@ function LoginPage() {
       await login({ username, password, rememberMe });
       navigate("/dashboard");
     } catch (err) {
-      setError(`❌ ${err.message || "Login failed. Check credentials."}`);
+      notify.error(err.message || "Login failed. Check credentials.");
     } finally {
       setLoading(false);
     }
@@ -37,8 +36,6 @@ function LoginPage() {
     <div className="login-page">
       <form className="login-form" onSubmit={handleLogin}>
         <h2>Login</h2>
-
-        {error && <p className="password-error">{error}</p>}
 
         <div className="mb-3">
           <label className="form-label" htmlFor="login-username">Username</label>
