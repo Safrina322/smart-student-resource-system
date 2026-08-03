@@ -58,6 +58,26 @@ App will run on `http://localhost:5173`
 
 ---
 
+### **Docker (optional, for environment parity)**
+
+Runs MySQL + backend + frontend together in containers, with live
+reload on both backend and frontend - no local Node/MySQL install
+needed.
+
+1. Copy `backend/.env.example` to `backend/.env` and fill in the
+   non-DB values (JWT secrets, SMTP, Cloudinary, Gemini key) - the
+   DB_* values are overridden by `docker-compose.yml` for the
+   containerized MySQL, so leave those as-is.
+2. From the repo root:
+```bash
+docker compose up --build
+```
+Frontend: `http://localhost:5173` · Backend: `http://localhost:5000`
+· MySQL (for a host tool like Workbench, not needed by the app itself):
+`localhost:3307`.
+
+---
+
 ## Database Setup
 
 1. **Create Database**

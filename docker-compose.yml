@@ -1,0 +1,71 @@
+services:
+  mysql:
+    image: mysql:8
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: dockerpass
+      MYSQL_DATABASE: smartstudent
+    ports:
+      # Host-side 3307 avoids clashing with a MySQL already running
+      # natively on the host's 3306 - only matters for connecting a host
+      # tool (Workbench, etc.) directly to this container's DB. The
+      # backend/frontend containers talk to it over the Docker network as
+      # "mysql:3306" regardless of this mapping.
+      - "3307:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-uroot", "-pdockerpass"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  backend:
+    build: ./backend
+    restart: unless-stopped
+    ports:
+      - "5000:5000"
+    # backend/.env must exist first (copy backend/.env.example) - it
+    # supplies JWT_SECRET, SMTP, Cloudinary, and Gemini credentials. The
+    # DB_* and NODE_ENV values below are Docker-specific and deliberately
+    # override whatever's in that file, since this MySQL is a separate,
+    # isolated container - not whatever MySQL install the host might have.
+    env_file:
+      - ./backend/.env
+    environment:
+      DB_HOST: mysql
+      DB_PORT: "3306"
+      DB_USER: root
+      DB_PASSWORD: dockerpass
+      DB_NAME: smartstudent
+      DB_SSL: "false"
+      NODE_ENV: development
+      FRONTEND_URL: http://localhost:5173
+    volumes:
+      - ./backend:/app
+      - /app/node_modules
+    depends_on:
+      mysql:
+        condition: service_healthy
+
+  frontend:
+    build: ./frontend
+    restart: unless-stopped
+    ports:
+      - "5173:5173"
+    environment:
+      # Points the Vite dev proxy (vite.config.js) at the backend's
+      # container-network address rather than localhost:5000, which
+      # wouldn't resolve to anything from inside the frontend container.
+      VITE_DEV_BACKEND_URL: http://backend:5000
+      # Vite (via chokidar) respects this directly - same Windows bind-mount
+      # inotify limitation as the backend's nodemon -L, see backend/Dockerfile.
+      CHOKIDAR_USEPOLLING: "true"
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+    depends_on:
+      - backend
+
+volumes:
+  mysql_data:
