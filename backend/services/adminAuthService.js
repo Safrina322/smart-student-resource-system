@@ -2,6 +2,7 @@ import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import { AppError } from "../utils/AppError.js";
 import * as adminRepository from "../repositories/adminRepository.js";
+import { isLockedOut, nextFailedAttemptState } from "../utils/accountLockout.js";
 
 // `role: "admin"` stays a fixed generic tier for backward compatibility
 // with adminAuth.js and anything else already checking for it;
@@ -26,6 +27,10 @@ export const login = async ({ email, password }) => {
     throw new AppError("Invalid credentials", 401);
   }
 
+  if (isLockedOut(admin)) {
+    throw new AppError("Too many failed attempts. Please try again in 15 minutes.", 423);
+  }
+
   let isMatch;
   if (admin.password?.startsWith("$2")) {
     isMatch = await bcrypt.compare(password, admin.password);
@@ -40,8 +45,12 @@ export const login = async ({ email, password }) => {
   }
 
   if (!isMatch) {
+    const { attempts, lockoutUntil } = nextFailedAttemptState(admin);
+    await adminRepository.recordFailedLogin(admin.id, attempts, lockoutUntil);
     throw new AppError("Invalid credentials", 401);
   }
+
+  await adminRepository.resetLoginAttempts(admin.id);
 
   const token = signToken(admin);
   return {

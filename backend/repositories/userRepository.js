@@ -80,3 +80,18 @@ export const updateEmailNotificationSetting = async (userId, enabled) => {
     userId,
   ]);
 };
+
+export const recordFailedLogin = async (userId, attempts, lockoutUntil) => {
+  await queryAsync("UPDATE users SET failed_login_attempts = ?, lockout_until = ? WHERE id = ?", [
+    attempts,
+    lockoutUntil,
+    userId,
+  ]);
+};
+
+export const resetLoginAttempts = async (userId) => {
+  await queryAsync(
+    "UPDATE users SET failed_login_attempts = 0, lockout_until = NULL WHERE id = ?",
+    [userId]
+  );
+};

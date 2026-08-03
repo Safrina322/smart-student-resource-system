@@ -5,6 +5,8 @@ vi.mock("../repositories/userRepository.js", () => ({
   findByEmail: vi.fn(),
   createUser: vi.fn(),
   updatePassword: vi.fn(),
+  recordFailedLogin: vi.fn(),
+  resetLoginAttempts: vi.fn(),
 }));
 vi.mock("../utils/mailer.js", () => ({
   sendVerificationEmail: vi.fn().mockResolvedValue(undefined),
@@ -100,6 +102,64 @@ describe("login", () => {
     const [userId, newHash] = userRepository.updatePassword.mock.calls[0];
     expect(userId).toBe(7);
     expect(newHash.startsWith("$2")).toBe(true);
+  });
+
+  it("rejects login for an account currently locked out, even with the correct password", async () => {
+    const bcrypt = await import("bcryptjs");
+    const hashedPassword = await bcrypt.default.hash("correct-password", 10);
+    userRepository.findByUsername.mockResolvedValue({
+      id: 1,
+      username: "safrina",
+      role: "student",
+      password: hashedPassword,
+      failed_login_attempts: 0,
+      lockout_until: new Date(Date.now() + 60 * 1000),
+    });
+
+    await expect(login({ username: "safrina", password: "correct-password" })).rejects.toMatchObject({
+      statusCode: 423,
+    });
+  });
+
+  it("locks the account after the 5th consecutive failed attempt", async () => {
+    const bcrypt = await import("bcryptjs");
+    const hashedPassword = await bcrypt.default.hash("correct-password", 10);
+    userRepository.findByUsername.mockResolvedValue({
+      id: 1,
+      username: "safrina",
+      role: "student",
+      password: hashedPassword,
+      failed_login_attempts: 4,
+      lockout_until: null,
+    });
+
+    await expect(login({ username: "safrina", password: "wrong-password" })).rejects.toMatchObject({
+      statusCode: 401,
+    });
+
+    expect(userRepository.recordFailedLogin).toHaveBeenCalledTimes(1);
+    const [userId, attempts, lockoutUntil] = userRepository.recordFailedLogin.mock.calls[0];
+    expect(userId).toBe(1);
+    expect(attempts).toBe(0);
+    expect(lockoutUntil).toBeInstanceOf(Date);
+    expect(lockoutUntil.getTime()).toBeGreaterThan(Date.now());
+  });
+
+  it("resets the failed-attempt counter on a successful login", async () => {
+    const bcrypt = await import("bcryptjs");
+    const hashedPassword = await bcrypt.default.hash("correct-password", 10);
+    userRepository.findByUsername.mockResolvedValue({
+      id: 1,
+      username: "safrina",
+      role: "student",
+      password: hashedPassword,
+      failed_login_attempts: 3,
+      lockout_until: null,
+    });
+
+    await login({ username: "safrina", password: "correct-password" });
+
+    expect(userRepository.resetLoginAttempts).toHaveBeenCalledWith(1);
   });
 });
 

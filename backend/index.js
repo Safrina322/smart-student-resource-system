@@ -114,9 +114,32 @@ const corsOptions = {
 // this API/static file server (port 5000) are different origins; helmet's
 // default "same-origin" policy would block the frontend from loading
 // /images and /lesson-files.
+//
+// contentSecurityPolicy is spelled out explicitly (rather than left to
+// helmet's implicit defaults) so a future helmet upgrade can't silently
+// change what's allowed here. Most responses are JSON, where CSP has no
+// effect - the one real surface is /api/docs (Swagger UI), which loads its
+// scripts as same-origin files (script-src 'self', no inline scripts) and
+// needs style-src's 'unsafe-inline' for its injected styles - verified by
+// booting the server and inspecting /api/docs directly.
 app.use(
   helmet({
     crossOriginResourcePolicy: { policy: "cross-origin" },
+    contentSecurityPolicy: {
+      directives: {
+        defaultSrc: ["'self'"],
+        baseUri: ["'self'"],
+        formAction: ["'self'"],
+        frameAncestors: ["'self'"],
+        objectSrc: ["'none'"],
+        scriptSrc: ["'self'"],
+        scriptSrcAttr: ["'none'"],
+        styleSrc: ["'self'", "https:", "'unsafe-inline'"],
+        fontSrc: ["'self'", "https:", "data:"],
+        imgSrc: ["'self'", "data:"],
+        upgradeInsecureRequests: [],
+      },
+    },
   })
 );
 app.use(cors(corsOptions));

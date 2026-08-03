@@ -5,6 +5,7 @@ import { AppError } from "../utils/AppError.js";
 import * as userRepository from "../repositories/userRepository.js";
 import { sendVerificationEmail, sendPasswordResetEmail } from "../utils/mailer.js";
 import logger from "../utils/logger.js";
+import { isLockedOut, nextFailedAttemptState } from "../utils/accountLockout.js";
 
 const REMEMBER_ME_EXPIRY = "30d";
 const DEFAULT_EXPIRY = "1h";
@@ -55,6 +56,10 @@ export const login = async ({ username, password, rememberMe = false }) => {
     throw new AppError("Invalid username or password", 401);
   }
 
+  if (isLockedOut(user)) {
+    throw new AppError("Too many failed attempts. Please try again in 15 minutes.", 423);
+  }
+
   let isMatch;
   if (user.password?.startsWith("$2")) {
     isMatch = await bcrypt.compare(password, user.password);
@@ -69,8 +74,12 @@ export const login = async ({ username, password, rememberMe = false }) => {
   }
 
   if (!isMatch) {
+    const { attempts, lockoutUntil } = nextFailedAttemptState(user);
+    await userRepository.recordFailedLogin(user.id, attempts, lockoutUntil);
     throw new AppError("Invalid username or password", 401);
   }
+
+  await userRepository.resetLoginAttempts(user.id);
 
   const token = signToken(user, { rememberMe });
   return {
