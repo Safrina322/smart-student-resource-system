@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { getApiUrl } from "../utils/api.js";
 import "../styles/Dashboard.css";
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import PopularResources from "../components/PopularResources.jsx";
 import NotificationsPanel from "../components/NotificationsPanel.jsx";
 import { SkeletonTableRows } from "../components/Skeleton.jsx";
@@ -19,8 +19,6 @@ function Dashboard() {
   const [bookmarks, setBookmarks] = useState([]);
   const [recommendations, setRecommendations] = useState([]);
   const [recsLoading, setRecsLoading] = useState(true);
-  const token = localStorage.getItem("token");
-  const navigate = useNavigate();
 
   const fetchCourses = async () => {
     setLoading(true);
@@ -50,11 +48,9 @@ function Dashboard() {
     }
   };
 
+  // No auth check here - this page is only ever reached via ProtectedRoute,
+  // which already guarantees a logged-in session before rendering children.
   useEffect(() => {
-    if (!token) {
-      navigate("/login");
-      return;
-    }
     fetchCourses();
     fetchLearningProgress();
     listMyBookmarks()
@@ -64,7 +60,8 @@ function Dashboard() {
       .then((data) => setRecommendations(data.recommendations || []))
       .catch(() => setRecommendations([]))
       .finally(() => setRecsLoading(false));
-  }, [token, navigate]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const resolveImageUrl = (image) => {
     if (!image) return "https://via.placeholder.com/300x200?text=Course";

@@ -3,12 +3,14 @@ import { getApiUrl } from "./apiClient.js";
 
 let socket = null;
 
-export const connectSocket = (token) => {
-  if (!token) return null;
-  if (socket?.connected && socket.auth?.token === token) return socket;
+// The access token is an httpOnly cookie now, invisible to this code - the
+// browser attaches it to the handshake request automatically as long as
+// withCredentials is set, same as any other same-site request.
+export const connectSocket = () => {
+  if (socket?.connected) return socket;
 
   disconnectSocket();
-  socket = io(getApiUrl(), { auth: { token }, transports: ["websocket", "polling"] });
+  socket = io(getApiUrl(), { withCredentials: true, transports: ["websocket", "polling"] });
   return socket;
 };
 

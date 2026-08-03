@@ -1,16 +1,15 @@
 import jwt from "jsonwebtoken";
+import { ADMIN_ACCESS_TOKEN_COOKIE } from "../utils/cookies.js";
 
 // Must match the secret adminAuthService.js signs with.
 const ADMIN_JWT_SECRET = process.env.ADMIN_JWT_SECRET || process.env.JWT_SECRET;
 
 const adminAuth = (req, res, next) => {
-  const authHeader = req.headers.authorization;
+  const token = req.cookies?.[ADMIN_ACCESS_TOKEN_COOKIE];
 
-  if (!authHeader) {
+  if (!token) {
     return res.status(401).json({ message: "No token provided" });
   }
-
-  const token = authHeader.split(" ")[1];
 
   try {
     const decoded = jwt.verify(token, ADMIN_JWT_SECRET);

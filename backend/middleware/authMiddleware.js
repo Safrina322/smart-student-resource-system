@@ -1,16 +1,11 @@
 import jwt from "jsonwebtoken";
+import { ACCESS_TOKEN_COOKIE } from "../utils/cookies.js";
 
 const authMiddleware = (req, res, next) => {
-  const authHeader = req.headers.authorization;
+  const token = req.cookies?.[ACCESS_TOKEN_COOKIE];
 
-  if (!authHeader) {
+  if (!token) {
     return res.status(401).json({ message: "No token provided" });
-  }
-
-  const [scheme, token] = authHeader.split(" ");
-
-  if (scheme !== "Bearer" || !token) {
-    return res.status(401).json({ message: "Malformed token" });
   }
 
   try {

@@ -3,10 +3,12 @@ import { useNavigate } from "react-router-dom";
 import { listMyRequests, submitRequest } from "../services/requestService.js";
 import { notify } from "../utils/notify.js";
 import { Skeleton } from "../components/Skeleton.jsx";
+import { useAuth } from "../hooks/useAuth.js";
 import "../styles/UploadResource.css";
 
 function RequestResource() {
   const navigate = useNavigate();
+  const { logout } = useAuth();
   const [imageFile, setImageFile] = useState(null);
   const [formData, setFormData] = useState({
     title: "",
@@ -38,13 +40,13 @@ function RequestResource() {
       normalizedMessage.includes("invalid token") ||
       normalizedMessage.includes("token expired") ||
       normalizedMessage.includes("no token provided") ||
+      normalizedMessage.includes("session to refresh") ||
+      normalizedMessage.includes("session expired") ||
       normalizedMessage.includes("malformed token");
 
     if (isAuthError) {
-      localStorage.removeItem("token");
-      localStorage.removeItem("userName");
       notify.error("Session expired. Please login again.");
-      setTimeout(() => navigate("/user/login"), 700);
+      logout().finally(() => setTimeout(() => navigate("/user/login"), 700));
       return true;
     }
 

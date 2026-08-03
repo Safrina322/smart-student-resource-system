@@ -8,7 +8,6 @@ import {
   HiOutlineChatBubbleLeftRight,
 } from "react-icons/hi2";
 import { useAuth } from "../hooks/useAuth.js";
-import { parseJwtPayload } from "../utils/jwt.js";
 import StarRating from "../components/StarRating.jsx";
 import ResourceAIPanel from "../components/ResourceAIPanel.jsx";
 import {
@@ -93,11 +92,7 @@ function ResourceDetailPage() {
   const [newComment, setNewComment] = useState("");
   const [rating, setRating] = useState({ average: 0, count: 0, myRating: null });
   const [bookmarked, setBookmarked] = useState(false);
-
-  const currentUserId = (() => {
-    const token = localStorage.getItem("token");
-    return token ? parseJwtPayload(token)?.id : null;
-  })();
+  const currentUserId = user?.id ?? null;
 
   const loadAll = useCallback(async () => {
     setLoading(true);

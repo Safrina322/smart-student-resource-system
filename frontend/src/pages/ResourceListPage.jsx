@@ -10,6 +10,7 @@ import { listCourses } from "../services/courseService.js";
 import { searchAssist } from "../services/aiService.js";
 import { notify } from "../utils/notify.js";
 import { SkeletonCard } from "../components/Skeleton.jsx";
+import { useAuth } from "../hooks/useAuth.js";
 import "../styles/Resources.css";
 import "../styles/ResourceAIPanel.css";
 
@@ -34,6 +35,7 @@ const FALLBACK_IMAGE =
 
 function ResourceListPage() {
   const navigate = useNavigate();
+  const { isAdminAuthenticated, logout } = useAuth();
   const [courses, setCourses] = useState([]);
   const [loading, setLoading] = useState(true);
   const [courseError, setCourseError] = useState("");
@@ -111,31 +113,6 @@ function ResourceListPage() {
     }
   };
 
-  const getSessionContext = () => {
-    const adminToken = localStorage.getItem("adminToken");
-    if (adminToken) {
-      return {
-        tokenType: "adminToken",
-        loginPath: "/admin/login",
-        clearSession: () => {
-          localStorage.removeItem("adminToken");
-          localStorage.removeItem("adminName");
-          localStorage.removeItem("adminEmail");
-        },
-      };
-    }
-
-    return {
-      tokenType: "token",
-      loginPath: "/login",
-      clearSession: () => {
-        localStorage.removeItem("token");
-        localStorage.removeItem("userName");
-        localStorage.removeItem("user");
-      },
-    };
-  };
-
   const isAuthError = (message) => {
     const normalizedMessage = (message || "").toLowerCase();
     return (
@@ -154,15 +131,15 @@ function ResourceListPage() {
   const fetchAllData = async () => {
     setLoading(true);
     setCourseError("");
-    const session = getSessionContext();
     try {
       const data = await listCourses();
       setCourses(data || []);
     } catch (err) {
       const message = getErrorMessage(err, "Failed to load courses");
       if (isAuthError(message)) {
-        session.clearSession();
-        navigate(session.loginPath);
+        const loginPath = isAdminAuthenticated ? "/admin/login" : "/login";
+        await logout();
+        navigate(loginPath);
         return;
       }
 

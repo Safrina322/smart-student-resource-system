@@ -1,34 +1,30 @@
 import { Navigate } from "react-router-dom";
-import { isTokenExpired, parseJwtPayload } from "../utils/jwt.js";
 import { useAuth } from "../hooks/useAuth.js";
+import PageLoader from "./PageLoader.jsx";
 
 // allowRoles restricts a logged-in student-side session (student/lecturer/
 // moderator) to specific roles, e.g. allowRoles={["lecturer"]}. Omit it for
 // routes any logged-in student-side role can reach.
 function ProtectedRoute({ children, allowAdmin = false, allowRoles = null }) {
-  const { logout } = useAuth();
-  const userToken = localStorage.getItem("token");
-  const adminToken = localStorage.getItem("adminToken");
+  const { user, authLoading, isAuthenticated, isAdminAuthenticated } = useAuth();
 
-  if (userToken && !isTokenExpired(userToken)) {
-    if (allowRoles) {
-      const role = parseJwtPayload(userToken)?.role;
-      if (!allowRoles.includes(role)) {
-        return <Navigate to="/dashboard" />;
-      }
+  // Session state comes from an initial /me bootstrap call (httpOnly
+  // cookies can't be read/checked client-side) - redirecting before that
+  // resolves would bounce a genuinely logged-in user to the login page on
+  // every page load.
+  if (authLoading) {
+    return <PageLoader />;
+  }
+
+  if (isAuthenticated) {
+    if (allowRoles && !allowRoles.includes(user?.role)) {
+      return <Navigate to="/dashboard" />;
     }
     return children;
   }
 
-  if (allowAdmin && adminToken && !isTokenExpired(adminToken)) {
+  if (allowAdmin && isAdminAuthenticated) {
     return children;
-  }
-
-  const hasExpiredToken =
-    (userToken && isTokenExpired(userToken)) || (allowAdmin && adminToken && isTokenExpired(adminToken));
-
-  if (hasExpiredToken) {
-    logout();
   }
 
   return <Navigate to={allowAdmin ? "/admin/login" : "/login"} />;

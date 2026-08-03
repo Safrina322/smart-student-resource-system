@@ -4,6 +4,7 @@ import { getApiUrl } from "../utils/api";
 import { getCourse, getCourseLessons } from "../services/courseService.js";
 import { trackAccess } from "../services/learningProgressService.js";
 import { trackEvent } from "../services/analyticsService.js";
+import { useAuth } from "../hooks/useAuth.js";
 import "../styles/Resources.css";
 
 function buildLearningPlan(course) {
@@ -40,6 +41,7 @@ function buildLearningPlan(course) {
 
 function CourseLearningPage() {
   const { id } = useParams();
+  const { isAuthenticated } = useAuth();
   const [course, setCourse] = useState(null);
   const [lessons, setLessons] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -57,15 +59,15 @@ function CourseLearningPage() {
         setCourse(courseData);
         setLessons(Array.isArray(lessonData) ? lessonData : []);
 
-        // Track course access for continue learning + popularity
-        const token = localStorage.getItem("token");
-        if (token) {
-          // Track in user learning progress
+        // Track course access for continue learning + popularity. This
+        // route is reachable both logged-in (/resources/:id) and logged-out
+        // (/course/:id), so tracking is gated on an actual session rather
+        // than assumed.
+        if (isAuthenticated) {
           trackAccess(Number(id)).catch(() => {
             // Silently ignore tracking errors
           });
 
-          // Track as analytics event for popularity ranking
           trackEvent({
             eventType: "course_access",
             courseId: Number(id),
@@ -82,7 +84,7 @@ function CourseLearningPage() {
     };
 
     fetchCourse();
-  }, [id]);
+  }, [id, isAuthenticated]);
 
   const learningPlan = useMemo(() => {
     if (!course) return [];
@@ -106,8 +108,7 @@ function CourseLearningPage() {
   };
 
   const trackResourceOpen = (lesson) => {
-    const token = localStorage.getItem("token");
-    if (!token) return;
+    if (!isAuthenticated) return;
 
     trackEvent({
       eventType: "resource_open",

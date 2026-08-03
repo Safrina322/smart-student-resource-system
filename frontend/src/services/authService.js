@@ -15,6 +15,21 @@ export const loginAdmin = async ({ email, password }) => {
   return data;
 };
 
+export const logoutUser = async () => {
+  const { data } = await apiClient.post("/api/auth/logout");
+  return data;
+};
+
+export const logoutAdmin = async () => {
+  const { data } = await apiClient.post("/api/admin/logout");
+  return data;
+};
+
+export const getMyAdminProfile = async () => {
+  const { data } = await apiClient.get("/api/admin/me");
+  return data;
+};
+
 export const verifyEmail = async (token) => {
   const { data } = await apiClient.get(`/api/auth/verify-email/${token}`);
   return data;

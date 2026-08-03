@@ -1,13 +1,15 @@
 import { Navigate } from "react-router-dom";
-import { isTokenExpired } from "../utils/jwt.js";
 import { useAuth } from "../hooks/useAuth.js";
+import PageLoader from "./PageLoader.jsx";
 
 function ProtectedAdminRoute({ children }) {
-  const { logout } = useAuth();
-  const token = localStorage.getItem("adminToken");
+  const { authLoading, isAdminAuthenticated } = useAuth();
 
-  if (!token || isTokenExpired(token)) {
-    logout();
+  if (authLoading) {
+    return <PageLoader />;
+  }
+
+  if (!isAdminAuthenticated) {
     return <Navigate to="/admin/login" />;
   }
 

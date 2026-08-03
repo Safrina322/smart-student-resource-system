@@ -5,6 +5,11 @@ export const findByEmail = async (email) => {
   return rows[0] || null;
 };
 
+export const findById = async (id) => {
+  const rows = await queryAsync("SELECT * FROM admin WHERE id = ?", [id]);
+  return rows[0] || null;
+};
+
 export const updatePassword = async (adminId, hashedPassword) => {
   await queryAsync("UPDATE admin SET password = ? WHERE id = ?", [hashedPassword, adminId]);
 };

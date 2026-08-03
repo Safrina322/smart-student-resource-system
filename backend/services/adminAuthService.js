@@ -1,7 +1,9 @@
+import crypto from "crypto";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import { AppError } from "../utils/AppError.js";
 import * as adminRepository from "../repositories/adminRepository.js";
+import * as refreshTokenRepository from "../repositories/refreshTokenRepository.js";
 import { isLockedOut, nextFailedAttemptState } from "../utils/accountLockout.js";
 
 // `role: "admin"` stays a fixed generic tier for backward compatibility
@@ -14,12 +16,39 @@ import { isLockedOut, nextFailedAttemptState } from "../utils/accountLockout.js"
 // so this can roll out without breaking a deployment that hasn't set it yet.
 const ADMIN_JWT_SECRET = process.env.ADMIN_JWT_SECRET || process.env.JWT_SECRET;
 
-const signToken = (admin) =>
+const ACCESS_TOKEN_EXPIRY = "15m";
+const REFRESH_TOKEN_MAX_AGE_MS = 7 * 24 * 60 * 60 * 1000;
+
+const signAccessToken = (admin) =>
   jwt.sign(
     { adminId: admin.id, role: "admin", adminRole: admin.role || "sysadmin" },
     ADMIN_JWT_SECRET,
-    { expiresIn: "1d" }
+    { expiresIn: ACCESS_TOKEN_EXPIRY }
   );
+
+const generateToken = () => crypto.randomBytes(32).toString("hex");
+
+const issueSession = async (admin) => {
+  const accessToken = signAccessToken(admin);
+  const refreshToken = generateToken();
+  const expiresAt = new Date(Date.now() + REFRESH_TOKEN_MAX_AGE_MS);
+
+  await refreshTokenRepository.create({
+    accountType: "admin",
+    accountId: admin.id,
+    tokenHash: refreshTokenRepository.hashToken(refreshToken),
+    expiresAt,
+  });
+
+  return { accessToken, refreshToken, refreshMaxAgeMs: REFRESH_TOKEN_MAX_AGE_MS };
+};
+
+const toPublicAdmin = (admin) => ({
+  id: admin.id,
+  name: admin.name,
+  email: admin.email,
+  role: admin.role || "sysadmin",
+});
 
 export const login = async ({ email, password }) => {
   const admin = await adminRepository.findByEmail(email);
@@ -52,9 +81,59 @@ export const login = async ({ email, password }) => {
 
   await adminRepository.resetLoginAttempts(admin.id);
 
-  const token = signToken(admin);
+  const session = await issueSession(admin);
   return {
-    token,
-    admin: { id: admin.id, name: admin.name, email: admin.email, role: admin.role || "sysadmin" },
+    ...session,
+    admin: toPublicAdmin(admin),
   };
+};
+
+export const refreshSession = async (refreshTokenRaw) => {
+  if (!refreshTokenRaw) {
+    throw new AppError("No session to refresh", 401);
+  }
+
+  const tokenHash = refreshTokenRepository.hashToken(refreshTokenRaw);
+  const record = await refreshTokenRepository.findValid(tokenHash);
+  if (!record || record.account_type !== "admin") {
+    throw new AppError("Session expired. Please log in again.", 401);
+  }
+
+  await refreshTokenRepository.revoke(tokenHash);
+
+  const admin = await adminRepository.findById(record.account_id);
+  if (!admin) {
+    throw new AppError("Session expired. Please log in again.", 401);
+  }
+
+  const accessToken = signAccessToken(admin);
+  const refreshToken = generateToken();
+  const refreshMaxAgeMs = Math.max(new Date(record.expires_at).getTime() - Date.now(), 0);
+
+  await refreshTokenRepository.create({
+    accountType: "admin",
+    accountId: admin.id,
+    tokenHash: refreshTokenRepository.hashToken(refreshToken),
+    expiresAt: record.expires_at,
+  });
+
+  return {
+    accessToken,
+    refreshToken,
+    refreshMaxAgeMs,
+    admin: toPublicAdmin(admin),
+  };
+};
+
+export const logoutAdmin = async (refreshTokenRaw) => {
+  if (!refreshTokenRaw) return;
+  await refreshTokenRepository.revoke(refreshTokenRepository.hashToken(refreshTokenRaw));
+};
+
+export const getAdminProfile = async (adminId) => {
+  const admin = await adminRepository.findById(adminId);
+  if (!admin) {
+    throw new AppError("Admin not found", 404);
+  }
+  return toPublicAdmin(admin);
 };

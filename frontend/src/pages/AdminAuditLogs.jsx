@@ -1,23 +1,19 @@
 import { useEffect, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { listAuditLogs } from "../services/adminAuditService.js";
 import { SkeletonTableRows } from "../components/Skeleton.jsx";
 import "../styles/AdminAuditLogs.css";
 
 function AdminAuditLogs() {
-  const navigate = useNavigate();
   const [logs, setLogs] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
+  // No auth check here - this page is only ever reached via
+  // ProtectedAdminRoute, which already guarantees an active admin session.
   useEffect(() => {
-    const token = localStorage.getItem("adminToken");
-    if (!token) {
-      navigate("/admin/login");
-      return;
-    }
     fetchLogs();
-  }, [navigate]);
+  }, []);
 
   const fetchLogs = async () => {
     setLoading(true);

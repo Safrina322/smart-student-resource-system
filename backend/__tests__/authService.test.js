@@ -3,10 +3,18 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 vi.mock("../repositories/userRepository.js", () => ({
   findByUsername: vi.fn(),
   findByEmail: vi.fn(),
+  findById: vi.fn(),
   createUser: vi.fn(),
   updatePassword: vi.fn(),
   recordFailedLogin: vi.fn(),
   resetLoginAttempts: vi.fn(),
+}));
+vi.mock("../repositories/refreshTokenRepository.js", () => ({
+  hashToken: vi.fn((raw) => `hashed:${raw}`),
+  create: vi.fn(),
+  findValid: vi.fn(),
+  revoke: vi.fn(),
+  revokeAllForAccount: vi.fn(),
 }));
 vi.mock("../utils/mailer.js", () => ({
   sendVerificationEmail: vi.fn().mockResolvedValue(undefined),
@@ -16,7 +24,10 @@ vi.mock("../utils/mailer.js", () => ({
 process.env.JWT_SECRET ||= "test-secret";
 
 const userRepository = await import("../repositories/userRepository.js");
-const { register, login, requestPasswordReset } = await import("../services/authService.js");
+const refreshTokenRepository = await import("../repositories/refreshTokenRepository.js");
+const { register, login, refreshSession, logoutUser, requestPasswordReset } = await import(
+  "../services/authService.js"
+);
 
 beforeEach(() => {
   vi.clearAllMocks();
@@ -72,7 +83,7 @@ describe("login", () => {
     });
   });
 
-  it("logs in successfully and returns a signed token for a correct password", async () => {
+  it("logs in successfully and returns a signed access token plus a stored refresh token", async () => {
     const bcrypt = await import("bcryptjs");
     const hashedPassword = await bcrypt.default.hash("correct-password", 10);
     userRepository.findByUsername.mockResolvedValue({
@@ -84,8 +95,35 @@ describe("login", () => {
 
     const result = await login({ username: "safrina", password: "correct-password" });
 
-    expect(result.token).toEqual(expect.any(String));
+    expect(result.accessToken).toEqual(expect.any(String));
+    expect(result.refreshToken).toEqual(expect.any(String));
     expect(result.user).toEqual({ id: 42, username: "safrina", role: "student" });
+
+    expect(refreshTokenRepository.create).toHaveBeenCalledTimes(1);
+    const call = refreshTokenRepository.create.mock.calls[0][0];
+    expect(call.accountType).toBe("user");
+    expect(call.accountId).toBe(42);
+    expect(call.tokenHash).toBe(`hashed:${result.refreshToken}`);
+  });
+
+  it("issues a 30-day refresh window when rememberMe is set, 7 days otherwise", async () => {
+    const bcrypt = await import("bcryptjs");
+    const hashedPassword = await bcrypt.default.hash("correct-password", 10);
+    userRepository.findByUsername.mockResolvedValue({
+      id: 42,
+      username: "safrina",
+      role: "student",
+      password: hashedPassword,
+    });
+
+    const withoutRememberMe = await login({ username: "safrina", password: "correct-password" });
+    const withRememberMe = await login({
+      username: "safrina",
+      password: "correct-password",
+      rememberMe: true,
+    });
+
+    expect(withRememberMe.refreshMaxAgeMs).toBeGreaterThan(withoutRememberMe.refreshMaxAgeMs);
   });
 
   it("transparently upgrades a legacy plaintext password to a bcrypt hash on successful login", async () => {
@@ -160,6 +198,66 @@ describe("login", () => {
     await login({ username: "safrina", password: "correct-password" });
 
     expect(userRepository.resetLoginAttempts).toHaveBeenCalledWith(1);
+  });
+});
+
+describe("refreshSession", () => {
+  it("rejects when no refresh token is provided", async () => {
+    await expect(refreshSession(undefined)).rejects.toMatchObject({ statusCode: 401 });
+  });
+
+  it("rejects an unknown, expired, or already-revoked refresh token", async () => {
+    refreshTokenRepository.findValid.mockResolvedValue(null);
+
+    await expect(refreshSession("some-raw-token")).rejects.toMatchObject({ statusCode: 401 });
+  });
+
+  it("rotates the refresh token: revokes the old one and issues a new access + refresh token", async () => {
+    const originalExpiry = new Date(Date.now() + 3 * 24 * 60 * 60 * 1000);
+    refreshTokenRepository.findValid.mockResolvedValue({
+      account_type: "user",
+      account_id: 42,
+      token_hash: "hashed:old-raw-token",
+      expires_at: originalExpiry,
+    });
+    userRepository.findById.mockResolvedValue({ id: 42, username: "safrina", role: "student" });
+
+    const result = await refreshSession("old-raw-token");
+
+    expect(refreshTokenRepository.revoke).toHaveBeenCalledWith("hashed:old-raw-token");
+    expect(result.accessToken).toEqual(expect.any(String));
+    expect(result.refreshToken).toEqual(expect.any(String));
+    expect(result.refreshToken).not.toBe("old-raw-token");
+    expect(result.user).toEqual({ id: 42, username: "safrina", role: "student" });
+
+    // Preserves the ORIGINAL absolute expiry rather than resetting a fresh
+    // full-length window on every refresh.
+    const createCall = refreshTokenRepository.create.mock.calls.at(-1)[0];
+    expect(createCall.expiresAt).toBe(originalExpiry);
+  });
+
+  it("rejects if the account behind a valid refresh token no longer exists", async () => {
+    refreshTokenRepository.findValid.mockResolvedValue({
+      account_type: "user",
+      account_id: 999,
+      token_hash: "hashed:raw-token",
+      expires_at: new Date(Date.now() + 1000),
+    });
+    userRepository.findById.mockResolvedValue(null);
+
+    await expect(refreshSession("raw-token")).rejects.toMatchObject({ statusCode: 401 });
+  });
+});
+
+describe("logoutUser", () => {
+  it("revokes the refresh token when one is provided", async () => {
+    await logoutUser("some-raw-token");
+    expect(refreshTokenRepository.revoke).toHaveBeenCalledWith("hashed:some-raw-token");
+  });
+
+  it("does nothing when no refresh token is provided", async () => {
+    await logoutUser(undefined);
+    expect(refreshTokenRepository.revoke).not.toHaveBeenCalled();
   });
 });
 

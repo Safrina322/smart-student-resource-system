@@ -1,4 +1,10 @@
 import * as authService from "../services/authService.js";
+import {
+  ACCESS_TOKEN_COOKIE,
+  REFRESH_TOKEN_COOKIE,
+  setSessionCookies,
+  clearAllSessionCookies,
+} from "../utils/cookies.js";
 
 export const register = async (req, res) => {
   await authService.register(req.body);
@@ -6,8 +12,40 @@ export const register = async (req, res) => {
 };
 
 export const login = async (req, res) => {
-  const result = await authService.login(req.body);
-  res.json({ message: "Login successful", ...result });
+  const { accessToken, refreshToken, refreshMaxAgeMs, user } = await authService.login(req.body);
+
+  clearAllSessionCookies(res);
+  setSessionCookies(res, {
+    accessCookieName: ACCESS_TOKEN_COOKIE,
+    refreshCookieName: REFRESH_TOKEN_COOKIE,
+    accessToken,
+    refreshToken,
+    refreshMaxAgeMs,
+  });
+
+  res.json({ message: "Login successful", user });
+};
+
+export const refresh = async (req, res) => {
+  const { accessToken, refreshToken, refreshMaxAgeMs, user } = await authService.refreshSession(
+    req.cookies?.[REFRESH_TOKEN_COOKIE]
+  );
+
+  setSessionCookies(res, {
+    accessCookieName: ACCESS_TOKEN_COOKIE,
+    refreshCookieName: REFRESH_TOKEN_COOKIE,
+    accessToken,
+    refreshToken,
+    refreshMaxAgeMs,
+  });
+
+  res.json({ message: "Session refreshed", user });
+};
+
+export const logout = async (req, res) => {
+  await authService.logoutUser(req.cookies?.[REFRESH_TOKEN_COOKIE]);
+  clearAllSessionCookies(res);
+  res.json({ message: "Logged out" });
 };
 
 export const verifyEmail = async (req, res) => {

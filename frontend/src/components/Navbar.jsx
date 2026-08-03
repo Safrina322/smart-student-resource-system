@@ -27,8 +27,8 @@ function Navbar() {
   const adminName = admin?.name || "";
   const role = user?.role || "student";
 
-  const handleLogout = () => {
-    logout();
+  const handleLogout = async () => {
+    await logout();
     setProfileDropdown(false);
     navigate("/");
   };

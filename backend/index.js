@@ -6,6 +6,8 @@ import cors from "cors";
 import helmet from "helmet";
 import dotenv from "dotenv";
 import bcrypt from "bcryptjs";
+import cookieParser from "cookie-parser";
+import { parseCookie as parseCookieHeader } from "cookie";
 import pinoHttp from "pino-http";
 import swaggerUi from "swagger-ui-express";
 import { generateOpenApiDocument } from "./openapi/document.js";
@@ -13,6 +15,8 @@ import db, { queryAsync } from "./db.js";
 import { runMigrations } from "./migrations/runner.js";
 import { setIo } from "./utils/socket.js";
 import logger from "./utils/logger.js";
+import { ACCESS_TOKEN_COOKIE } from "./utils/cookies.js";
+import { ensureCsrfCookie, csrfProtection } from "./middleware/csrf.js";
 import authRoutes from "./routes/authRoutes.js";
 import courseRoutes from "./routes/courseRoutes.js";
 import adminCourseRoutes from "./routes/adminCourseRoutes.js";
@@ -106,9 +110,11 @@ const corsOptions = {
     if (!isProduction && /^http:\/\/localhost:\d+$/.test(origin)) return callback(null, true);
     callback(new Error(`Not allowed by CORS: ${origin}`));
   },
-  credentials: false,
+  // Cookies must ride along on cross-origin requests for the httpOnly
+  // access/refresh-token cookies to work at all.
+  credentials: true,
   methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
-  allowedHeaders: ["Content-Type", "Authorization"],
+  allowedHeaders: ["Content-Type", "Authorization", "X-CSRF-Token"],
 };
 // crossOriginResourcePolicy is relaxed because the frontend (port 5173) and
 // this API/static file server (port 5000) are different origins; helmet's
@@ -144,6 +150,9 @@ app.use(
 );
 app.use(cors(corsOptions));
 app.use(pinoHttp({ logger }));
+app.use(cookieParser());
+app.use(ensureCsrfCookie);
+app.use(csrfProtection);
 
 startReportScheduler();
 
@@ -220,14 +229,24 @@ app.use((err, req, res, next) => {
 const httpServer = http.createServer(app);
 
 const io = new Server(httpServer, {
-  cors: { origin: corsOptions.origin, credentials: false },
+  cors: { origin: corsOptions.origin, credentials: true },
 });
 
 // Only student-side (users table) tokens are accepted - notifications are
 // only ever addressed to users.id right now, so there's nothing for an
 // admin-token connection to subscribe to.
+//
+// The access token is an httpOnly cookie now, invisible to client-side JS,
+// so it can't be handed to socket.io as `auth: { token }` like before - the
+// client instead connects with `withCredentials: true` and the cookie
+// rides along on the handshake's HTTP request automatically, same as any
+// other same-site request. Parsed here from the raw Cookie header since
+// socket.io's handshake doesn't run through Express's cookie-parser.
 io.use((socket, next) => {
-  const token = socket.handshake.auth?.token;
+  const cookieHeader = socket.handshake.headers.cookie;
+  if (!cookieHeader) return next(new Error("Unauthorized"));
+
+  const token = parseCookieHeader(cookieHeader)[ACCESS_TOKEN_COOKIE];
   if (!token) return next(new Error("Unauthorized"));
 
   try {

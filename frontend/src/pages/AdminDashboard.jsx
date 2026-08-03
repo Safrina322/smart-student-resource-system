@@ -14,10 +14,11 @@ import {
   downloadReport,
 } from "../services/adminAnalyticsService.js";
 import { notify } from "../utils/notify.js";
+import { useAuth } from "../hooks/useAuth.js";
 
 function AdminDashboard() {
   const navigate = useNavigate();
-  const [adminName, setAdminName] = useState("");
+  const { admin, logout } = useAuth();
   const [heroImageError, setHeroImageError] = useState(false);
   const [reportDays, setReportDays] = useState("30");
   const [reportLoading, setReportLoading] = useState(false);
@@ -46,49 +47,28 @@ function AdminDashboard() {
     topSubjects: [],
   });
 
-  const buildAdminDisplayName = (name, email) => {
-    const cleanedName = (name || "").trim();
-    if (cleanedName && cleanedName.toLowerCase() !== "admin user") {
-      return cleanedName;
-    }
-
-    const mail = (email || "").trim().toLowerCase();
-    if (mail.includes("@")) {
-      return mail.split("@")[0];
-    }
-
-    return cleanedName || "Admin";
-  };
-
+  // No auth check here - this page is only ever reached via
+  // ProtectedAdminRoute, which already guarantees an active admin session.
   useEffect(() => {
-    const token = localStorage.getItem("adminToken");
-    const name = localStorage.getItem("adminName");
-    const adminEmail = localStorage.getItem("adminEmail");
+    getSummary()
+      .then((data) => {
+        setSummary(data || {});
+      })
+      .catch(() => {
+        // Keep fallback stats if summary fails.
+      });
 
-    if (!token) {
-      navigate("/admin/login");
-    } else {
-      setAdminName(buildAdminDisplayName(name, adminEmail));
+    getTrends()
+      .then((data) => {
+        setTrends(data || {});
+      })
+      .catch(() => {
+        // Keep fallback chart state if trend call fails.
+      });
 
-      getSummary()
-        .then((data) => {
-          setSummary(data || {});
-        })
-        .catch(() => {
-          // Keep fallback stats if summary fails.
-        });
-
-      getTrends()
-        .then((data) => {
-          setTrends(data || {});
-        })
-        .catch(() => {
-          // Keep fallback chart state if trend call fails.
-        });
-
-      loadReportHistory();
-      loadReportSchedule();
-    }
+    loadReportHistory();
+    loadReportSchedule();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const loadReportHistory = async () => {
@@ -123,13 +103,8 @@ function AdminDashboard() {
     }
   };
 
-  const handleLogout = () => {
-    localStorage.removeItem("adminToken");
-    localStorage.removeItem("adminName");
-    localStorage.removeItem("adminEmail");
-    localStorage.removeItem("token");
-    localStorage.removeItem("userName");
-    localStorage.removeItem("user");
+  const handleLogout = async () => {
+    await logout();
     navigate("/admin/login");
   };
 
@@ -137,12 +112,6 @@ function AdminDashboard() {
     setReportLoading(true);
 
     try {
-      const token = localStorage.getItem("adminToken");
-      if (!token) {
-        navigate("/admin/login");
-        return;
-      }
-
       const response = await downloadReport(reportDays);
       const downloadUrl = window.URL.createObjectURL(response.data);
       const link = document.createElement("a");
@@ -220,7 +189,7 @@ function AdminDashboard() {
 
         <div className="admin-hero-content">
           <p className="admin-eyebrow">Control Center</p>
-          <h2 className="admin-title">Welcome, {adminName}</h2>
+          <h2 className="admin-title">Welcome, {admin?.name || "Admin"}</h2>
           <p className="admin-subtitle">
             Review requests, publish courses, and keep your learning platform active.
           </p>

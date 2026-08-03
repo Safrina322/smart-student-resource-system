@@ -33,6 +33,22 @@ registerRoute({
 });
 
 registerRoute({
+  method: "post",
+  path: "/api/auth/refresh",
+  tags,
+  summary: "Rotate the refresh-token cookie for a new short-lived access token",
+  security: [],
+});
+
+registerRoute({
+  method: "post",
+  path: "/api/auth/logout",
+  tags,
+  summary: "Revoke the current refresh token and clear session cookies",
+  security: [],
+});
+
+registerRoute({
   method: "get",
   path: "/api/auth/verify-email/{token}",
   tags,
@@ -118,4 +134,28 @@ registerRoute({
   summary: "Log in as an admin (dept_admin or sysadmin)",
   security: [],
   schema: adminLoginSchema,
+});
+
+registerRoute({
+  method: "post",
+  path: "/api/admin/refresh",
+  tags,
+  summary: "Rotate the admin refresh-token cookie for a new short-lived access token",
+  security: [],
+});
+
+registerRoute({
+  method: "post",
+  path: "/api/admin/logout",
+  tags,
+  summary: "Revoke the current admin refresh token and clear session cookies",
+  security: [],
+});
+
+registerRoute({
+  method: "get",
+  path: "/api/admin/me",
+  tags,
+  summary: "Get the logged-in admin's profile",
+  security: [{ adminAuth: [] }],
 });

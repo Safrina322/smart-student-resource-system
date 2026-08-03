@@ -20,6 +20,8 @@ const router = express.Router();
 
 router.post("/register", authLimiter, validate(registerSchema), asyncHandler(authController.register));
 router.post("/login", authLimiter, validate(loginSchema), asyncHandler(authController.login));
+router.post("/refresh", authLimiter, asyncHandler(authController.refresh));
+router.post("/logout", asyncHandler(authController.logout));
 
 router.get(
   "/verify-email/:token",

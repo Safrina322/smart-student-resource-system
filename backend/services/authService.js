@@ -3,20 +3,44 @@ import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import { AppError } from "../utils/AppError.js";
 import * as userRepository from "../repositories/userRepository.js";
+import * as refreshTokenRepository from "../repositories/refreshTokenRepository.js";
 import { sendVerificationEmail, sendPasswordResetEmail } from "../utils/mailer.js";
 import logger from "../utils/logger.js";
 import { isLockedOut, nextFailedAttemptState } from "../utils/accountLockout.js";
 
-const REMEMBER_ME_EXPIRY = "30d";
-const DEFAULT_EXPIRY = "1h";
+// Access tokens are short-lived by design - they're the one credential a
+// stolen cookie value could be replayed with, so keeping the window small
+// limits the damage. "Remember me" now controls the refresh token's
+// lifetime instead, not the access token's.
+const ACCESS_TOKEN_EXPIRY = "15m";
+const REFRESH_TOKEN_MAX_AGE_MS = 7 * 24 * 60 * 60 * 1000;
+const REMEMBER_ME_REFRESH_MAX_AGE_MS = 30 * 24 * 60 * 60 * 1000;
 const RESET_TOKEN_TTL_MS = 60 * 60 * 1000; // 1 hour
 
-const signToken = (user, { rememberMe = false } = {}) =>
+const signAccessToken = (user) =>
   jwt.sign({ id: user.id, role: user.role }, process.env.JWT_SECRET, {
-    expiresIn: rememberMe ? REMEMBER_ME_EXPIRY : DEFAULT_EXPIRY,
+    expiresIn: ACCESS_TOKEN_EXPIRY,
   });
 
 const generateToken = () => crypto.randomBytes(32).toString("hex");
+
+// Issues a fresh access token + a new, hashed-and-stored refresh token for
+// a user. Shared by both login and refresh so the two paths can't drift.
+const issueSession = async (user, { rememberMe = false } = {}) => {
+  const accessToken = signAccessToken(user);
+  const refreshToken = generateToken();
+  const refreshMaxAgeMs = rememberMe ? REMEMBER_ME_REFRESH_MAX_AGE_MS : REFRESH_TOKEN_MAX_AGE_MS;
+  const expiresAt = new Date(Date.now() + refreshMaxAgeMs);
+
+  await refreshTokenRepository.create({
+    accountType: "user",
+    accountId: user.id,
+    tokenHash: refreshTokenRepository.hashToken(refreshToken),
+    expiresAt,
+  });
+
+  return { accessToken, refreshToken, refreshMaxAgeMs };
+};
 
 const toPublicProfile = (user) => ({
   id: user.id,
@@ -81,11 +105,59 @@ export const login = async ({ username, password, rememberMe = false }) => {
 
   await userRepository.resetLoginAttempts(user.id);
 
-  const token = signToken(user, { rememberMe });
+  const session = await issueSession(user, { rememberMe });
   return {
-    token,
+    ...session,
     user: { id: user.id, username: user.username, role: user.role },
   };
+};
+
+// Rotates the refresh token on every use (old one revoked, new one issued)
+// so a stolen-then-replayed refresh token is only usable once - the
+// legitimate owner's next refresh attempt would fail, which is a visible
+// signal something is wrong, rather than a silently-shared valid token.
+// Preserves the ORIGINAL absolute expiry rather than extending it on each
+// refresh, so a session can't be kept alive forever just by staying active.
+export const refreshSession = async (refreshTokenRaw) => {
+  if (!refreshTokenRaw) {
+    throw new AppError("No session to refresh", 401);
+  }
+
+  const tokenHash = refreshTokenRepository.hashToken(refreshTokenRaw);
+  const record = await refreshTokenRepository.findValid(tokenHash);
+  if (!record) {
+    throw new AppError("Session expired. Please log in again.", 401);
+  }
+
+  await refreshTokenRepository.revoke(tokenHash);
+
+  const user = await userRepository.findById(record.account_id);
+  if (!user) {
+    throw new AppError("Session expired. Please log in again.", 401);
+  }
+
+  const accessToken = signAccessToken(user);
+  const refreshToken = generateToken();
+  const refreshMaxAgeMs = Math.max(new Date(record.expires_at).getTime() - Date.now(), 0);
+
+  await refreshTokenRepository.create({
+    accountType: "user",
+    accountId: user.id,
+    tokenHash: refreshTokenRepository.hashToken(refreshToken),
+    expiresAt: record.expires_at,
+  });
+
+  return {
+    accessToken,
+    refreshToken,
+    refreshMaxAgeMs,
+    user: { id: user.id, username: user.username, role: user.role },
+  };
+};
+
+export const logoutUser = async (refreshTokenRaw) => {
+  if (!refreshTokenRaw) return;
+  await refreshTokenRepository.revoke(refreshTokenRepository.hashToken(refreshTokenRaw));
 };
 
 export const verifyEmail = async (token) => {
@@ -143,6 +215,7 @@ export const resetPassword = async ({ token, newPassword }) => {
   const hashedPassword = await bcrypt.hash(newPassword, 10);
   await userRepository.updatePassword(user.id, hashedPassword);
   await userRepository.clearPasswordResetToken(user.id);
+  await refreshTokenRepository.revokeAllForAccount("user", user.id);
 };
 
 export const changePassword = async ({ userId, currentPassword, newPassword }) => {
@@ -161,6 +234,9 @@ export const changePassword = async ({ userId, currentPassword, newPassword }) =
 
   const hashedPassword = await bcrypt.hash(newPassword, 10);
   await userRepository.updatePassword(user.id, hashedPassword);
+  // Changing the password is a strong signal to end every other session,
+  // not just leave old refresh tokens usable until they naturally expire.
+  await refreshTokenRepository.revokeAllForAccount("user", user.id);
 };
 
 export const getProfile = async (userId) => {

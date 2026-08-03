@@ -7,22 +7,25 @@ extendZodWithOpenApi(z);
 
 export const registry = new OpenAPIRegistry();
 
-// Two separate bearer schemes, matching the two separate token types the API
-// actually issues (student-side vs admin-side - see ADMIN_JWT_SECRET) - a
-// route documented as requiring "userAuth" genuinely rejects an admin token
-// and vice versa, so this isn't just a display label.
+// Two separate httpOnly-cookie schemes, matching the two separate token
+// types the API actually issues (student-side vs admin-side - see
+// ADMIN_JWT_SECRET) - a route documented as requiring "userAuth" genuinely
+// rejects an admin token and vice versa, so this isn't just a display label.
+// Swagger UI's "Try it out" sends these automatically (same-origin cookies
+// set by a prior POST /login in the same browser session) - there's no
+// "Authorize" token to paste in manually anymore.
 registry.registerComponent("securitySchemes", "userAuth", {
-  type: "http",
-  scheme: "bearer",
-  bearerFormat: "JWT",
-  description: "Student/lecturer/moderator session token from POST /api/auth/login",
+  type: "apiKey",
+  in: "cookie",
+  name: "access_token",
+  description: "Student/lecturer/moderator httpOnly session cookie from POST /api/auth/login",
 });
 
 registry.registerComponent("securitySchemes", "adminAuth", {
-  type: "http",
-  scheme: "bearer",
-  bearerFormat: "JWT",
-  description: "Admin session token from POST /api/admin/login",
+  type: "apiKey",
+  in: "cookie",
+  name: "admin_access_token",
+  description: "Admin httpOnly session cookie from POST /api/admin/login",
 });
 
 const errorSchema = z.object({ message: z.string() });

@@ -85,8 +85,8 @@ function Sidebar({ collapsed, onToggleCollapsed, mobileOpen, onCloseMobile }) {
   // always ignores a persisted "collapsed" desktop preference.
   const effectiveCollapsed = collapsed && !mobileOpen;
 
-  const handleLogout = () => {
-    logout();
+  const handleLogout = async () => {
+    await logout();
     onCloseMobile();
     navigate("/");
   };
