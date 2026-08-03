@@ -13,6 +13,30 @@ jobs:
     defaults:
       run:
         working-directory: backend
+    services:
+      # Only the integration suite (npm run test:integration) touches this -
+      # the default `npm test` unit suite mocks every repository and has no
+      # DB dependency, so it stays fast even if this service were ever removed.
+      mysql:
+        image: mysql:8
+        env:
+          MYSQL_ROOT_PASSWORD: root
+          MYSQL_DATABASE: smartstudent_test
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="mysqladmin ping -uroot -proot"
+          --health-interval=5s
+          --health-timeout=5s
+          --health-retries=10
+    env:
+      DB_HOST: 127.0.0.1
+      DB_PORT: 3306
+      DB_USER: root
+      DB_PASSWORD: root
+      TEST_DB_NAME: smartstudent_test
+      JWT_SECRET: ci-test-secret
+      ADMIN_JWT_SECRET: ci-test-admin-secret
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -29,6 +53,7 @@ jobs:
       # any new high/critical issue in what actually ships.
       - run: npm audit --omit=dev --audit-level=high
       - run: npm test
+      - run: npm run test:integration
 
   frontend:
     name: Frontend lint, tests, and build
