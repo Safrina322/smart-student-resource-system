@@ -9,6 +9,7 @@ import { listResources as listHubResources } from "../services/resourceHubServic
 import { listCourses } from "../services/courseService.js";
 import { searchAssist } from "../services/aiService.js";
 import { notify } from "../utils/notify.js";
+import { SkeletonCard } from "../components/Skeleton.jsx";
 import "../styles/Resources.css";
 import "../styles/ResourceAIPanel.css";
 
@@ -385,7 +386,11 @@ function ResourceListPage() {
         </div>
 
         {hubLoading ? (
-          <p className="empty-saved-resources">Loading community resources...</p>
+          <div className="online-resources-grid">
+            {Array.from({ length: 3 }).map((_, i) => (
+              <SkeletonCard key={i} />
+            ))}
+          </div>
         ) : filteredHubResources.length === 0 ? (
           <p className="empty-saved-resources">No community resources match your search yet.</p>
         ) : (
@@ -413,7 +418,11 @@ function ResourceListPage() {
       </section>
 
       {loading ? (
-        <div className="resources-loading">Loading your learning space...</div>
+        <div className="course-grid">
+          {Array.from({ length: 6 }).map((_, i) => (
+            <SkeletonCard key={i} />
+          ))}
+        </div>
       ) : filteredCourses.length === 0 ? (
         <div className="resources-empty-state">
           <p>{courses.length === 0 ? "No courses available yet" : "No matching resources found"}</p>

@@ -23,6 +23,7 @@ import {
   listMyBookmarks,
 } from "../services/resourceHubService.js";
 import { notify } from "../utils/notify.js";
+import { Skeleton } from "../components/Skeleton.jsx";
 import "../styles/ResourceDetail.css";
 
 function CommentThread({ comment, onReply, onDelete, canDelete, depth = 0 }) {
@@ -191,7 +192,17 @@ function ResourceDetailPage() {
     isAuthenticated && (comment.user_id === currentUserId || user?.role === "moderator");
 
   if (loading) {
-    return <div className="resource-detail-page"><p className="resource-detail-status">Loading...</p></div>;
+    return (
+      <div className="resource-detail-page">
+        <div className="resource-detail-card">
+          <div className="skeleton-lines">
+            <Skeleton height="1.6em" width="60%" />
+            <Skeleton height="0.9em" width="30%" />
+            <Skeleton height="4em" />
+          </div>
+        </div>
+      </div>
+    );
   }
 
   if (error || !resource) {

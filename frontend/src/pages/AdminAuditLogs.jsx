@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { listAuditLogs } from "../services/adminAuditService.js";
+import { SkeletonTableRows } from "../components/Skeleton.jsx";
 import "../styles/AdminAuditLogs.css";
 
 function AdminAuditLogs() {
@@ -45,9 +46,7 @@ function AdminAuditLogs() {
 
       {error ? <p className="audit-error">{error}</p> : null}
 
-      {loading ? (
-        <p className="audit-empty">Loading logs...</p>
-      ) : logs.length === 0 ? (
+      {!loading && logs.length === 0 ? (
         <p className="audit-empty">No audit logs yet.</p>
       ) : (
         <div className="audit-table-wrap">
@@ -62,15 +61,19 @@ function AdminAuditLogs() {
               </tr>
             </thead>
             <tbody>
-              {logs.map((log) => (
-                <tr key={log.id}>
-                  <td>{formatDate(log.created_at)}</td>
-                  <td>{log.admin_name || log.admin_email || "System"}</td>
-                  <td>{log.action_type}</td>
-                  <td>{log.target_type} #{log.target_id ?? "-"}</td>
-                  <td>{log.details || "-"}</td>
-                </tr>
-              ))}
+              {loading ? (
+                <SkeletonTableRows rows={6} columns={5} />
+              ) : (
+                logs.map((log) => (
+                  <tr key={log.id}>
+                    <td>{formatDate(log.created_at)}</td>
+                    <td>{log.admin_name || log.admin_email || "System"}</td>
+                    <td>{log.action_type}</td>
+                    <td>{log.target_type} #{log.target_id ?? "-"}</td>
+                    <td>{log.details || "-"}</td>
+                  </tr>
+                ))
+              )}
             </tbody>
           </table>
         </div>

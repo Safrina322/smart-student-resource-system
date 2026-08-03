@@ -3,6 +3,7 @@ import { useForm } from "react-hook-form";
 import "../styles/ProfilePage.css";
 import { useAuth } from "../hooks/useAuth.js";
 import { notify } from "../utils/notify.js";
+import { Skeleton } from "../components/Skeleton.jsx";
 
 function ProfilePage() {
   const { fetchProfile, updateProfile, changePassword } = useAuth();
@@ -61,9 +62,18 @@ function ProfilePage() {
   if (loading) {
     return (
       <div className="profile-page">
-        <p style={{ color: "var(--color-text-muted)", textAlign: "center", paddingTop: 60 }}>
-          Loading profile...
-        </p>
+        <Skeleton height="2rem" width="240px" />
+        <section className="profile-card">
+          <div className="skeleton-lines">
+            <Skeleton height="1.1em" width="180px" />
+            <div className="profile-grid">
+              <Skeleton height="2.4em" />
+              <Skeleton height="2.4em" />
+              <Skeleton height="2.4em" />
+              <Skeleton height="2.4em" />
+            </div>
+          </div>
+        </section>
       </div>
     );
   }

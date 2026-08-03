@@ -33,3 +33,12 @@
   border: 1px solid var(--color-border);
   background: var(--color-surface);
 }
+
+/* Stacks a run of bare <Skeleton> lines inside an already-styled container
+   (a card that has its own border/padding), since .skeleton itself is
+   inline-block and won't stack vertically on its own. */
+.skeleton-lines {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}

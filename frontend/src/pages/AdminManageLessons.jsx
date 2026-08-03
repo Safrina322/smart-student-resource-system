@@ -7,6 +7,7 @@ import {
   deleteLesson,
 } from "../services/adminLessonService.js";
 import { notify } from "../utils/notify.js";
+import { Skeleton } from "../components/Skeleton.jsx";
 import "../styles/AdminManageLessons.css";
 
 function AdminManageLessons() {
@@ -131,7 +132,12 @@ function AdminManageLessons() {
         {loadError && <p className="admin-lessons-status">{loadError}</p>}
 
         {loading ? (
-          <p>Loading...</p>
+          <div className="admin-lessons-skeleton">
+            <Skeleton height="0.85em" width="140px" />
+            <Skeleton height="2.4em" />
+            <Skeleton height="1.2em" width="200px" />
+            <Skeleton height="8em" />
+          </div>
         ) : (
           <>
             <label>Select Course</label>

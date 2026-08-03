@@ -1,6 +1,6 @@
 .admin-container {
   min-height: 100vh;
-  padding: 96px 32px 40px;
+  padding: 8px 32px 40px;
   background:
     radial-gradient(1200px 500px at 20% -10%, rgba(34, 238, 217, 0.14), transparent 60%),
     radial-gradient(1000px 550px at 90% 0%, rgba(59, 246, 204, 0.14), transparent 58%),
@@ -314,7 +314,7 @@
 
 @media (max-width: 768px) {
   .admin-container {
-    padding: 86px 16px 26px;
+    padding: 8px 16px 26px;
   }
 
   .admin-hero-content {

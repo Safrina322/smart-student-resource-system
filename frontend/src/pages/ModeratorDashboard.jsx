@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import "../styles/RoleDashboard.css";
 import { getReviewQueue, approveResource, rejectResource, flagResource } from "../services/moderationService.js";
 import { notify } from "../utils/notify.js";
+import { Skeleton } from "../components/Skeleton.jsx";
 
 const STATUSES = ["pending", "approved", "rejected", "flagged"];
 
@@ -61,7 +62,17 @@ function ModeratorDashboard() {
 
       <section className="role-card">
         {loading ? (
-          <p style={{ color: "var(--color-text-muted)" }}>Loading...</p>
+          <div className="review-list">
+            {Array.from({ length: 3 }).map((_, i) => (
+              <div key={i} className="review-item">
+                <div className="skeleton-lines">
+                  <Skeleton height="1.1em" width="50%" />
+                  <Skeleton height="0.85em" width="70%" />
+                  <Skeleton height="0.85em" width="90%" />
+                </div>
+              </div>
+            ))}
+          </div>
         ) : queue.length === 0 ? (
           <p style={{ color: "var(--color-text-muted)" }}>Nothing in the {status} queue.</p>
         ) : (

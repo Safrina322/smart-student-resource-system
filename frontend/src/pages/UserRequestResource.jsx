@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { listMyRequests, submitRequest } from "../services/requestService.js";
 import { notify } from "../utils/notify.js";
+import { Skeleton } from "../components/Skeleton.jsx";
 import "../styles/UploadResource.css";
 
 function RequestResource() {
@@ -287,7 +288,16 @@ function RequestResource() {
         <section className="request-timeline-section">
           <h3>Your Request Timeline</h3>
           {timelineLoading ? (
-            <p className="timeline-empty">Loading your requests...</p>
+            <div className="timeline-request-list">
+              {Array.from({ length: 2 }).map((_, i) => (
+                <div key={i} className="timeline-request-card">
+                  <div className="skeleton-lines">
+                    <Skeleton height="1.1em" width="50%" />
+                    <Skeleton height="0.85em" width="70%" />
+                  </div>
+                </div>
+              ))}
+            </div>
           ) : myRequests.length === 0 ? (
             <p className="timeline-empty">No requests yet. Submit one above to start tracking.</p>
           ) : (

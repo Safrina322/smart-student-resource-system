@@ -9,6 +9,7 @@ import {
   getLecturerAnalytics,
 } from "../services/lecturerResourceService.js";
 import { notify } from "../utils/notify.js";
+import { SkeletonTableRows } from "../components/Skeleton.jsx";
 
 const RESOURCE_TYPES = ["PDF", "Video", "Link", "Image", "ZIP", "Document"];
 
@@ -197,9 +198,7 @@ function LecturerDashboard() {
 
       <section className="role-card">
         <h2>My Resources</h2>
-        {loading ? (
-          <p style={{ color: "var(--color-text-muted)" }}>Loading...</p>
-        ) : resources.length === 0 ? (
+        {!loading && resources.length === 0 ? (
           <p style={{ color: "var(--color-text-muted)" }}>No resources uploaded yet.</p>
         ) : (
           <div className="role-table-wrap">
@@ -214,18 +213,22 @@ function LecturerDashboard() {
                 </tr>
               </thead>
               <tbody>
-                {resources.map((resource) => (
-                  <tr key={resource.id}>
-                    <td>{resource.title}</td>
-                    <td>{resource.resource_type}</td>
-                    <td><StatusBadge status={resource.status} /></td>
-                    <td>{resource.review_comment || "—"}</td>
-                    <td>
-                      <button className="role-link-btn" onClick={() => startEdit(resource)}>Edit</button>
-                      <button className="role-link-btn role-link-danger" onClick={() => handleDelete(resource.id)}>Delete</button>
-                    </td>
-                  </tr>
-                ))}
+                {loading ? (
+                  <SkeletonTableRows rows={4} columns={5} />
+                ) : (
+                  resources.map((resource) => (
+                    <tr key={resource.id}>
+                      <td>{resource.title}</td>
+                      <td>{resource.resource_type}</td>
+                      <td><StatusBadge status={resource.status} /></td>
+                      <td>{resource.review_comment || "—"}</td>
+                      <td>
+                        <button className="role-link-btn" onClick={() => startEdit(resource)}>Edit</button>
+                        <button className="role-link-btn role-link-danger" onClick={() => handleDelete(resource.id)}>Delete</button>
+                      </td>
+                    </tr>
+                  ))
+                )}
               </tbody>
             </table>
           </div>

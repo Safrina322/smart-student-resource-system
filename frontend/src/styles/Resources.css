@@ -248,7 +248,6 @@
   line-height: 1.5;
 }
 
-.resources-loading,
 .resources-empty-state {
   margin: 20px 0 8px;
   padding: 18px;
@@ -259,12 +258,8 @@
   background: rgba(10, 26, 22, 0.55);
 }
 
-.resources-empty-state p,
-.resources-loading {
-  margin: 0;
-}
-
 .resources-empty-state p {
+  margin: 0;
   color: #b8d9d2;
 }
 

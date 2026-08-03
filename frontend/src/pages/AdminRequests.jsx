@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { listRequests, approveRequest, rejectRequest } from "../services/adminRequestService.js";
 import { notify } from "../utils/notify.js";
+import { Skeleton } from "../components/Skeleton.jsx";
 import "../styles/AdminRequests.css";
 
 function AdminRequests() {
@@ -60,7 +61,16 @@ function AdminRequests() {
         {error && <p style={{ color: "red", textAlign: "center" }}>{error}</p>}
 
         {loading ? (
-          <p style={{ textAlign: "center" }}>Loading requests...</p>
+          Array.from({ length: 3 }).map((_, i) => (
+            <div key={i} className="request-box">
+              <div className="skeleton-lines">
+                <Skeleton height="1em" width="60%" />
+                <Skeleton height="0.85em" />
+                <Skeleton height="0.85em" width="80%" />
+                <Skeleton height="0.85em" width="40%" />
+              </div>
+            </div>
+          ))
         ) : requests.length === 0 ? (
           <p style={{ textAlign: "center", color: "#666" }}>✅ No pending requests</p>
         ) : (
