@@ -3,8 +3,7 @@ import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { queryClient } from "./queryClient.js";
 import { AuthProvider } from "./context/AuthContext.jsx";
-import Navbar from "./components/Navbar";
-import Footer from "./components/Footer";
+import AppShell from "./components/AppShell.jsx";
 import ScrollToTop from "./components/ScrollToTop.jsx";
 import ErrorBoundary from "./components/ErrorBoundary.jsx";
 import PageLoader from "./components/PageLoader.jsx";
@@ -46,10 +45,7 @@ function App() {
     <AuthProvider>
     <Router>
       <ScrollToTop />
-      <Navbar />
-
-      <div className="app-container">
-        <div className="main-content" >
+      <AppShell>
         <ErrorBoundary>
         <Suspense fallback={<PageLoader />}>
         <Routes>
@@ -91,13 +87,7 @@ function App() {
         </Routes>
         </Suspense>
         </ErrorBoundary>
-      </div>
-
-      <Footer />
-
-      </div>
-
-
+      </AppShell>
     </Router>
     </AuthProvider>
     </QueryClientProvider>
