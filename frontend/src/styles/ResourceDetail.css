@@ -130,12 +130,6 @@
   margin-bottom: 18px;
 }
 
-.resource-detail-feedback {
-  color: var(--color-accent-cyan);
-  font-size: 0.85rem;
-  margin-bottom: 12px;
-}
-
 .resource-download-btn {
   display: inline-flex;
   align-items: center;

@@ -41,6 +41,7 @@ const AdminManageUsers = lazy(() => import("./pages/AdminManageUsers.jsx"));
 const ResourceDetailPage = lazy(() => import("./pages/ResourceDetailPage.jsx"));
 const AchievementsPage = lazy(() => import("./pages/AchievementsPage.jsx"));
 const StudyPlannerPage = lazy(() => import("./pages/StudyPlannerPage.jsx"));
+const AiToolsPage = lazy(() => import("./pages/AiToolsPage.jsx"));
 function App() {
   return (
     <QueryClientProvider client={queryClient}>
@@ -98,6 +99,7 @@ function App() {
           <Route path="/resource-hub/:id" element={<ResourceDetailPage />} />
           <Route path="/achievements" element={<ProtectedRoute><AchievementsPage /></ProtectedRoute>} />
           <Route path="/study-planner" element={<ProtectedRoute><StudyPlannerPage /></ProtectedRoute>} />
+          <Route path="/ai-tools" element={<ProtectedRoute><AiToolsPage /></ProtectedRoute>} />
           <Route path="*" element={<NotFoundPage />} />
         </Routes>
         </Suspense>
