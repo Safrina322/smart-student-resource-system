@@ -9,6 +9,7 @@ import {
   resetPasswordSchema,
   changePasswordSchema,
   updateProfileSchema,
+  updateSettingsSchema,
 } from "../validation/authValidation.js";
 import validate from "../middleware/validate.js";
 import { authLimiter } from "../middleware/rateLimiter.js";
@@ -57,6 +58,14 @@ router.post(
   authMiddleware,
   validate(changePasswordSchema),
   asyncHandler(authController.changePassword)
+);
+
+router.get("/settings", authMiddleware, asyncHandler(authController.getSettings));
+router.put(
+  "/settings",
+  authMiddleware,
+  validate(updateSettingsSchema),
+  asyncHandler(authController.updateSettings)
 );
 
 export default router;

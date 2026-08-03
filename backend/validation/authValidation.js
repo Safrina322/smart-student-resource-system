@@ -65,3 +65,9 @@ export const updateProfileSchema = z.object({
     courseBranch: z.string().trim().max(100).optional(),
   }),
 });
+
+export const updateSettingsSchema = z.object({
+  body: z.object({
+    emailNotificationsEnabled: z.boolean(),
+  }),
+});

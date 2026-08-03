@@ -34,6 +34,7 @@ const ForgotPasswordPage = lazy(() => import("./pages/ForgotPasswordPage.jsx"));
 const ResetPasswordPage = lazy(() => import("./pages/ResetPasswordPage.jsx"));
 const VerifyEmailPage = lazy(() => import("./pages/VerifyEmailPage.jsx"));
 const ProfilePage = lazy(() => import("./pages/ProfilePage.jsx"));
+const SettingsPage = lazy(() => import("./pages/SettingsPage.jsx"));
 const LecturerDashboard = lazy(() => import("./pages/LecturerDashboard.jsx"));
 const ModeratorDashboard = lazy(() => import("./pages/ModeratorDashboard.jsx"));
 const AdminManageUsers = lazy(() => import("./pages/AdminManageUsers.jsx"));
@@ -70,6 +71,7 @@ function App() {
           <Route path="/reset-password/:token" element={<ResetPasswordPage />} />
           <Route path="/verify-email/:token" element={<VerifyEmailPage />} />
           <Route path="/profile" element={<ProtectedRoute><ProfilePage /></ProtectedRoute>} />
+          <Route path="/settings" element={<ProtectedRoute><SettingsPage /></ProtectedRoute>} />
           <Route
             path="/lecturer/dashboard"
             element={<ProtectedRoute allowRoles={["lecturer"]}><LecturerDashboard /></ProtectedRoute>}

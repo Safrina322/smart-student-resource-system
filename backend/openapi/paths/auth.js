@@ -8,6 +8,7 @@ import {
   resetPasswordSchema,
   changePasswordSchema,
   updateProfileSchema,
+  updateSettingsSchema,
 } from "../../validation/authValidation.js";
 import { adminLoginSchema } from "../../validation/adminAuthValidation.js";
 
@@ -91,6 +92,23 @@ registerRoute({
   summary: "Change the logged-in user's password",
   security: [{ userAuth: [] }],
   schema: changePasswordSchema,
+});
+
+registerRoute({
+  method: "get",
+  path: "/api/auth/settings",
+  tags,
+  summary: "Get the logged-in user's app preferences",
+  security: [{ userAuth: [] }],
+});
+
+registerRoute({
+  method: "put",
+  path: "/api/auth/settings",
+  tags,
+  summary: "Update the logged-in user's app preferences",
+  security: [{ userAuth: [] }],
+  schema: updateSettingsSchema,
 });
 
 registerRoute({

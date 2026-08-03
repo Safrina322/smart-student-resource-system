@@ -44,3 +44,13 @@ export const updateProfile = async (req, res) => {
   const profile = await authService.updateProfile(req.user.id, req.body);
   res.json({ message: "Profile updated successfully.", profile });
 };
+
+export const getSettings = async (req, res) => {
+  const settings = await authService.getSettings(req.user.id);
+  res.json(settings);
+};
+
+export const updateSettings = async (req, res) => {
+  const settings = await authService.updateSettings(req.user.id, req.body);
+  res.json({ message: "Settings updated successfully.", settings });
+};

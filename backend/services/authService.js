@@ -170,3 +170,21 @@ export const updateProfile = async (userId, { firstName, lastName, phone, semest
   await userRepository.updateProfile(userId, { firstName, lastName, phone, semester, courseBranch });
   return getProfile(userId);
 };
+
+export const getSettings = async (userId) => {
+  const user = await userRepository.findById(userId);
+  if (!user) {
+    throw new AppError("User not found", 404);
+  }
+  return { emailNotificationsEnabled: Boolean(user.email_notifications_enabled) };
+};
+
+export const updateSettings = async (userId, { emailNotificationsEnabled }) => {
+  const user = await userRepository.findById(userId);
+  if (!user) {
+    throw new AppError("User not found", 404);
+  }
+
+  await userRepository.updateEmailNotificationSetting(userId, emailNotificationsEnabled);
+  return getSettings(userId);
+};

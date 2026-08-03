@@ -69,14 +69,16 @@ export const approve = async (id, { comment, adminId }) => {
       adminId,
     });
 
-    sendRequestStatusEmail({
-      to: request.user_email,
-      studentName: request.username,
-      courseTitle: request.title,
-      status: "approved",
-      resourceType: normalizedType,
-      adminComment: adminEmailComment,
-    }).catch((err) => console.error("❌ Email send failed (approve):", err.message));
+    if (request.user_email_notifications_enabled !== 0) {
+      sendRequestStatusEmail({
+        to: request.user_email,
+        studentName: request.username,
+        courseTitle: request.title,
+        status: "approved",
+        resourceType: normalizedType,
+        adminComment: adminEmailComment,
+      }).catch((err) => console.error("❌ Email send failed (approve):", err.message));
+    }
 
     notifyUser({
       userId: request.user_id,
@@ -143,14 +145,16 @@ export const reject = async (id, { comment, adminId }) => {
     adminId,
   });
 
-  sendRequestStatusEmail({
-    to: request.user_email,
-    studentName: request.username,
-    courseTitle: request.title,
-    status: "rejected",
-    resourceType: request.type,
-    adminComment,
-  }).catch((err) => console.error("❌ Email send failed (reject):", err.message));
+  if (request.user_email_notifications_enabled !== 0) {
+    sendRequestStatusEmail({
+      to: request.user_email,
+      studentName: request.username,
+      courseTitle: request.title,
+      status: "rejected",
+      resourceType: request.type,
+      adminComment,
+    }).catch((err) => console.error("❌ Email send failed (reject):", err.message));
+  }
 
   notifyUser({
     userId: request.user_id,

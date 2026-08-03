@@ -49,3 +49,13 @@ export const updateMyProfile = async (profile) => {
   const { data } = await apiClient.put("/api/auth/profile", profile);
   return data;
 };
+
+export const getMySettings = async () => {
+  const { data } = await apiClient.get("/api/auth/settings");
+  return data;
+};
+
+export const updateMySettings = async (settings) => {
+  const { data } = await apiClient.put("/api/auth/settings", settings);
+  return data;
+};

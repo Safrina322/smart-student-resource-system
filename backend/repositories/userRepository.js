@@ -73,3 +73,10 @@ export const updateProfile = async (userId, { firstName, lastName, phone, semest
     [firstName ?? null, lastName ?? null, phone ?? null, semester ?? null, courseBranch ?? null, userId]
   );
 };
+
+export const updateEmailNotificationSetting = async (userId, enabled) => {
+  await queryAsync("UPDATE users SET email_notifications_enabled = ? WHERE id = ?", [
+    enabled ? 1 : 0,
+    userId,
+  ]);
+};

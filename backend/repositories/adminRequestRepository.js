@@ -14,7 +14,8 @@ export const findPending = async ({ page, pageSize }) => {
 
 export const findWithUserById = async (id) => {
   const rows = await queryAsync(
-    `SELECT rr.*, u.email AS user_email, u.username AS username
+    `SELECT rr.*, u.email AS user_email, u.username AS username,
+            u.email_notifications_enabled AS user_email_notifications_enabled
      FROM resource_requests rr
      LEFT JOIN users u ON rr.user_id = u.id
      WHERE rr.id = ?`,

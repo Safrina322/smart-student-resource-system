@@ -7,6 +7,7 @@ import {
   HiOutlineTrophy,
   HiOutlineArrowUpTray,
   HiOutlineUserCircle,
+  HiOutlineCog6Tooth,
   HiOutlineClipboardDocumentList,
   HiOutlineUsers,
   HiOutlinePlusCircle,
@@ -29,18 +30,21 @@ const STUDENT_ITEMS = [
   { to: "/achievements", label: "Achievements", icon: HiOutlineTrophy },
   { to: "/upload", label: "Upload", icon: HiOutlineArrowUpTray },
   { to: "/profile", label: "Profile", icon: HiOutlineUserCircle },
+  { to: "/settings", label: "Settings", icon: HiOutlineCog6Tooth },
 ];
 
 const LECTURER_ITEMS = [
   { to: "/lecturer/dashboard", label: "Lecturer Dashboard", icon: HiOutlineSquares2X2 },
   { to: "/resources", label: "Resources", icon: HiOutlineBookOpen },
   { to: "/profile", label: "Profile", icon: HiOutlineUserCircle },
+  { to: "/settings", label: "Settings", icon: HiOutlineCog6Tooth },
 ];
 
 const MODERATOR_ITEMS = [
   { to: "/moderator/dashboard", label: "Review Queue", icon: HiOutlineClipboardDocumentCheck },
   { to: "/resources", label: "Resources", icon: HiOutlineBookOpen },
   { to: "/profile", label: "Profile", icon: HiOutlineUserCircle },
+  { to: "/settings", label: "Settings", icon: HiOutlineCog6Tooth },
 ];
 
 const ADMIN_ITEMS = [
