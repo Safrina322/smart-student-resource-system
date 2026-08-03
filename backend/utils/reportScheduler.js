@@ -6,6 +6,7 @@ import {
   buildReportCsv,
   insertReportHistory,
 } from "./reporting.js";
+import logger from "./logger.js";
 
 const POLL_INTERVAL_MS = 60 * 1000;
 
@@ -119,7 +120,7 @@ const processDueSchedules = async () => {
 export const startReportScheduler = () => {
   setInterval(() => {
     processDueSchedules().catch((err) => {
-      console.error("⚠️ Report scheduler warning:", err.message);
+      logger.warn({ err }, "Report scheduler warning");
     });
   }, POLL_INTERVAL_MS);
 };

@@ -1,4 +1,5 @@
 import { queryAsync } from "../db.js";
+import logger from "../utils/logger.js";
 
 export const findPending = async ({ page, pageSize }) => {
   const offset = (page - 1) * pageSize;
@@ -77,6 +78,6 @@ export const addHistoryEntry = ({ requestId, status, note = null, adminId = null
      VALUES (?, ?, ?, ?)`,
     [requestId, status, note, adminId]
   ).catch((err) => {
-    console.error("⚠️ Request history write warning:", err.message);
+    logger.warn({ err }, "Request history write warning");
   });
 };

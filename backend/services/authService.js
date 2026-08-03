@@ -4,6 +4,7 @@ import jwt from "jsonwebtoken";
 import { AppError } from "../utils/AppError.js";
 import * as userRepository from "../repositories/userRepository.js";
 import { sendVerificationEmail, sendPasswordResetEmail } from "../utils/mailer.js";
+import logger from "../utils/logger.js";
 
 const REMEMBER_ME_EXPIRY = "30d";
 const DEFAULT_EXPIRY = "1h";
@@ -44,7 +45,7 @@ export const register = async ({ username, email, password }) => {
   try {
     await sendVerificationEmail({ to: email, name: username, token: verificationToken });
   } catch (err) {
-    console.error("⚠️ Failed to send verification email:", err.message);
+    logger.warn({ err }, "Failed to send verification email");
   }
 };
 
@@ -101,7 +102,7 @@ export const resendVerificationEmail = async (email) => {
   try {
     await sendVerificationEmail({ to: user.email, name: user.username, token: verificationToken });
   } catch (err) {
-    console.error("⚠️ Failed to resend verification email:", err.message);
+    logger.warn({ err }, "Failed to resend verification email");
   }
 };
 
@@ -120,7 +121,7 @@ export const requestPasswordReset = async (email) => {
   try {
     await sendPasswordResetEmail({ to: user.email, name: user.username, token: resetToken });
   } catch (err) {
-    console.error("⚠️ Failed to send password reset email:", err.message);
+    logger.warn({ err }, "Failed to send password reset email");
   }
 };
 

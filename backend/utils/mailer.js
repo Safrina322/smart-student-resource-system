@@ -1,4 +1,5 @@
 import nodemailer from "nodemailer";
+import logger from "./logger.js";
 
 const {
   SMTP_HOST,
@@ -35,7 +36,7 @@ export const sendRequestStatusEmail = async ({
   if (!to) return;
 
   if (!smtpConfigured || !transporter) {
-    console.warn("⚠️ Email skipped: SMTP not configured.");
+    logger.warn("Email skipped: SMTP not configured.");
     return;
   }
 
@@ -69,7 +70,7 @@ export const sendVerificationEmail = async ({ to, name, token }) => {
   if (!to) return;
 
   if (!smtpConfigured || !transporter) {
-    console.warn("⚠️ Email skipped: SMTP not configured.");
+    logger.warn("Email skipped: SMTP not configured.");
     return;
   }
 
@@ -100,7 +101,7 @@ export const sendPasswordResetEmail = async ({ to, name, token }) => {
   if (!to) return;
 
   if (!smtpConfigured || !transporter) {
-    console.warn("⚠️ Email skipped: SMTP not configured.");
+    logger.warn("Email skipped: SMTP not configured.");
     return;
   }
 

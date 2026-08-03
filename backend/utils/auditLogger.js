@@ -1,4 +1,5 @@
 import db from "../db.js";
+import logger from "./logger.js";
 
 export const logAdminAction = ({
   adminId = null,
@@ -17,7 +18,7 @@ export const logAdminAction = ({
     [adminId, actionType, targetType, targetId, details],
     (err) => {
       if (err) {
-        console.error("⚠️ Audit log write warning:", err.message);
+        logger.warn({ err }, "Audit log write warning");
       }
     }
   );

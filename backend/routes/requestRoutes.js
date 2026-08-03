@@ -2,6 +2,7 @@ import express from "express";
 import db from "../db.js";
 import authMiddleware from "../middleware/authMiddleware.js";
 import createCloudinaryUploader from "../middleware/cloudinaryUpload.js";
+import logger from "../utils/logger.js";
 
 const router = express.Router();
 
@@ -14,7 +15,7 @@ const addRequestHistoryEntry = ({ requestId, status, note = null, adminId = null
     [requestId, status, note, adminId],
     (historyErr) => {
       if (historyErr) {
-        console.error("⚠️ Request history write warning:", historyErr.message);
+        logger.warn({ err: historyErr }, "Request history write warning");
       }
     }
   );
@@ -59,7 +60,7 @@ router.post("/", authMiddleware, upload.single("image"), async (req, res) => {
       [title, subject, semesterNumber, type],
       (err, result) => {
         if (err) {
-          console.error(err);
+          logger.error({ err }, "Request route error");
           return res.status(500).json({ message: "Server error" });
         }
 
@@ -92,7 +93,7 @@ router.post("/", authMiddleware, upload.single("image"), async (req, res) => {
           ],
           (err, insertResult) => {
             if (err) {
-              console.error(err);
+              logger.error({ err }, "Request route error");
               return res.status(500).json({ message: "Server error" });
             }
 
@@ -114,7 +115,7 @@ router.post("/", authMiddleware, upload.single("image"), async (req, res) => {
       }
     );
   } catch (err) {
-    console.error(err);
+    logger.error({ err }, "Request route error");
     res.status(500).json({ message: "Server error" });
   }
 });
@@ -146,7 +147,7 @@ router.get("/mine", authMiddleware, (req, res) => {
     [userId],
     (reqErr, requestRows) => {
       if (reqErr) {
-        console.error("❌ Request timeline query error:", reqErr.message);
+        logger.error({ err: reqErr }, "Request timeline query error");
         return res.status(500).json({ message: "Failed to fetch your requests" });
       }
 
@@ -170,7 +171,7 @@ router.get("/mine", authMiddleware, (req, res) => {
         [requestIds],
         (historyErr, historyRows) => {
           if (historyErr) {
-            console.error("❌ Request history query error:", historyErr.message);
+            logger.error({ err: historyErr }, "Request history query error");
             return res.status(500).json({ message: "Failed to fetch request history" });
           }
 

@@ -1,4 +1,5 @@
 import * as searchRepository from "../repositories/searchRepository.js";
+import logger from "../utils/logger.js";
 
 const escapeLikeWildcards = (value) => value.replace(/[%_]/g, (match) => `\\${match}`);
 
@@ -13,7 +14,7 @@ export const search = async (query) => {
   // Best-effort logging for the popular-searches feature; a logging
   // failure should never break search itself.
   searchRepository.logQuery(query).catch((err) => {
-    console.error("⚠️ Failed to log search query:", err.message);
+    logger.warn({ err }, "Failed to log search query");
   });
 
   return {

@@ -6,11 +6,13 @@ import cors from "cors";
 import helmet from "helmet";
 import dotenv from "dotenv";
 import bcrypt from "bcryptjs";
+import pinoHttp from "pino-http";
 import swaggerUi from "swagger-ui-express";
 import { generateOpenApiDocument } from "./openapi/document.js";
 import db, { queryAsync } from "./db.js";
 import { runMigrations } from "./migrations/runner.js";
 import { setIo } from "./utils/socket.js";
+import logger from "./utils/logger.js";
 import authRoutes from "./routes/authRoutes.js";
 import courseRoutes from "./routes/courseRoutes.js";
 import adminCourseRoutes from "./routes/adminCourseRoutes.js";
@@ -64,9 +66,9 @@ const seedDemoRoleAccounts = async () => {
         "INSERT INTO users (username, email, password, role, email_verified) VALUES (?, ?, ?, ?, 1)",
         [username, email, hashedPassword, role]
       );
-      console.log(`✅ Seeded demo ${role} account: ${username} / Demo@12345`);
+      logger.info(`Seeded demo ${role} account: ${username} / Demo@12345`);
     } catch (err) {
-      console.error(`❌ Failed to seed demo ${role}:`, err.message);
+      logger.error({ err }, `Failed to seed demo ${role}`);
     }
   }
 };
@@ -84,9 +86,9 @@ const seedDefaultAdmin = async () => {
       "INSERT INTO admin (name, email, password, department, role) VALUES (?, ?, ?, ?, ?)",
       ["Admin User", "fathimasafrina57@gmail.com", hashedPassword, "Administration", "sysadmin"]
     );
-    console.log("✅ Seeded default admin account: fathimasafrina57@gmail.com / admin123");
+    logger.info("Seeded default admin account: fathimasafrina57@gmail.com / admin123");
   } catch (err) {
-    console.error("❌ Failed to seed default admin:", err.message);
+    logger.error({ err }, "Failed to seed default admin");
   }
 };
 
@@ -118,13 +120,14 @@ app.use(
   })
 );
 app.use(cors(corsOptions));
+app.use(pinoHttp({ logger }));
 
 startReportScheduler();
 
 await seedDemoRoleAccounts();
 await seedDefaultAdmin();
 
-console.log("✅ Database schema and seed data ready");
+logger.info("Database schema and seed data ready");
 
 // Hosted free-tier MySQL (e.g. Aiven) auto-powers-off after a period of no
 // activity, which then 404s every request until someone manually resumes it
@@ -132,7 +135,7 @@ console.log("✅ Database schema and seed data ready");
 // active so the database never looks idle. No-op cost on local dev.
 setInterval(() => {
   db.query("SELECT 1", (err) => {
-    if (err) console.error("⚠️ Keep-alive ping failed:", err.message);
+    if (err) logger.warn({ err }, "Keep-alive ping failed");
   });
 }, 4 * 60 * 1000);
 
@@ -180,7 +183,7 @@ app.use("/api", (req, res) => {
 app.use((err, req, res, next) => {
   const statusCode = err.statusCode || 500;
   if (statusCode >= 500) {
-    console.error("❌ API Error:", err);
+    logger.error({ err }, "API Error");
   }
   res.status(statusCode).json({ message: err.message || "Internal server error" });
 });
@@ -222,14 +225,14 @@ setIo(io);
 
 const PORT = process.env.PORT || 5000;
 httpServer.listen(PORT, () => {
-  console.log(`✅ Server running on port ${PORT}`);
+  logger.info(`Server running on port ${PORT}`);
 });
 
 
 process.on("uncaughtException", (err) => {
-  console.error("❌ Uncaught Exception:", err);
+  logger.fatal({ err }, "Uncaught Exception");
 });
 
 process.on("unhandledRejection", (err) => {
-  console.error("❌ Unhandled Promise Rejection:", err);
+  logger.fatal({ err }, "Unhandled Promise Rejection");
 });

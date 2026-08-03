@@ -2,6 +2,7 @@ import { AppError } from "../utils/AppError.js";
 import * as adminAnalyticsRepository from "../repositories/adminAnalyticsRepository.js";
 import { buildReportPayload, buildReportCsv, insertReportHistory } from "../utils/reporting.js";
 import { computeNextRunAt } from "../utils/reportScheduler.js";
+import logger from "../utils/logger.js";
 
 const buildLastDays = (days = 7) => {
   const result = [];
@@ -20,7 +21,7 @@ const safeHistoryInsert = async (payload) => {
   try {
     await insertReportHistory(payload);
   } catch (err) {
-    console.error("⚠️ Report history write warning:", err.message);
+    logger.warn({ err }, "Report history write warning");
   }
 };
 

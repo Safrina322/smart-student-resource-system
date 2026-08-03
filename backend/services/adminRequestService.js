@@ -4,6 +4,7 @@ import { sendRequestStatusEmail } from "../utils/mailer.js";
 import { notifyUser } from "./notificationService.js";
 import { logAdminAction } from "../utils/auditLogger.js";
 import { buildPaginationMeta } from "../utils/pagination.js";
+import logger from "../utils/logger.js";
 
 export const listPending = async ({ page, pageSize }) => {
   const { rows, total } = await adminRequestRepository.findPending({ page, pageSize });
@@ -77,7 +78,7 @@ export const approve = async (id, { comment, adminId }) => {
         status: "approved",
         resourceType: normalizedType,
         adminComment: adminEmailComment,
-      }).catch((err) => console.error("❌ Email send failed (approve):", err.message));
+      }).catch((err) => logger.error({ err }, "Email send failed (approve)"));
     }
 
     notifyUser({
@@ -153,7 +154,7 @@ export const reject = async (id, { comment, adminId }) => {
       status: "rejected",
       resourceType: request.type,
       adminComment,
-    }).catch((err) => console.error("❌ Email send failed (reject):", err.message));
+    }).catch((err) => logger.error({ err }, "Email send failed (reject)"));
   }
 
   notifyUser({

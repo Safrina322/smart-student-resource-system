@@ -1,5 +1,6 @@
 import * as notificationRepository from "../repositories/notificationRepository.js";
 import { emitToUser } from "../utils/socket.js";
+import logger from "../utils/logger.js";
 
 export const listForUser = async (userId) => {
   const notifications = await notificationRepository.findByUser(userId);
@@ -20,7 +21,7 @@ export const notifyUser = ({ userId, title, message, type = "info", meta = null 
       emitToUser(userId, "notification:new", notification);
     })
     .catch((err) => {
-      console.error("⚠️ Notification write warning:", err.message);
+      logger.warn({ err }, "Notification write warning");
     });
 };
 

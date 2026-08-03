@@ -2,6 +2,7 @@ import { readdir, readFile } from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { queryAsync } from "../db.js";
+import logger from "../utils/logger.js";
 
 const migrationsDir = path.dirname(fileURLToPath(import.meta.url));
 
@@ -43,7 +44,7 @@ export const runMigrations = async () => {
   const pending = files.filter((file) => !appliedNames.has(file));
 
   if (pending.length === 0) {
-    console.log("✅ Database schema up to date - no pending migrations");
+    logger.info("Database schema up to date - no pending migrations");
     return;
   }
 
@@ -56,6 +57,6 @@ export const runMigrations = async () => {
     }
 
     await queryAsync("INSERT INTO schema_migrations (name) VALUES (?)", [file]);
-    console.log(`✅ Applied migration ${file} (${statements.length} statement(s))`);
+    logger.info(`Applied migration ${file} (${statements.length} statement(s))`);
   }
 };
