@@ -12,22 +12,42 @@ const apiClient = axios.create({
   withCredentials: true,
 });
 
-const readCookie = (name) => {
-  const match = document.cookie.match(new RegExp(`(?:^|; )${name}=([^;]*)`));
-  return match ? decodeURIComponent(match[1]) : null;
-};
-
 const MUTATING_METHODS = new Set(["post", "put", "patch", "delete"]);
 
-// Double-submit CSRF: the cookie is httpOnly-free by design so this can
-// read it and echo it back as a header - a cross-site attacker can trigger
-// the cookie to be sent automatically, but can't read its value to also set
-// the matching header.
-apiClient.interceptors.request.use((config) => {
+// Double-submit CSRF: the backend can't be trusted to accept a mutating
+// request unless the caller also proves it can see the matching token
+// value. In production frontend and backend are on different origins
+// (Vercel/Railway), so document.cookie can't read the csrf_token cookie
+// directly - it's scoped to the backend's origin, not this page's. Fetching
+// it from GET /api/csrf-token's JSON body instead works because that
+// response is protected by the backend's own CORS allowlist, same as the
+// cookie would otherwise be protected by same-origin - a forged cross-site
+// request can trigger the cookie to be sent automatically, but can't read
+// this response to learn the value to echo back as a header.
+let csrfToken = null;
+let csrfTokenPromise = null;
+
+const getCsrfToken = async () => {
+  if (csrfToken) return csrfToken;
+  if (!csrfTokenPromise) {
+    csrfTokenPromise = axios
+      .get(`${API_BASE_URL}/api/csrf-token`, { withCredentials: true })
+      .then(({ data }) => {
+        csrfToken = data.csrfToken;
+        return csrfToken;
+      })
+      .finally(() => {
+        csrfTokenPromise = null;
+      });
+  }
+  return csrfTokenPromise;
+};
+
+apiClient.interceptors.request.use(async (config) => {
   if (MUTATING_METHODS.has((config.method || "").toLowerCase())) {
-    const csrfToken = readCookie("csrf_token");
-    if (csrfToken) {
-      config.headers["X-CSRF-Token"] = csrfToken;
+    const token = await getCsrfToken();
+    if (token) {
+      config.headers["X-CSRF-Token"] = token;
     }
   }
   return config;
@@ -66,11 +86,11 @@ apiClient.interceptors.response.use(
     ) {
       originalRequest._retried = true;
       try {
-        const csrfToken = readCookie("csrf_token");
+        const token = await getCsrfToken();
         await axios.post(
           `${API_BASE_URL}${refreshPath}`,
           {},
-          { withCredentials: true, headers: csrfToken ? { "X-CSRF-Token": csrfToken } : {} }
+          { withCredentials: true, headers: token ? { "X-CSRF-Token": token } : {} }
         );
         return apiClient(originalRequest);
       } catch {

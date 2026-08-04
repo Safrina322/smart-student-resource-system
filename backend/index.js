@@ -37,6 +37,7 @@ import resourceHubRoutes from "./routes/resourceHubRoutes.js";
 import achievementRoutes from "./routes/achievementRoutes.js";
 import aiRoutes from "./routes/aiRoutes.js";
 import healthRoutes from "./routes/healthRoutes.js";
+import csrfRoutes from "./routes/csrfRoutes.js";
 import { startReportScheduler } from "./utils/reportScheduler.js";
 dotenv.config();
 
@@ -173,6 +174,7 @@ setInterval(() => {
 
 app.use(express.json());
 app.use("/api/health", healthRoutes);
+app.use("/api/csrf-token", csrfRoutes);
 app.use("/api/admin", adminAuthRoutes);
 app.use("/api/requests", requestRoutes);
 app.use("/api/admin/requests", adminRequestRoutes);

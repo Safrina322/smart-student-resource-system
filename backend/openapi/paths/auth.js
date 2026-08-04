@@ -15,6 +15,14 @@ import { adminLoginSchema } from "../../validation/adminAuthValidation.js";
 const tags = ["Auth"];
 
 registerRoute({
+  method: "get",
+  path: "/api/csrf-token",
+  tags,
+  summary: "Get the current CSRF token value, for use as the X-CSRF-Token header on mutating requests",
+  security: [],
+});
+
+registerRoute({
   method: "post",
   path: "/api/auth/register",
   tags,
