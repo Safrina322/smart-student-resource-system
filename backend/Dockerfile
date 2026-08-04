@@ -3,12 +3,7 @@ FROM node:22-alpine
 WORKDIR /app
 
 COPY package*.json ./
-# npm install rather than npm ci: this is a dev-only image (CI uses npm ci
-# for strict reproducibility) and the lockfile's large optional-dependency
-# matrix (vitest -> Vite -> rolldown's per-platform native bindings) can hit
-# npm ci's strict-sync check depending on the exact npm/platform combination
-# that last regenerated it.
-RUN npm install
+RUN npm ci
 
 COPY . .
 

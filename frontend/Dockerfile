@@ -3,9 +3,7 @@ FROM node:22-alpine
 WORKDIR /app
 
 COPY package*.json ./
-# npm install rather than npm ci - see backend/Dockerfile for why (same
-# Vite/rolldown optional-dependency-matrix lockfile sensitivity).
-RUN npm install
+RUN npm ci
 
 COPY . .
 
