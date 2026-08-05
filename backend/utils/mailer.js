@@ -22,6 +22,12 @@ if (smtpConfigured) {
       user: SMTP_USER,
       pass: SMTP_PASS,
     },
+    // Some hosts (Railway included) don't route outbound IPv6, but
+    // smtp.gmail.com resolves to both an IPv4 and an IPv6 address - Node
+    // can pick the IPv6 one and fail with ENETUNREACH before ever reaching
+    // the auth step. Forcing IPv4 sidesteps that regardless of the host's
+    // IPv6 support.
+    family: 4,
   });
 }
 
