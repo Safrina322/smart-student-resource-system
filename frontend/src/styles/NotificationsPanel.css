@@ -3,8 +3,8 @@
   margin-bottom: 36px;
   padding: 16px;
   border-radius: 14px;
-  border: 1px solid #20473e;
-  background: linear-gradient(145deg, #0e2621, #091c18);
+  border: 1px solid #262344;
+  background: linear-gradient(145deg, #121024, #0c0a1b);
   box-shadow: 0 10px 24px rgba(0, 0, 0, 0.28);
 }
 
@@ -28,7 +28,7 @@
 }
 
 .notifications-count {
-  color: #b3fff1;
+  color: #c1b8fa;
   font-size: 0.9rem;
   font-weight: 600;
 }
@@ -44,13 +44,13 @@
 }
 
 .mark-all-btn {
-  background: #1e3b34;
-  color: #dbf5f0;
-  border: 1px solid #315f56;
+  background: #222039;
+  color: #e0ddf3;
+  border: 1px solid #39345c;
 }
 
 .mark-read-btn {
-  background: linear-gradient(135deg, #0ee9c9, #25ebbb);
+  background: linear-gradient(135deg, #3b1cdb, #4132de);
   color: #fff;
   border: 1px solid rgba(255, 255, 255, 0.18);
 }
@@ -70,16 +70,16 @@
   justify-content: space-between;
   gap: 10px;
   border-radius: 10px;
-  border: 1px solid #234941;
+  border: 1px solid #292547;
   padding: 11px 12px;
 }
 
 .notification-item.is-unread {
-  background: #102c26;
+  background: #15122a;
 }
 
 .notification-item.is-read {
-  background: #0d221d;
+  background: #100e21;
   opacity: 0.85;
 }
 
@@ -90,16 +90,16 @@
 
 .notification-main p {
   margin: 0 0 4px;
-  color: #cae8e2;
+  color: #cfcce6;
   line-height: 1.45;
 }
 
 .notification-main small {
-  color: #90bdb4;
+  color: #9893ba;
 }
 
 .notifications-empty {
-  color: #9ec7bf;
+  color: #a5a1c4;
   margin: 0;
 }
 

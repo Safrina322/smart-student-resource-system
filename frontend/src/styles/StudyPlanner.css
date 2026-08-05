@@ -53,7 +53,7 @@
 
 .study-planner-form textarea,
 .study-planner-form input {
-  background: rgba(2, 23, 17, 0.4);
+  background: rgba(4, 3, 22, 0.4);
   border: 1px solid var(--color-border);
   border-radius: var(--radius-sm);
   padding: 12px 14px;
@@ -113,7 +113,7 @@
 
 .study-plan-week-badge {
   background: var(--gradient-accent);
-  color: #041f19;
+  color: #08061d;
   font-size: 0.75rem;
   font-weight: 700;
   padding: 4px 12px;

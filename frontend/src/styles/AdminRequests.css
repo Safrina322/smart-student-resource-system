@@ -11,7 +11,7 @@
 .upload-card {
   width: 100%;
   max-width: 700px;
-  background-color: #0b1412;
+  background-color: #0c0c13;
   padding: 30px;
   border-radius: 18px;
   box-shadow: 0 20px 50px rgba(0, 0, 0, 0.85);
@@ -97,7 +97,7 @@
   padding: 8px 14px;
   border-radius: 8px;
   border: 1px solid #333;
-  background: #16221f;
+  background: #181721;
   color: #fff;
   cursor: pointer;
   font-weight: bold;

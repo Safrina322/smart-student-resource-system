@@ -1,28 +1,30 @@
 :root {
-  /* Surfaces - neutral slate, deliberately not blue-tinted */
-  --color-bg: #0b0f0e;
-  --color-surface: rgba(19, 26, 24, 0.6);
-  --color-surface-strong: rgba(19, 26, 24, 0.92);
-  --color-border: rgba(160, 175, 170, 0.18);
+  /* Surfaces - deep charcoal with a whisper of violet, not flat/blue-black */
+  --color-bg: #0c0c13;
+  --color-surface: rgba(23, 23, 33, 0.6);
+  --color-surface-strong: rgba(23, 23, 33, 0.92);
+  --color-border: rgba(150, 148, 168, 0.14);
 
   /* Text */
-  --color-text: #f1f5f4;
-  --color-text-secondary: #cbd2cf;
-  --color-text-muted: #8a9a95;
+  --color-text: #f1f0f5;
+  --color-text-secondary: #c7c5d3;
+  --color-text-muted: #87859a;
 
-  /* Accents - emerald/teal, replacing the old cyan/indigo */
-  --color-accent-cyan: #14b8a6;
-  --color-accent: #10b981;
-  --color-accent-strong: #059669;
-  --color-accent-violet: #8b5cf6;
+  /* Accents - refined indigo/violet, replacing the old emerald/teal.
+     Deliberately lower-saturation and lighter than a typical "neon" accent
+     so hover glows and gradients read as calm/premium rather than vibrant. */
+  --color-accent-cyan: #8b85f0;
+  --color-accent: #6c63e0;
+  --color-accent-strong: #524ab8;
+  --color-accent-violet: #a78bfa;
   --color-accent-pink: #f472b6;
-  --gradient-accent: linear-gradient(90deg, #10b981, #14b8a6);
+  --gradient-accent: linear-gradient(90deg, #6c63e0, #8b85f0);
   --gradient-accent-alt: linear-gradient(160deg, #a78bfa, #6d28d9);
 
   /* RGB triplets for rgba(var(--x-rgb), alpha) glow/tint effects */
-  --color-accent-cyan-rgb: 20, 184, 166;
-  --color-accent-rgb: 16, 185, 129;
-  --color-accent-violet-rgb: 139, 92, 246;
+  --color-accent-cyan-rgb: 139, 133, 240;
+  --color-accent-rgb: 108, 99, 224;
+  --color-accent-violet-rgb: 167, 139, 250;
   --color-accent-pink-rgb: 244, 114, 182;
 
   /* Status */
@@ -41,8 +43,10 @@
   --radius-sm: 8px;
   --radius-md: 14px;
   --radius-lg: 20px;
-  --shadow-md: 0 20px 40px rgba(2, 8, 6, 0.45);
-  --shadow-glow: 0 0 30px rgba(16, 185, 129, 0.25);
+  --shadow-md: 0 20px 40px rgba(4, 4, 10, 0.45);
+  /* Softer and tighter than the old glow (was 30px blur / 0.25 alpha) - a
+     visible accent on hover without reading as a harsh neon glow. */
+  --shadow-glow: 0 0 22px rgba(108, 99, 224, 0.18);
 
   /* Typography */
   --font-sans: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial,

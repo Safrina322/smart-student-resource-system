@@ -42,7 +42,7 @@
 
 .login-form .form-control:focus {
   background-color: #1c1c1c;
-  border-color: #4fffda;
+  border-color: #6c5af4;
   box-shadow: none;
   color: white;
 }
@@ -66,12 +66,12 @@
   padding: 10px;
   font-size: 1rem;
   border-radius: 6px;
-  background: linear-gradient(135deg, #4fffda, #2bb096);
+  background: linear-gradient(135deg, #6c5af4, #4234a7);
   border: none;
 }
 
 .login-form .btn:hover {
-  background: linear-gradient(135deg, #2bb096, #4fffda);
+  background: linear-gradient(135deg, #4234a7, #6c5af4);
 }
 /* Slightly increase spacing between fields */
 .login-form .mb-3 {
@@ -90,7 +90,7 @@
 }
 
 .switch-auth a {
-  color: #4fffda;
+  color: #6c5af4;
   text-decoration: none;
   font-weight: 500;
 }

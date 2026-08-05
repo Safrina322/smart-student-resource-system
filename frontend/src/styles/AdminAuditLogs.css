@@ -1,9 +1,9 @@
 .audit-page {
   min-height: 100vh;
   background:
-    radial-gradient(950px 420px at 90% -10%, rgba(56, 248, 220, 0.1), transparent 60%),
-    #040b0a;
-  color: #e5ebea;
+    radial-gradient(950px 420px at 90% -10%, rgba(96, 68, 236, 0.1), transparent 60%),
+    #05040b;
+  color: #e6e5eb;
   padding: 26px;
 }
 
@@ -18,7 +18,7 @@
 .audit-back-btn {
   text-decoration: none;
   color: #ffffff;
-  background: linear-gradient(135deg, #0ee9c9, #25ebbb);
+  background: linear-gradient(135deg, #3b1cdb, #4132de);
   border-radius: 8px;
   padding: 9px 14px;
   font-weight: 600;
@@ -28,7 +28,7 @@
 
 .audit-back-btn:hover {
   transform: translateY(-1px);
-  box-shadow: 0 8px 16px rgba(37, 235, 187, 0.35);
+  box-shadow: 0 8px 16px rgba(65, 50, 222, 0.35);
 }
 
 .audit-error {
@@ -36,14 +36,14 @@
 }
 
 .audit-empty {
-  color: #a1cbc2;
+  color: #a8a4c8;
 }
 
 .audit-table-wrap {
   overflow: auto;
   border-radius: 12px;
-  border: 1px solid #224840;
-  background: #0a1b17;
+  border: 1px solid #282446;
+  background: #0c0b1a;
   box-shadow: 0 10px 24px rgba(0, 0, 0, 0.3);
 }
 
@@ -51,27 +51,27 @@
   width: 100%;
   border-collapse: collapse;
   min-width: 920px;
-  background: #0b1c18;
+  background: #0d0c1b;
 }
 
 .audit-table th,
 .audit-table td {
   padding: 12px;
   text-align: left;
-  border-bottom: 1px solid #1d4139;
+  border-bottom: 1px solid #231f3f;
   vertical-align: top;
 }
 
 .audit-table th {
-  background: #102a24;
-  color: #bce8df;
+  background: #141228;
+  color: #c3bfe5;
   font-size: 0.84rem;
   text-transform: uppercase;
   letter-spacing: 0.05em;
 }
 
 .audit-table tbody tr:hover {
-  background: #102a24;
+  background: #141228;
 }
 
 @media (max-width: 768px) {

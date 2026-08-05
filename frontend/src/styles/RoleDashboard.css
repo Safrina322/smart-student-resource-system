@@ -77,7 +77,7 @@
 .role-field input,
 .role-field select,
 .role-field textarea {
-  background: rgba(2, 23, 17, 0.5);
+  background: rgba(4, 3, 22, 0.5);
   border: 1px solid var(--color-border);
   border-radius: var(--radius-sm);
   padding: 10px 12px;
@@ -130,13 +130,13 @@
 }
 
 .role-btn-secondary {
-  background: rgba(148, 184, 176, 0.15);
+  background: rgba(154, 150, 182, 0.15);
   color: var(--color-text);
   border: 1px solid var(--color-border);
 }
 
 .role-btn-secondary:hover {
-  background: rgba(148, 184, 176, 0.25);
+  background: rgba(154, 150, 182, 0.25);
 }
 
 .role-link-btn {
@@ -223,7 +223,7 @@
   border: 1px solid var(--color-border);
   border-radius: var(--radius-md);
   padding: 18px;
-  background: rgba(2, 23, 17, 0.35);
+  background: rgba(4, 3, 22, 0.35);
 }
 
 .review-item-header {
@@ -274,7 +274,7 @@
 .review-actions input {
   flex: 1;
   min-width: 180px;
-  background: rgba(2, 23, 17, 0.5);
+  background: rgba(4, 3, 22, 0.5);
   border: 1px solid var(--color-border);
   border-radius: var(--radius-sm);
   padding: 8px 12px;

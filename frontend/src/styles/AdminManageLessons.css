@@ -1,6 +1,6 @@
 .admin-lessons-page {
   min-height: 100vh;
-  background: #021712;
+  background: #050316;
   padding: 30px;
   color: #fff;
 }
@@ -8,8 +8,8 @@
 .admin-lessons-card {
   max-width: 900px;
   margin: 0 auto;
-  background: #0f2a23;
-  border: 1px solid #1e3b34;
+  background: #131128;
+  border: 1px solid #222039;
   border-radius: 14px;
   padding: 20px;
 }
@@ -29,16 +29,16 @@
   display: block;
   margin-top: 10px;
   margin-bottom: 6px;
-  color: #cbe1dc;
+  color: #cecce0;
 }
 
 .admin-lessons-card input,
 .admin-lessons-card select {
   width: 100%;
   padding: 10px;
-  border: 1px solid #33554e;
+  border: 1px solid #393553;
   border-radius: 8px;
-  background: #0b201b;
+  background: #0e0c1f;
   color: #fff;
 }
 
@@ -49,10 +49,10 @@
 }
 
 .lesson-item {
-  border: 1px solid #1e3b34;
+  border: 1px solid #222039;
   border-radius: 10px;
   padding: 14px;
-  background: #0b201b;
+  background: #0e0c1f;
 }
 
 .lesson-item h3 {
@@ -75,7 +75,7 @@
   padding: 9px 14px;
   cursor: pointer;
   font-weight: 600;
-  background: #25ebbb;
+  background: #4132de;
   color: #fff;
 }
 
@@ -89,5 +89,5 @@
 
 .empty-note {
   margin-top: 14px;
-  color: #94b8b0;
+  color: #9a96b6;
 }

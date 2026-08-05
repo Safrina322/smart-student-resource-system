@@ -51,6 +51,7 @@ const MODERATOR_ITEMS = [
 
 const ADMIN_ITEMS = [
   { to: "/admin/dashboard", label: "Admin Dashboard", icon: HiOutlineSquares2X2 },
+  { to: "/resources", label: "Resources", icon: HiOutlineBookOpen },
   { to: "/admin/users", label: "Manage Users", icon: HiOutlineUsers },
   { to: "/admin/requests", label: "Manage Requests", icon: HiOutlineClipboardDocumentList },
   { to: "/admin/add-course", label: "Add Course", icon: HiOutlinePlusCircle },

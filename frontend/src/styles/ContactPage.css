@@ -2,10 +2,10 @@
   min-height: 100vh;
   padding: 110px 8% 50px;
   background:
-    radial-gradient(900px 420px at 90% -10%, rgba(56, 248, 220, 0.16), transparent 58%),
-    radial-gradient(700px 300px at -5% 20%, rgba(14, 233, 201, 0.13), transparent 55%),
-    #040b0a;
-  color: #e8fbf7;
+    radial-gradient(900px 420px at 90% -10%, rgba(96, 68, 236, 0.16), transparent 58%),
+    radial-gradient(700px 300px at -5% 20%, rgba(59, 28, 219, 0.13), transparent 55%),
+    #05040b;
+  color: #ebe9fa;
 }
 
 .contact-hero {
@@ -15,7 +15,7 @@
 
 .contact-kicker {
   margin: 0 0 8px;
-  color: #7dfce9;
+  color: #9785f4;
   text-transform: uppercase;
   letter-spacing: 0.08em;
   font-weight: 700;
@@ -29,7 +29,7 @@
 
 .contact-hero p {
   margin: 0;
-  color: #b5ded5;
+  color: #bbb8db;
   line-height: 1.65;
 }
 
@@ -40,8 +40,8 @@
 }
 
 .contact-card {
-  background: linear-gradient(145deg, #0e2621, #091c18);
-  border: 1px solid #234b42;
+  background: linear-gradient(145deg, #121024, #0c0a1b);
+  border: 1px solid #292648;
   border-radius: 14px;
   padding: 18px;
   box-shadow: 0 10px 26px rgba(0, 0, 0, 0.3);
@@ -54,7 +54,7 @@
 .contact-link {
   display: inline-block;
   margin-bottom: 8px;
-  color: #8dffed;
+  color: #a494f8;
   text-decoration: none;
   font-weight: 600;
 }
@@ -65,16 +65,16 @@
 
 .contact-card p {
   margin: 0;
-  color: #b6e2d9;
+  color: #bdb9df;
   line-height: 1.55;
 }
 
 .whatsapp-card {
-  border-color: #1d7f56;
+  border-color: #232779;
 }
 
 .contact-footnote {
   margin-top: 16px;
-  color: #93c2b8;
+  color: #9b96bf;
   font-size: 0.88rem;
 }

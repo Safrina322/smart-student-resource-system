@@ -88,7 +88,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: rgba(2, 23, 17, 0.85);
+  background: rgba(4, 3, 22, 0.85);
   border-radius: var(--radius-md);
   color: var(--color-accent-cyan);
   font-size: 0.8rem;

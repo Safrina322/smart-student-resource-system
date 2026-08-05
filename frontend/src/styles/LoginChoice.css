@@ -2,7 +2,7 @@
 
 .login-choice-page {
   min-height: 100vh;
-  background: linear-gradient(135deg, #0a271f 0%, #15352d 50%, #0f2e27 100%);
+  background: linear-gradient(135deg, #0d0c25 0%, #191733 50%, #14112c 100%);
   display: flex;
   justify-content: center;
   align-items: center;
@@ -54,7 +54,7 @@
   align-items: center;
   padding: 50px 30px;
   border-radius: 16px;
-  background: linear-gradient(135deg, rgba(10, 39, 31, 0.8) 0%, rgba(21, 53, 45, 0.8) 100%);
+  background: linear-gradient(135deg, rgba(13, 12, 37, 0.8) 0%, rgba(25, 23, 51, 0.8) 100%);
   border: 2px solid transparent;
   transition: all 0.4s ease;
   position: relative;
@@ -150,7 +150,7 @@
 
 .choice-card.user-card:hover .choice-btn {
   background: linear-gradient(135deg, var(--color-accent-cyan), var(--color-accent-cyan));
-  color: #0a271f;
+  color: #0d0c25;
   border-color: var(--color-accent-cyan);
   font-weight: 700;
 }
@@ -162,7 +162,7 @@
 
 .choice-card.admin-card:hover .choice-btn {
   background: linear-gradient(135deg, #ffd700, #ffed4e);
-  color: #0a271f;
+  color: #0d0c25;
   border-color: #ffed4e;
   font-weight: 700;
 }

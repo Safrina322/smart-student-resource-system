@@ -56,8 +56,8 @@ function App() {
             color: "var(--color-text)",
             border: "1px solid var(--color-border)",
           },
-          success: { iconTheme: { primary: "#10b981", secondary: "#0b0f0e" } },
-          error: { iconTheme: { primary: "#ef4444", secondary: "#0b0f0e" } },
+          success: { iconTheme: { primary: "#34d399", secondary: "#0c0c13" } },
+          error: { iconTheme: { primary: "#ef4444", secondary: "#0c0c13" } },
         }}
       />
       <AppShell>
