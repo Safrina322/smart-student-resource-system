@@ -6,7 +6,7 @@
   left: 0;
   width: 100%;
   height: 70px;
-  background: linear-gradient(90deg, #0d0c25 0%, #191733 100%);
+  background: linear-gradient(90deg, #0d2422 0%, #183230 100%);
   border-bottom: 2px solid var(--color-accent-cyan);
   display: flex;
   justify-content: center;
@@ -103,7 +103,7 @@
 }
 
 .login-btn:hover {
-  background: linear-gradient(135deg, var(--color-accent-cyan), #3611ee);
+  background: linear-gradient(135deg, var(--color-accent-cyan), #1ae5e2);
   box-shadow: 0 6px 20px rgba(var(--color-accent-cyan-rgb), 0.5);
   transform: translateY(-2px);
 }
@@ -157,7 +157,7 @@
   position: absolute;
   top: 100%;
   right: 0;
-  background: linear-gradient(135deg, #0d0c25 0%, #191733 100%);
+  background: linear-gradient(135deg, #0d2422 0%, #183230 100%);
   border: 1px solid var(--color-accent-cyan);
   border-radius: 8px;
   padding: 10px 0;
@@ -252,7 +252,7 @@
     top: 70px;
     left: 0;
     width: 100%;
-    background: #0d0c25;
+    background: #0d2422;
     flex-direction: column;
     gap: 0;
     max-height: 0;

@@ -1,68 +1,63 @@
 /* POPULAR RESOURCES CONTAINER */
 .popular-resources-container {
-  padding: 26px 0;
-  color: #e7e6f5;
+  padding: 20px 0;
+  color: var(--color-text);
 }
 
 /* POPULAR SECTION */
 .popular-section {
-  margin-bottom: 46px;
+  margin-bottom: 36px;
 }
 
 .popular-section h2 {
-  font-size: 1.7rem;
-  margin-bottom: 6px;
-  background: linear-gradient(135deg, #fbbf24, #fde68a);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
+  font-size: 1.3rem;
+  margin-bottom: 4px;
+  color: var(--color-text);
 }
 
 .section-subtitle {
-  color: #a4a0c5;
-  margin-bottom: 18px;
-  font-size: 0.95rem;
+  color: var(--color-text-secondary);
+  margin-bottom: 14px;
+  font-size: 0.88rem;
 }
 
 /* POPULAR GRID */
 .popular-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-  gap: 18px;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 14px;
 }
 
 .popular-card {
   position: relative;
-  background: linear-gradient(135deg, #121024 0%, #0b091a 100%);
-  border-radius: 14px;
+  background: var(--color-surface);
+  border-radius: var(--radius-md);
   overflow: hidden;
-  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.35);
-  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
-  border: 1px solid #252143;
+  transition: transform 0.18s ease, border-color 0.18s ease;
+  border: 1px solid var(--color-border);
 }
 
 .popular-card:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 14px 28px rgba(0, 0, 0, 0.45);
-  border-color: #fbbf24;
+  transform: translateY(-3px);
+  border-color: var(--color-warning);
 }
 
 .popular-image {
   width: 100%;
-  height: 180px;
+  height: 140px;
   object-fit: cover;
   display: block;
 }
 
 .popular-badge {
   position: absolute;
-  top: 12px;
-  right: 12px;
-  background: rgba(251, 191, 36, 0.96);
-  color: #231600;
-  padding: 7px 10px;
-  border-radius: 6px;
-  font-size: 0.8rem;
+  top: 10px;
+  right: 10px;
+  background: var(--color-warning);
+  color: #241a00;
+  padding: 5px 9px;
+  border-radius: var(--radius-sm);
+  font-size: 0.75rem;
   font-weight: 600;
   display: flex;
   align-items: center;
@@ -70,212 +65,197 @@
 }
 
 .badge-icon {
-  font-size: 1rem;
+  font-size: 0.9rem;
 }
 
 .popular-content {
-  padding: 16px;
+  padding: 14px;
 }
 
 .popular-content h3 {
-  font-size: 1.1rem;
-  margin: 0 0 6px;
+  font-size: 1rem;
+  margin: 0 0 5px;
   line-height: 1.3;
 }
 
 .course-subject {
-  color: #a39fc5;
-  font-size: 0.88rem;
-  margin-bottom: 8px;
+  color: var(--color-text-secondary);
+  font-size: 0.82rem;
+  margin-bottom: 6px;
 }
 
 .course-level {
-  color: #b5b1d4;
-  font-size: 0.82rem;
-  margin-bottom: 12px;
+  color: var(--color-text-muted);
+  font-size: 0.78rem;
+  margin-bottom: 10px;
 }
 
 .popularity-bar {
-  height: 6px;
-  background-color: #201c3e;
+  height: 5px;
+  background-color: var(--color-bg-secondary);
   border-radius: 3px;
   overflow: hidden;
-  margin-bottom: 10px;
+  margin-bottom: 8px;
 }
 
 .popularity-fill {
   height: 100%;
-  background: linear-gradient(90deg, #f59e0b, #fcd34d);
+  background: var(--color-warning);
   border-radius: 3px;
   transition: width 0.3s ease;
 }
 
 .unique-users {
-  font-size: 0.85rem;
-  color: #b0acd2;
-  margin-bottom: 12px;
+  font-size: 0.8rem;
+  color: var(--color-text-secondary);
+  margin-bottom: 10px;
 }
 
 .view-course-btn {
   display: block;
   text-align: center;
-  padding: 10px 14px;
-  background: linear-gradient(135deg, #3b1cdb, #4132de);
-  color: white;
+  padding: 8px 12px;
+  background: var(--color-accent);
+  color: #051615;
   text-decoration: none;
-  border-radius: 8px;
+  border-radius: var(--radius-sm);
   font-weight: 600;
-  font-size: 0.9rem;
-  border: 1px solid rgba(255, 255, 255, 0.18);
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  font-size: 0.85rem;
+  transition: background 0.18s ease;
 }
 
 .view-course-btn:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 7px 18px rgba(65, 50, 222, 0.34);
+  background: var(--color-accent-strong);
 }
 
 /* TRENDING SECTION */
 .trending-section {
-  margin-bottom: 24px;
+  margin-bottom: 20px;
 }
 
 .trending-section h2 {
-  font-size: 1.7rem;
-  margin-bottom: 6px;
-  background: linear-gradient(135deg, #fb7185, #fda4af);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
+  font-size: 1.3rem;
+  margin-bottom: 4px;
+  color: var(--color-text);
 }
 
 /* TRENDING GRID */
 .trending-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-  gap: 16px;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 14px;
 }
 
 .trending-card {
-  background: linear-gradient(135deg, #171525 0%, #0d0c1b 100%);
-  border-radius: 12px;
+  background: var(--color-surface);
+  border-radius: var(--radius-sm);
   overflow: hidden;
-  box-shadow: 0 8px 18px rgba(0, 0, 0, 0.35);
-  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
-  border: 1px solid #282446;
+  transition: transform 0.18s ease, border-color 0.18s ease;
+  border: 1px solid var(--color-border);
   display: flex;
   flex-direction: column;
 }
 
 .trending-card:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.42);
+  transform: translateY(-2px);
   border-color: #fb7185;
 }
 
 .trending-image-wrapper {
   position: relative;
   overflow: hidden;
-  height: 140px;
+  height: 110px;
 }
 
 .trending-image {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  transition: transform 0.3s ease;
+  transition: transform 0.25s ease;
 }
 
 .trending-card:hover .trending-image {
-  transform: scale(1.05);
+  transform: scale(1.03);
 }
 
 .trending-badge {
   position: absolute;
   top: 8px;
   left: 8px;
-  font-size: 1.8rem;
-  animation: float 2s ease-in-out infinite;
-}
-
-@keyframes float {
-  0%, 100% { transform: translateY(0px); }
-  50% { transform: translateY(-8px); }
+  font-size: 1.3rem;
 }
 
 .trending-content {
-  padding: 14px;
+  padding: 12px;
   flex: 1;
   display: flex;
   flex-direction: column;
 }
 
 .trending-content h4 {
-  font-size: 1.05rem;
+  font-size: 0.95rem;
   margin-bottom: 4px;
   line-height: 1.3;
 }
 
 .trending-subject {
-  color: #aea9d0;
-  font-size: 0.85rem;
-  margin-bottom: 10px;
+  color: var(--color-text-secondary);
+  font-size: 0.8rem;
+  margin-bottom: 8px;
 }
 
 .trending-stats {
   display: flex;
   gap: 8px;
-  font-size: 0.78rem;
-  color: #b8b4d6;
-  margin-bottom: 10px;
+  font-size: 0.74rem;
+  color: var(--color-text-secondary);
+  margin-bottom: 8px;
   flex-wrap: wrap;
 }
 
 .trending-stats span {
-  padding: 3px 0;
+  padding: 2px 0;
 }
 
 .trending-btn {
   display: inline-block;
-  padding: 8px 12px;
-  background: linear-gradient(135deg, #fb7185, #f43f5e);
-  color: white;
+  padding: 7px 11px;
+  background: #fb7185;
+  color: #240509;
   text-decoration: none;
-  border-radius: 6px;
+  border-radius: var(--radius-sm);
   font-weight: 600;
-  font-size: 0.9rem;
+  font-size: 0.85rem;
   text-align: center;
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
-  box-shadow: 0 4px 10px rgba(244, 63, 94, 0.28);
+  transition: transform 0.18s ease;
 }
 
 .trending-btn:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 8px 14px rgba(244, 63, 94, 0.35);
+  transform: translateY(-1px);
 }
 
 /* ERROR & EMPTY STATES */
 .error-message {
   color: #fecaca;
-  padding: 16px;
-  background-color: #221014;
-  border-radius: 8px;
-  border-left: 4px solid #ff6b6b;
-  margin-bottom: 20px;
+  padding: 14px;
+  background-color: rgba(239, 68, 68, 0.1);
+  border-radius: var(--radius-sm);
+  border-left: 3px solid var(--color-danger-strong);
+  margin-bottom: 16px;
 }
 
 .empty-state {
   text-align: center;
-  padding: 40px 20px;
-  color: #9793b8;
-  font-size: 1.1rem;
+  padding: 32px 16px;
+  color: var(--color-text-secondary);
+  font-size: 1rem;
 }
 
 /* RESPONSIVE */
 @media (max-width: 768px) {
   .popular-section h2,
   .trending-section h2 {
-    font-size: 1.5rem;
+    font-size: 1.15rem;
   }
 
   .popular-grid {
@@ -283,13 +263,13 @@
   }
 
   .trending-grid {
-    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
   }
 
   .popular-card {
     display: grid;
-    grid-template-columns: 140px 1fr;
-    border-radius: 10px;
+    grid-template-columns: 120px 1fr;
+    border-radius: var(--radius-sm);
   }
 
   .popular-image {
@@ -298,10 +278,10 @@
   }
 
   .popular-content {
-    padding: 16px;
+    padding: 12px;
   }
 
   .popular-content h3 {
-    font-size: 1.05rem;
+    font-size: 0.95rem;
   }
 }

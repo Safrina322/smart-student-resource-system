@@ -10,7 +10,7 @@ import { chartColors, baseChartOptions } from "./chartTheme.js";
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, Tooltip);
 
-const PALETTE = [chartColors.cyan, chartColors.indigo, chartColors.violet, chartColors.pink, "#34d399"];
+const PALETTE = [chartColors.teal, chartColors.cyan, chartColors.violet, chartColors.pink, "#10b981"];
 
 function TopSubjectsChart({ subjects }) {
   const data = {

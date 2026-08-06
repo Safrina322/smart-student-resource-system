@@ -1,8 +1,8 @@
 .upload-page {
   min-height: 100vh;
   background:
-    radial-gradient(800px 320px at 100% -10%, rgba(59, 28, 219, 0.12), transparent 60%),
-    #05040b;
+    radial-gradient(800px 320px at 100% -10%, rgba(36, 211, 208, 0.12), transparent 60%),
+    #040b0b;
   display: flex;
   justify-content: center;
   padding: 22px;
@@ -10,8 +10,8 @@
 
 .upload-card {
   width: min(980px, 100%);
-  background: linear-gradient(145deg, #100e22, #0c0a1b);
-  border: 1px solid #252142;
+  background: linear-gradient(145deg, #0f2120, #0b1a1a);
+  border: 1px solid #22413f;
   padding: 26px;
   border-radius: 18px;
   box-shadow: 0 16px 36px rgba(0, 0, 0, 0.4);
@@ -19,13 +19,13 @@
 
 .upload-card h2 {
   margin: 0 0 16px;
-  color: #f6f5fe;
+  color: #f5fefd;
 }
 
 .upload-card label {
   display: block;
   margin-top: 12px;
-  color: #b0abd3;
+  color: #add1d0;
   font-size: 0.92rem;
   font-weight: 600;
 }
@@ -36,17 +36,17 @@
   padding: 10px 11px;
   margin-top: 6px;
   border-radius: 8px;
-  border: 1px solid #2b2748;
-  background-color: #0e0c1f;
-  color: #eae8fa;
+  border: 1px solid #284745;
+  background-color: #0d1e1d;
+  color: #e9f9f8;
   outline: none;
   transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
 
 .upload-card input:focus,
 .upload-card select:focus {
-  border-color: #6044ec;
-  box-shadow: 0 0 0 3px rgba(96, 68, 236, 0.18);
+  border-color: #4be5e3;
+  box-shadow: 0 0 0 3px rgba(75, 229, 227, 0.18);
 }
 
 .upload-card button {
@@ -55,7 +55,7 @@
   padding: 12px;
   border-radius: 10px;
   border: none;
-  background: linear-gradient(90deg, #3b1cdb, #4132de);
+  background: linear-gradient(90deg, #24d3d0, #39d7cd);
   color: #fff;
   font-weight: 700;
   cursor: pointer;
@@ -64,7 +64,7 @@
 
 .upload-card button:hover {
   transform: translateY(-1px);
-  box-shadow: 0 9px 18px rgba(65, 50, 222, 0.35);
+  box-shadow: 0 9px 18px rgba(57, 215, 205, 0.35);
 }
 
 .upload-status-message {
@@ -73,14 +73,14 @@
   border-radius: 10px;
   text-align: center;
   font-weight: 600;
-  background: rgba(59, 28, 219, 0.1);
-  border: 1px solid rgba(59, 28, 219, 0.3);
-  color: #ebe8fd;
+  background: rgba(36, 211, 208, 0.1);
+  border: 1px solid rgba(36, 211, 208, 0.3);
+  color: #e9fcfc;
 }
 
 .request-timeline-section {
   margin-top: 26px;
-  border-top: 1px solid #272345;
+  border-top: 1px solid #244442;
   padding-top: 16px;
 }
 
@@ -89,7 +89,7 @@
 }
 
 .timeline-empty {
-  color: #aba7c9;
+  color: #a8c8c6;
 }
 
 .timeline-request-list {
@@ -98,8 +98,8 @@
 }
 
 .timeline-request-card {
-  background: #131126;
-  border: 1px solid #2a264a;
+  background: #122524;
+  border: 1px solid #274947;
   border-radius: 12px;
   padding: 12px;
 }
@@ -117,7 +117,7 @@
 
 .timeline-request-meta {
   margin: 8px 0 12px;
-  color: #a5a1c5;
+  color: #a2c4c2;
   font-size: 0.9rem;
 }
 
@@ -131,13 +131,13 @@
 
 .status-submitted,
 .status-pending {
-  background: #2c2583;
-  color: #e1ddfc;
+  background: #297f79;
+  color: #defbfa;
 }
 
 .status-approved {
-  background: #100c59;
-  color: #d4d8f7;
+  background: #0f5650;
+  color: #d5f6f0;
 }
 
 .status-rejected {
@@ -166,11 +166,11 @@
 
 .dot-submitted,
 .dot-pending {
-  background: #796af0;
+  background: #6febe5;
 }
 
 .dot-approved {
-  background: #34d399;
+  background: #10b981;
 }
 
 .dot-rejected {
@@ -179,12 +179,12 @@
 
 .timeline-step-content p {
   margin: 4px 0;
-  color: #d9d6ec;
+  color: #d7ebea;
   line-height: 1.4;
 }
 
 .timeline-step-content small {
-  color: #9893ba;
+  color: #95b8b7;
 }
 
 @media (max-width: 768px) {

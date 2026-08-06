@@ -1,54 +1,55 @@
 :root {
-  /* Surfaces - deep charcoal with a whisper of violet, not flat/blue-black */
-  --color-bg: #0c0c13;
-  --color-surface: rgba(23, 23, 33, 0.6);
-  --color-surface-strong: rgba(23, 23, 33, 0.92);
-  --color-border: rgba(150, 148, 168, 0.14);
+  /* Surfaces - matte dark, GitHub/Linear/Vercel-style. Solid, not
+     translucent-glass - cards should read as flat panels, not frosted glass. */
+  --color-bg: #0f1115;
+  --color-bg-secondary: #121417;
+  --color-surface: #171a21;
+  --color-surface-strong: #1c202a;
+  --color-border: #2a2f3a;
 
   /* Text */
-  --color-text: #f1f0f5;
-  --color-text-secondary: #c7c5d3;
-  --color-text-muted: #87859a;
+  --color-text: #f3f4f6;
+  --color-text-secondary: #c7c9d1;
+  --color-text-muted: #9ca3af;
 
-  /* Accents - refined indigo/violet, replacing the old emerald/teal.
-     Deliberately lower-saturation and lighter than a typical "neon" accent
-     so hover glows and gradients read as calm/premium rather than vibrant. */
-  --color-accent-cyan: #8b85f0;
-  --color-accent: #6c63e0;
-  --color-accent-strong: #524ab8;
+  /* Accent - a single restrained teal identity (not a multi-hue rainbow).
+     --color-accent-cyan is a lighter tint of the SAME hue for secondary/
+     subtle uses, not a second competing color. */
+  --color-accent: #14b8a6;
+  --color-accent-strong: #0f9488;
+  --color-accent-cyan: #5eead4;
   --color-accent-violet: #a78bfa;
   --color-accent-pink: #f472b6;
-  --gradient-accent: linear-gradient(90deg, #6c63e0, #8b85f0);
+  --gradient-accent: linear-gradient(90deg, #14b8a6, #5eead4);
   --gradient-accent-alt: linear-gradient(160deg, #a78bfa, #6d28d9);
 
   /* RGB triplets for rgba(var(--x-rgb), alpha) glow/tint effects */
-  --color-accent-cyan-rgb: 139, 133, 240;
-  --color-accent-rgb: 108, 99, 224;
+  --color-accent-cyan-rgb: 94, 234, 212;
+  --color-accent-rgb: 20, 184, 166;
   --color-accent-violet-rgb: 167, 139, 250;
   --color-accent-pink-rgb: 244, 114, 182;
 
   /* Status */
   --color-danger: #fca5a5;
   --color-danger-strong: #ef4444;
-  --color-success: #34d399;
-  --color-warning: #fbbf24;
+  --color-success: #10b981;
+  --color-warning: #f59e0b;
 
-  /* Reserved for admin-tier UI accents (distinct from the regular emerald accent) */
+  /* Reserved for admin-tier UI accents (distinct from the regular accent) */
   --color-gold: #ffd700;
   --color-gold-light: #ffed4e;
   --color-gold-rgb: 255, 215, 0;
   --color-danger-strong-rgb: 239, 68, 68;
 
-  /* Shape & elevation */
+  /* Shape & elevation - soft, not glowing */
   --radius-sm: 8px;
-  --radius-md: 14px;
-  --radius-lg: 20px;
-  --shadow-md: 0 20px 40px rgba(4, 4, 10, 0.45);
-  /* Softer and tighter than the old glow (was 30px blur / 0.25 alpha) - a
-     visible accent on hover without reading as a harsh neon glow. */
-  --shadow-glow: 0 0 22px rgba(108, 99, 224, 0.18);
+  --radius-md: 12px;
+  --radius-lg: 14px;
+  --shadow-md: 0 16px 32px rgba(0, 0, 0, 0.35);
+  --shadow-glow: 0 0 18px rgba(20, 184, 166, 0.14);
 
-  /* Typography */
+  /* Typography - Poppins for headings, Inter for body */
+  --font-heading: "Poppins", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   --font-sans: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial,
     sans-serif;
 }

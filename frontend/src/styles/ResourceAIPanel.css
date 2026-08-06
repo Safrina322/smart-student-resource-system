@@ -101,7 +101,7 @@
 }
 
 .ai-action-btn.secondary {
-  background: rgba(154, 150, 182, 0.12);
+  background: rgba(151, 181, 179, 0.12);
   color: var(--color-text);
 }
 
@@ -149,7 +149,7 @@
 
 .ai-quiz-option {
   text-align: left;
-  background: rgba(4, 3, 22, 0.4);
+  background: rgba(4, 21, 20, 0.4);
   border: 1px solid var(--color-border);
   border-radius: var(--radius-sm);
   padding: 12px 16px;
@@ -164,7 +164,7 @@
 
 .ai-quiz-option.correct {
   border-color: var(--color-success);
-  background: rgba(52, 211, 153, 0.12);
+  background: rgba(16, 185, 129, 0.12);
   color: var(--color-success);
 }
 
@@ -175,7 +175,7 @@
 }
 
 .ai-quiz-explanation {
-  background: rgba(154, 150, 182, 0.08);
+  background: rgba(151, 181, 179, 0.08);
   border-radius: var(--radius-sm);
   padding: 14px 16px;
 }
@@ -219,7 +219,7 @@
 }
 
 .ai-flashcard.flipped {
-  background: linear-gradient(160deg, #522fe1, #2e13a7);
+  background: linear-gradient(160deg, #36dada, #19a1a0);
 }
 
 .ai-flashcard-label {
@@ -267,13 +267,13 @@
 .ai-chat-bubble.user {
   align-self: flex-end;
   background: var(--gradient-accent);
-  color: #08061d;
+  color: #071c1b;
   font-weight: 500;
 }
 
 .ai-chat-bubble.model {
   align-self: flex-start;
-  background: rgba(154, 150, 182, 0.12);
+  background: rgba(151, 181, 179, 0.12);
   color: var(--color-text-secondary);
 }
 

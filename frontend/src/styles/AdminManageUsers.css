@@ -118,7 +118,7 @@
 }
 
 .manage-users-table tbody tr:hover {
-  background: rgba(154, 150, 182, 0.05);
+  background: rgba(151, 181, 179, 0.05);
 }
 
 .manage-users-empty {
@@ -160,7 +160,7 @@
 }
 
 .status-badge.active {
-  background: rgba(52, 211, 153, 0.15);
+  background: rgba(16, 185, 129, 0.15);
   color: var(--color-success);
 }
 
@@ -206,12 +206,12 @@
 }
 
 .activate-btn {
-  background: rgba(52, 211, 153, 0.15);
+  background: rgba(16, 185, 129, 0.15);
   color: var(--color-success);
 }
 
 .activate-btn:hover {
-  background: rgba(52, 211, 153, 0.25);
+  background: rgba(16, 185, 129, 0.25);
 }
 
 .manage-users-actions button:disabled,

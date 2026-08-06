@@ -23,8 +23,8 @@
 
 .contact-btn {
   background: transparent;
-  color: #4d3bf1;
-  border: 1px solid #4d3bf1;
+  color: #42eae0;
+  border: 1px solid #42eae0;
   padding: 10px 20px;
   cursor: pointer;
   border-radius: 6px;
@@ -32,7 +32,7 @@
 }
 
 .contact-btn:hover {
-  background: #4d3bf1;
+  background: #42eae0;
   color: white;
 }
 
