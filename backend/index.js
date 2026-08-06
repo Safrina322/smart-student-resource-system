@@ -97,6 +97,125 @@ const seedDefaultAdmin = async () => {
   }
 };
 
+// A freshly deployed environment has an empty resource hub, so every AI
+// Tools search / resource browse comes back empty until someone actually
+// uploads and gets a resource approved - not something a visitor evaluating
+// the site should have to do first. Seeds a small set of real, correctly-
+// linked resources (research papers, lecture notes, videos) pre-approved
+// under the demo lecturer account, so search/browse/AI tools all have real
+// content immediately. Checked by title, once - safe to run on every boot.
+const seedDemoResources = async () => {
+  const DEMO_RESOURCES = [
+    {
+      title: "Attention Is All You Need — Transformer Architecture",
+      description:
+        "The original research paper introducing the Transformer architecture, the foundation of modern large language models.",
+      subject: "Artificial Intelligence",
+      department: "CS",
+      semester: 4,
+      resource_type: "PDF",
+      resource_link: "https://arxiv.org/pdf/1706.03762",
+      tags: "ai,deep-learning,transformers",
+    },
+    {
+      title: "Deep Residual Learning for Image Recognition (ResNet)",
+      description:
+        "The paper that introduced residual connections in convolutional neural networks, enabling very deep image recognition models.",
+      subject: "Machine Learning",
+      department: "CS",
+      semester: 4,
+      resource_type: "PDF",
+      resource_link: "https://arxiv.org/pdf/1512.03385",
+      tags: "cnn,computer-vision,resnet",
+    },
+    {
+      title: "Linear Algebra Essentials for Data Science",
+      description:
+        "A concise study guide covering vectors, matrices, eigenvalues, and eigenvectors as applied to data science and machine learning workflows.",
+      subject: "Mathematics",
+      department: "CS",
+      semester: 2,
+      resource_type: "PDF",
+      resource_link: "https://cs229.stanford.edu/section/cs229-linalg.pdf",
+      tags: "math,linear-algebra,vectors",
+    },
+    {
+      title: "Probability & Statistics Review for Machine Learning",
+      description: "Stanford CS229 review notes covering probability theory and statistics foundations needed for ML.",
+      subject: "Mathematics",
+      department: "CS",
+      semester: 3,
+      resource_type: "PDF",
+      resource_link: "https://cs229.stanford.edu/section/cs229-prob.pdf",
+      tags: "probability,statistics,math",
+    },
+    {
+      title: "Word Vectors and Word Embeddings",
+      description: "Stanford CS224N lecture notes introducing word vector representations (word2vec, GloVe) for NLP.",
+      subject: "Natural Language Processing",
+      department: "CS",
+      semester: 5,
+      resource_type: "PDF",
+      resource_link: "https://web.stanford.edu/class/cs224n/readings/cs224n-2019-notes01-wordvecs1.pdf",
+      tags: "nlp,word2vec,embeddings",
+    },
+    {
+      title: "Essence of Linear Algebra: Vectors",
+      description:
+        "3Blue1Brown video explaining what vectors really are, visually and intuitively - a great primer before diving into matrix math.",
+      subject: "Mathematics",
+      department: "CS",
+      semester: 2,
+      resource_type: "Video",
+      resource_link: "https://www.youtube.com/watch?v=fNk_zzaMoSs",
+      tags: "linear-algebra,vectors,video",
+    },
+    {
+      title: "But What Is a Neural Network?",
+      description: "3Blue1Brown video visually explaining how neural networks work, from neurons to weights to activations.",
+      subject: "Artificial Intelligence",
+      department: "CS",
+      semester: 4,
+      resource_type: "Video",
+      resource_link: "https://www.youtube.com/watch?v=aircAruvnKk",
+      tags: "neural-networks,deep-learning,video",
+    },
+  ];
+
+  try {
+    const lecturerRows = await queryAsync("SELECT id FROM users WHERE username = 'demo.lecturer'");
+    const lecturerId = lecturerRows[0]?.id;
+    if (!lecturerId) return; // seedDemoRoleAccounts runs first, but guard anyway
+
+    for (const resource of DEMO_RESOURCES) {
+      const existing = await queryAsync("SELECT id FROM lecturer_resources WHERE title = ?", [
+        resource.title,
+      ]);
+      if (existing.length > 0) continue;
+
+      await queryAsync(
+        `INSERT INTO lecturer_resources
+          (uploader_id, title, description, subject, department, semester, resource_type, resource_link, tags, status)
+         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 'approved')`,
+        [
+          lecturerId,
+          resource.title,
+          resource.description,
+          resource.subject,
+          resource.department,
+          resource.semester,
+          resource.resource_type,
+          resource.resource_link,
+          resource.tags,
+        ]
+      );
+      logger.info(`Seeded demo resource: ${resource.title}`);
+    }
+  } catch (err) {
+    logger.error({ err }, "Failed to seed demo resources");
+  }
+};
+
 // ✅ Configure CORS for the frontend app
 // Vite picks the next free port (5174, 5175, ...) whenever 5173 is already
 // taken by another process, which silently breaks a fixed-origin CORS check
@@ -159,6 +278,7 @@ startReportScheduler();
 
 await seedDemoRoleAccounts();
 await seedDefaultAdmin();
+await seedDemoResources();
 
 logger.info("Database schema and seed data ready");
 
