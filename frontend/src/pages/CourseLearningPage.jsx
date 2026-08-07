@@ -7,6 +7,21 @@ import { trackEvent } from "../services/analyticsService.js";
 import { useAuth } from "../hooks/useAuth.js";
 import "../styles/Resources.css";
 
+const FALLBACK_IMAGE =
+  "data:image/svg+xml;charset=UTF-8," +
+  encodeURIComponent(`
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 360">
+      <rect width="600" height="360" fill="#171a21"/>
+      <rect x="1" y="1" width="598" height="358" fill="none" stroke="#2a2f3a" stroke-width="2"/>
+      <g opacity="0.55">
+        <rect x="250" y="130" width="100" height="76" rx="8" fill="none" stroke="#14b8a6" stroke-width="3"/>
+        <circle cx="272" cy="152" r="7" fill="#14b8a6"/>
+        <path d="M258,196 L288,166 L306,184 L322,168 L342,196 Z" fill="#14b8a6"/>
+      </g>
+      <text x="300" y="240" fill="#9ca3af" font-family="Arial, sans-serif" font-size="15" font-weight="600" text-anchor="middle">No preview available</text>
+    </svg>
+  `);
+
 function buildLearningPlan(course) {
   const subject = course.subject || "this subject";
   const title = course.title || "Course";
@@ -92,7 +107,7 @@ function CourseLearningPage() {
   }, [course]);
 
   const resolveImageUrl = (image) => {
-    if (!image) return "https://via.placeholder.com/800x300?text=Course";
+    if (!image) return FALLBACK_IMAGE;
     if (image.startsWith("http://") || image.startsWith("https://")) {
       return image;
     }
@@ -158,7 +173,7 @@ function CourseLearningPage() {
             src={resolveImageUrl(course.image)}
             alt={course.title}
             onError={(e) => {
-              e.target.src = "https://via.placeholder.com/800x300?text=Course";
+              e.target.src = FALLBACK_IMAGE;
             }}
           />
 

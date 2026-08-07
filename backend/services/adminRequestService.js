@@ -18,7 +18,11 @@ const resolveOrCreateCourse = async (request) => {
   );
   if (existing) return existing.id;
 
-  const courseImage = request.image?.trim() ? request.image.trim() : "default.jpg";
+  // Leaving this null (rather than a sentinel like "default.jpg") means the
+  // frontend's resolveImageUrl() goes straight to its built-in placeholder
+  // instead of first attempting - and failing - a request for a file that
+  // was never actually created.
+  const courseImage = request.image?.trim() || null;
   const courseDescription = request.description?.trim()
     ? request.description.trim()
     : request.message || "Course created from approved request";

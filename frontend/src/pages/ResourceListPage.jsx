@@ -18,18 +18,14 @@ const FALLBACK_IMAGE =
   "data:image/svg+xml;charset=UTF-8," +
   encodeURIComponent(`
     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 360">
-      <defs>
-        <linearGradient id="g" x1="0" x2="1" y1="0" y2="1">
-          <stop offset="0%" stop-color="#0f172a" />
-          <stop offset="100%" stop-color="#1d4ed8" />
-        </linearGradient>
-      </defs>
-      <rect width="600" height="360" rx="24" fill="url(#g)"/>
-      <circle cx="420" cy="110" r="54" fill="rgba(255,255,255,0.12)"/>
-      <rect x="70" y="86" width="220" height="18" rx="9" fill="rgba(255,255,255,0.7)"/>
-      <rect x="70" y="124" width="300" height="14" rx="7" fill="rgba(255,255,255,0.45)"/>
-      <rect x="70" y="154" width="260" height="14" rx="7" fill="rgba(255,255,255,0.35)"/>
-      <text x="70" y="254" fill="#e0f2fe" font-family="Arial, sans-serif" font-size="28" font-weight="700">Study Resource</text>
+      <rect width="600" height="360" fill="#171a21"/>
+      <rect x="1" y="1" width="598" height="358" fill="none" stroke="#2a2f3a" stroke-width="2"/>
+      <g opacity="0.55">
+        <rect x="250" y="130" width="100" height="76" rx="8" fill="none" stroke="#14b8a6" stroke-width="3"/>
+        <circle cx="272" cy="152" r="7" fill="#14b8a6"/>
+        <path d="M258,196 L288,166 L306,184 L322,168 L342,196 Z" fill="#14b8a6"/>
+      </g>
+      <text x="300" y="240" fill="#9ca3af" font-family="Arial, sans-serif" font-size="15" font-weight="600" text-anchor="middle">No preview available</text>
     </svg>
   `);
 

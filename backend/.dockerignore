@@ -2,6 +2,4 @@ node_modules
 npm-debug.log
 .env
 .git
-images
-lesson-files
 openapi.json

@@ -216,6 +216,23 @@ const seedDemoResources = async () => {
   }
 };
 
+// Older approved requests without an uploaded image got a literal
+// "default.jpg" written to courses.image - a file that was never actually
+// created, so every card wasted a failed request before falling back to
+// the placeholder. Clearing it to NULL goes straight to the placeholder
+// instead. Safe to run on every boot: once cleared, the WHERE clause
+// matches nothing.
+const cleanupLegacyImageSentinel = async () => {
+  try {
+    const result = await queryAsync("UPDATE courses SET image = NULL WHERE image = 'default.jpg'");
+    if (result.affectedRows > 0) {
+      logger.info(`Cleared legacy "default.jpg" image sentinel on ${result.affectedRows} course(s)`);
+    }
+  } catch (err) {
+    logger.error({ err }, "Failed to clean up legacy image sentinel");
+  }
+};
+
 // ✅ Configure CORS for the frontend app
 // Vite picks the next free port (5174, 5175, ...) whenever 5173 is already
 // taken by another process, which silently breaks a fixed-origin CORS check
@@ -279,6 +296,7 @@ startReportScheduler();
 await seedDemoRoleAccounts();
 await seedDefaultAdmin();
 await seedDemoResources();
+await cleanupLegacyImageSentinel();
 
 logger.info("Database schema and seed data ready");
 
