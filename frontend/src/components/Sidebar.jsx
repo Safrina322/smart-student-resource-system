@@ -106,7 +106,12 @@ function Sidebar({ collapsed, onToggleCollapsed, mobileOpen, onCloseMobile }) {
         <div className="sidebar-header">
           <Link to="/" className="sidebar-logo-link">
             <img src={logo} alt="Smart Student Logo" className="sidebar-logo-image" />
-            {!effectiveCollapsed && <span className="sidebar-logo-text">SmartStudent</span>}
+            {!effectiveCollapsed && (
+              <span className="sidebar-logo-text-group">
+                <span className="sidebar-logo-text">SmartStudent</span>
+                <span className="sidebar-logo-tagline">Learn · Share · Grow</span>
+              </span>
+            )}
           </Link>
           <button
             type="button"

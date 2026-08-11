@@ -1,12 +1,28 @@
 import { useEffect } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import {
+  HiOutlineCheckCircle,
+  HiOutlineXCircle,
+  HiOutlineChatBubbleLeftRight,
+  HiOutlineBell,
+} from "react-icons/hi2";
+import {
   listNotifications,
   markRead as markReadRequest,
   markAllRead as markAllReadRequest,
 } from "../services/notificationService.js";
 import { getSocket } from "../services/socketClient.js";
 import "../styles/NotificationsPanel.css";
+
+// The border-stripe color encodes real severity (approved/rejected/reply),
+// not arbitrary per-item decoration - anything else falls back to the
+// neutral "info" treatment.
+const TYPE_META = {
+  request_approved: { className: "type-success", icon: HiOutlineCheckCircle },
+  request_rejected: { className: "type-danger", icon: HiOutlineXCircle },
+  comment_reply: { className: "type-accent", icon: HiOutlineChatBubbleLeftRight },
+};
+const DEFAULT_META = { className: "type-info", icon: HiOutlineBell };
 
 // Shares the ["notifications"] query cache with NotificationBell - see that
 // component for why. Mutations invalidate the shared cache instead of
@@ -72,28 +88,33 @@ function NotificationsPanel() {
         <p className="notifications-empty">No notifications yet.</p>
       ) : (
         <div className="notifications-list">
-          {notifications.map((item) => (
-            <article
-              key={item.id}
-              className={`notification-item ${item.is_read ? "is-read" : "is-unread"}`}
-            >
-              <div className="notification-main">
-                <h4>{item.title}</h4>
-                <p>{item.message}</p>
-                <small>{formatDate(item.created_at)}</small>
-              </div>
-              {!item.is_read && (
-                <button
-                  type="button"
-                  onClick={() => markReadMutation.mutate(item.id)}
-                  disabled={markReadMutation.isPending}
-                  className="mark-read-btn"
-                >
-                  Mark read
-                </button>
-              )}
-            </article>
-          ))}
+          {notifications.map((item) => {
+            const meta = TYPE_META[item.type] || DEFAULT_META;
+            const Icon = meta.icon;
+            return (
+              <article
+                key={item.id}
+                className={`notification-item ${meta.className} ${item.is_read ? "is-read" : "is-unread"}`}
+              >
+                <Icon className="notification-icon" />
+                <div className="notification-main">
+                  <h4>{item.title}</h4>
+                  <p>{item.message}</p>
+                  <small>{formatDate(item.created_at)}</small>
+                </div>
+                {!item.is_read && (
+                  <button
+                    type="button"
+                    onClick={() => markReadMutation.mutate(item.id)}
+                    disabled={markReadMutation.isPending}
+                    className="mark-read-btn"
+                  >
+                    Mark read
+                  </button>
+                )}
+              </article>
+            );
+          })}
         </div>
       )}
     </section>
